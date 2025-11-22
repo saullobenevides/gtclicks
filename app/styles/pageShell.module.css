@@ -1,0 +1,201 @@
+.page {
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.header h1 {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  color: var(--color-heading);
+}
+
+.header p {
+  max-width: 620px;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.contentCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.01);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.authCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-heading);
+  box-shadow: var(--shadow-lg);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.authCard .stack-scope {
+  color: var(--color-body);
+}
+
+.authCard .stack-scope * {
+  font-family: var(--font-geist-sans), "Inter", system-ui, sans-serif;
+  color: inherit;
+}
+
+.authCard .stack-scope a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.authCard .stack-scope a:hover {
+  text-decoration: underline;
+}
+
+.authCard .stack-scope input,
+.authCard .stack-scope select,
+.authCard .stack-scope textarea {
+  background: var(--color-bg);
+  color: var(--color-heading);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+}
+
+.authCard .stack-scope input:focus {
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+.authCard .stack-scope button {
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-accent);
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 0.75rem 1.5rem;
+  transition: var(--transition);
+}
+
+.authCard .stack-scope button:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.2rem;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.card h3 {
+  color: var(--color-heading);
+}
+
+.tag {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.06);
+  width: fit-content;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.inputGroup label {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.inputGroup input,
+.inputGroup textarea,
+.inputGroup select {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  padding: 0.7rem 0.9rem;
+  color: var(--color-heading);
+  font-size: 0.95rem;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.primaryButton {
+  border-radius: var(--radius-pill);
+  padding: 0.75rem 1.4rem;
+  border: none;
+  background: linear-gradient(120deg, var(--color-accent), var(--color-accent-2));
+  color: #050509;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ghostButton {
+  border-radius: var(--radius-pill);
+  padding: 0.75rem 1.4rem;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.formMessage {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.formMessageError {
+  color: var(--color-accent);
+}
+
+.formMessageSuccess {
+  color: var(--color-accent-2);
+}
+
+.primaryButton:disabled,
+.ghostButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.emptyState {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--color-muted);
+}
