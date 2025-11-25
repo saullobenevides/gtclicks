@@ -21,6 +21,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import ImageWithFallback from '@/components/ImageWithFallback';
 import { Heart, Share2, Info, CheckCircle2, ShoppingCart } from 'lucide-react';
+import { useUser } from '@stackframe/stack';
 
 export default function PhotoDetailsClient({ photo }) {
   const { addToCart } = useCart();
@@ -238,12 +239,20 @@ function MetadataItem({ label, value }) {
   );
 }
 
+
+
 function LikeButton({ photoId, initialLikes }) {
+  const user = useUser();
   const [likes, setLikes] = useState(initialLikes);
   const [liked, setLiked] = useState(false); 
   const [loading, setLoading] = useState(false);
 
   const toggleLike = async () => {
+    if (!user) {
+      alert("Você precisa estar logado para curtir esta foto.");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch(`/api/photos/${photoId}/like`, { method: 'POST' });
