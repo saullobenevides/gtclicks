@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { getUser } from "@stackframe/stack";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { stackServerApp } from "@/stack/server";
 import prisma from "@/lib/prisma";
-import styles from "./page.module.css";
 
 export default async function CadastroPage() {
-  const user = await getUser();
+  const user = await stackServerApp.getUser();
   
-  // Check if user already has a photographer profile
   let hasProfile = false;
   if (user) {
     const fotografo = await prisma.fotografo.findUnique({
@@ -17,101 +17,107 @@ export default async function CadastroPage() {
 
   return (
     <div className="container">
-      <section className={styles.page}>
-        <div className={styles.header}>
-          <span className="pill">Seja Fotógrafo</span>
-          <h1>Comece a vender suas fotos</h1>
-          <p>
+      <section className="py-16">
+        <div className="text-center mb-16">
+          <Badge>Seja Fotógrafo</Badge>
+          <h1 className="text-6xl font-bold my-4 bg-clip-text text-transparent bg-gradient-to-br from-white to-gray-400">Comece a vender suas fotos</h1>
+          <p className="text-xl text-body max-w-3xl mx-auto">
             Junte-se à comunidade de fotógrafos do GTClicks e transforme sua
             paixão em renda. É rápido, fácil e você define seus próprios preços.
           </p>
         </div>
 
-        <div className={styles.features}>
-          <div className={styles.feature}>
-            <div className={styles.featureIcon}>📸</div>
-            <h3>Você no controle</h3>
-            <p>Defina seus próprios preços e mantenha 80% de cada venda</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="text-center p-8 bg-card border rounded-md transition hover:-translate-y-1 hover:shadow-lg">
+            <div className="text-5xl mb-4">📸</div>
+            <h3 className="text-xl font-bold my-4 text-heading">Você no controle</h3>
+            <p className="text-body leading-relaxed">Defina seus próprios preços e mantenha 80% de cada venda</p>
           </div>
-          <div className={styles.feature}>
-            <div className={styles.featureIcon}>💰</div>
-            <h3>Pagamentos rápidos</h3>
-            <p>Receba via Pix ou transferência bancária com saque mínimo de R$ 50</p>
+          <div className="text-center p-8 bg-card border rounded-md transition hover:-translate-y-1 hover:shadow-lg">
+            <div className="text-5xl mb-4">💰</div>
+            <h3 className="text-xl font-bold my-4 text-heading">Pagamentos rápidos</h3>
+            <p className="text-body leading-relaxed">Receba via Pix ou transferência bancária com saque mínimo de R$ 50</p>
           </div>
-          <div className={styles.feature}>
-            <div className={styles.featureIcon}>🛡️</div>
-            <h3>Proteção automática</h3>
-            <p>Suas fotos são protegidas com marca d'água e anti-cópia</p>
+          <div className="text-center p-8 bg-card border rounded-md transition hover:-translate-y-1 hover:shadow-lg">
+            <div className="text-5xl mb-4">🛡️</div>
+            <h3 className="text-xl font-bold my-4 text-heading">Proteção automática</h3>
+            <p className="text-body leading-relaxed">Suas fotos são protegidas com marca d&apos;água e anti-cópia</p>
           </div>
         </div>
 
-        <div className={styles.cta}>
+        <div className="text-center p-12 rounded-lg my-16 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
           {user ? (
             hasProfile ? (
-              <div className={styles.alreadyMember}>
-                <p>✅ Você já tem um perfil de fotógrafo!</p>
-                <Link href="/dashboard/fotografo/upload" className="btn btn-primary">
-                  Fazer Upload
-                </Link>
+              <div className="max-w-lg mx-auto">
+                <p className="text-lg text-green-500 mb-6">✅ Você já tem um perfil de fotógrafo!</p>
+                <Button asChild>
+                  <Link href="/dashboard/fotografo/upload">
+                    Fazer Upload
+                  </Link>
+                </Button>
               </div>
             ) : (
-              <div className={styles.createProfile}>
-                <h2>Crie seu perfil agora</h2>
-                <p>Clique abaixo para começar. Vamos criar seu perfil automaticamente.</p>
-                <Link href="/dashboard/fotografo/upload" className="btn btn-primary">
-                  Criar Meu Perfil de Fotógrafo
-                </Link>
+              <div className="max-w-lg mx-auto">
+                <h2 className="text-3xl font-bold mb-4 text-heading">Crie seu perfil agora</h2>
+                <p className="text-lg text-body mb-8">Clique abaixo para começar. Vamos criar seu perfil automaticamente.</p>
+                <Button asChild>
+                  <Link href="/dashboard/fotografo/upload">
+                    Criar Meu Perfil de Fotógrafo
+                  </Link>
+                </Button>
               </div>
             )
           ) : (
-            <div className={styles.loginPrompt}>
-              <h2>Pronto para começar?</h2>
-              <p>Faça login ou crie uma conta para começar a vender suas fotos.</p>
-              <Link href="/login" className="btn btn-primary">
-                Entrar ou Criar Conta
-              </Link>
+            <div className="max-w-lg mx-auto">
+              <h2 className="text-3xl font-bold mb-4 text-heading">Pronto para começar?</h2>
+              <p className="text-lg text-body mb-8">Faça login ou crie uma conta para começar a vender suas fotos.</p>
+              <Button asChild>
+                <Link href="/login">
+                  Entrar ou Criar Conta
+                </Link>
+              </Button>
             </div>
           )}
         </div>
 
-        <div className={styles.howItWorks}>
-          <h2>Como funciona</h2>
-          <div className={styles.steps}>
-            <div className={styles.step}>
-              <div className={styles.stepNumber}>1</div>
-              <h3>Crie seu perfil</h3>
-              <p>Cadastre-se gratuitamente e crie seu perfil de fotógrafo</p>
+        <div className="my-16 text-center">
+          <h2 className="text-4xl font-bold mb-12 text-heading">Como funciona</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="relative p-8">
+              <div className="w-16 h-16 bg-accent text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">1</div>
+              <h3 className="text-xl font-bold mb-3 text-heading">Crie seu perfil</h3>
+              <p className="text-body leading-relaxed">Cadastre-se gratuitamente e crie seu perfil de fotógrafo</p>
             </div>
-            <div className={styles.step}>
-              <div className={styles.stepNumber}>2</div>
-              <h3>Faça upload</h3>
-              <p>Envie suas melhores fotos e defina os preços</p>
+            <div className="relative p-8">
+              <div className="w-16 h-16 bg-accent text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">2</div>
+              <h3 className="text-xl font-bold mb-3 text-heading">Faça upload</h3>
+              <p className="text-body leading-relaxed">Envie suas melhores fotos e defina os preços</p>
             </div>
-            <div className={styles.step}>
-              <div className={styles.stepNumber}>3</div>
-              <h3>Receba pagamentos</h3>
-              <p>Quando alguém comprar, você recebe 80% do valor direto na sua conta</p>
+            <div className="relative p-8">
+              <div className="w-16 h-16 bg-accent text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">3</div>
+              <h3 className="text-xl font-bold mb-3 text-heading">Receba pagamentos</h3>
+              <p className="text-body leading-relaxed">Quando alguém comprar, você recebe 80% do valor direto na sua conta</p>
             </div>
           </div>
         </div>
 
-        <div className={styles.faq}>
-          <h2>Perguntas frequentes</h2>
-          <details>
-            <summary>Quanto custa para vender no GTClicks?</summary>
-            <p>É totalmente gratuito! Cobramos apenas 20% de comissão sobre cada venda realizada.</p>
+        <div className="max-w-4xl mx-auto my-16">
+          <h2 className="text-3xl font-bold text-center mb-8 text-heading">Perguntas frequentes</h2>
+          <details className="bg-card border rounded-md p-6 mb-4 transition hover:border-accent">
+            <summary className="font-semibold text-heading cursor-pointer text-lg">Quanto custa para vender no GTClicks?</summary>
+            <p className="text-body leading-relaxed mt-4">É totalmente gratuito! Cobramos apenas 20% de comissão sobre cada venda realizada.</p>
           </details>
-          <details>
-            <summary>Como recebo meus pagamentos?</summary>
-            <p>Você pode sacar via Pix ou transferência bancária sempre que tiver um saldo mínimo de R$ 50.</p>
+          <details className="bg-card border rounded-md p-6 mb-4 transition hover:border-accent">
+            <summary className="font-semibold text-heading cursor-pointer text-lg">Como recebo meus pagamentos?</summary>
+            <p className="text-body leading-relaxed mt-4">Você pode sacar via Pix ou transferência bancária sempre que tiver um saldo mínimo de R$ 50.</p>
           </details>
-          <details>
-            <summary>Minhas fotos ficam protegidas?</summary>
-            <p>Sim! Aplicamos marca d'água automática e proteção anti-cópia em todas as previews.</p>
+          <details className="bg-card border rounded-md p-6 mb-4 transition hover:border-accent">
+            <summary className="font-semibold text-heading cursor-pointer text-lg">Minhas fotos ficam protegidas?</summary>
+            <p className="text-body leading-relaxed mt-4">Sim! Aplicamos marca d&apos;água automática e proteção anti-cópia em todas as previews.</p>
           </details>
-          <details>
-            <summary>Posso definir meus próprios preços?</summary>
-            <p>Absolutamente! Você tem total controle sobre os preços de cada licença das suas fotos.</p>
+          <details className="bg-card border rounded-md p-6 mb-4 transition hover:border-accent">
+            <summary className="font-semibold text-heading cursor-pointer text-lg">Posso definir meus próprios preços?</summary>
+            <p className="text-body leading-relaxed mt-4">Absolutamente! Você tem total controle sobre os preços de cada licença das suas fotos.</p>
           </details>
         </div>
       </section>

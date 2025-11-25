@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const licenses = await prisma.licenca.findMany({
       orderBy: {
-        precoSugerido: 'asc',
+        nome: 'asc',
       },
     });
 

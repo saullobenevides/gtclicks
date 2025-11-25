@@ -1,575 +1,506 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { useUser } from "@stackframe/stack";
-import { CATEGORIES } from "@/lib/constants";
-import { addWatermark } from "@/lib/watermark";
-import styles from "./page.module.css";
+import { useEffect, useState } from 'react';
+import { useUser } from '@stackframe/stack';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { UploadCloud, Trash2, PlusCircle, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
-const orientationOptions = ["HORIZONTAL", "VERTICAL", "PANORAMICA", "QUADRADO"];
+const orientationOptions = ['HORIZONTAL', 'VERTICAL', 'PANORAMICA', 'QUADRADO'];
 
 const blankPhoto = () => ({
-  titulo: "",
-  descricao: "",
-  previewUrl: "",
-  originalUrl: "",
-  tags: "",
-  orientacao: "HORIZONTAL",
-  categoria: "",
+  id: null,
+  titulo: '',
+  descricao: '',
+  previewUrl: '',
+  s3Key: '',
+  previewS3Key: '',
+  tags: '',
+  orientacao: 'HORIZONTAL',
+  licencas: [],
 });
 
+import EXIF from 'exif-js';
+
+const extractMetadata = (file) => {
+  return new Promise((resolve) => {
+    EXIF.getData(file, function() {
+      const make = EXIF.getTag(this, "Make");
+      const model = EXIF.getTag(this, "Model");
+      const iso = EXIF.getTag(this, "ISOSpeedRatings");
+      const focalLength = EXIF.getTag(this, "FocalLength");
+      const aperture = EXIF.getTag(this, "FNumber");
+      const shutterSpeed = EXIF.getTag(this, "ExposureTime");
+      const lens = EXIF.getTag(this, "LensModel") || EXIF.getTag(this, "LensInfo");
+
+      // Format shutter speed
+      let formattedShutterSpeed = null;
+      if (shutterSpeed) {
+        if (shutterSpeed < 1) {
+          formattedShutterSpeed = `1/${Math.round(1/shutterSpeed)}`;
+        } else {
+          formattedShutterSpeed = `${shutterSpeed}`;
+        }
+      }
+
+      resolve({
+        camera: make && model ? `${make} ${model}` : (model || make || null),
+        lens: lens || null,
+        focalLength: focalLength ? `${focalLength}mm` : null,
+        iso: iso || null,
+        shutterSpeed: formattedShutterSpeed,
+        aperture: aperture ? `f/${aperture}` : null,
+      });
+    });
+  });
+};
+
+const generatePreview = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 1200;
+        let width = img.width;
+        let height = img.height;
+  
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+  
+        canvas.width = width;
+        canvas.height = height;
+  
+        ctx.drawImage(img, 0, 0, width, height);
+  
+        // Watermark
+        ctx.save();
+        ctx.globalAlpha = 0.4;
+        ctx.font = `bold ${width * 0.08}px Arial`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Center watermark
+        ctx.translate(width / 2, height / 2);
+        ctx.rotate(-30 * Math.PI / 180);
+        ctx.fillText('GT Clicks Preview', 0, 0);
+        
+        // Repeat smaller watermarks
+        ctx.restore();
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.font = `bold ${width * 0.04}px Arial`;
+        ctx.fillStyle = 'white';
+        
+        const stepX = width / 3;
+        const stepY = height / 3;
+        
+        for (let x = stepX/2; x < width; x += stepX) {
+          for (let y = stepY/2; y < height; y += stepY) {
+             if (Math.abs(x - width/2) > stepX/2 || Math.abs(y - height/2) > stepY/2) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(-30 * Math.PI / 180);
+                ctx.fillText('GT Clicks', 0, 0);
+                ctx.restore();
+             }
+          }
+        }
+        ctx.restore();
+  
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("Failed to generate preview blob"));
+          }
+        }, 'image/jpeg', 0.60); // Lower quality for preview
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
 export default function UploadDashboard() {
-  const user = useUser({ or: "anonymous" });
+  const user = useUser({ or: 'anonymous' });
   const isAuthenticated = Boolean(user && !user.isAnonymous && user.id);
 
-  const [fotografoId, setFotografoId] = useState("");
-  const [fotografoLookup, setFotografoLookup] = useState({
-    loading: false,
-    error: "",
-    data: null,
-  });
+  const [fotografoId, setFotografoId] = useState('');
+  const [fotografoLookup, setFotografoLookup] = useState({ loading: true, error: '', data: null });
   const [creatingProfile, setCreatingProfile] = useState(false);
-  const [colecoes, setColecoes] = useState([]);
-  const [colecoesLoading, setColecoesLoading] = useState(false);
-  const [collectionMode, setCollectionMode] = useState("avulso");
-  const [selectedCollection, setSelectedCollection] = useState("");
-  const [newCollection, setNewCollection] = useState({ nome: "", descricao: "", capaUrl: "" });
   const [photos, setPhotos] = useState([blankPhoto()]);
-  const [status, setStatus] = useState({ type: "", message: "" });
+  const [status, setStatus] = useState({ type: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
-  const [uploadState, setUploadState] = useState({ index: null, label: "" });
-  const [coverIndex, setCoverIndex] = useState(0);
+  const [uploadState, setUploadState] = useState({ index: null, label: '' });
+  const [availableLicenses, setAvailableLicenses] = useState([]);
 
-  const autoProfile = fotografoLookup.data;
-  const canEditFotografoId = !autoProfile?.id;
+  useEffect(() => {
+    fetch('/api/licencas')
+      .then((res) => res.json())
+      .then((data) => setAvailableLicenses(data.data || []))
+      .catch((err) => console.error('Failed to fetch licenses:', err));
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
-      setFotografoLookup({ loading: false, error: "", data: null });
-      setFotografoId("");
+      setFotografoLookup({ loading: false, error: '', data: null });
+      setFotografoId('');
       return;
     }
 
     let cancelled = false;
-    setFotografoLookup({ loading: true, error: "", data: null });
-
-    const params = new URLSearchParams({ userId: user.id });
-    fetch(`/api/fotografos/resolve?${params.toString()}`)
-      .then(async (response) => {
-        const payload = await response.json();
-        if (!response.ok) {
-          throw new Error(payload?.error || "Nao encontramos seu perfil de fotografo.");
-        }
+    setFotografoLookup({ loading: true, error: '', data: null });
+    fetch(`/api/fotografos/resolve?userId=${user.id}`)
+      .then(async (res) => {
+        const payload = await res.json();
+        if (!res.ok) throw new Error(payload?.error || 'Não encontramos seu perfil.');
         return payload.data;
       })
       .then((data) => {
         if (cancelled) return;
-        setFotografoLookup({ loading: false, error: "", data });
-        setFotografoId(data?.id ?? "");
+        setFotografoLookup({ loading: false, error: '', data });
+        setFotografoId(data?.id ?? '');
       })
-      .catch((error) => {
+      .catch((err) => {
         if (cancelled) return;
-        setFotografoLookup({
-          loading: false,
-          error: error.message,
-          data: null,
-        });
+        setFotografoLookup({ loading: false, error: err.message, data: null });
       });
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [isAuthenticated, user?.id]);
 
-  useEffect(() => {
-    if (!fotografoId) {
-      setColecoes([]);
-      setSelectedCollection("");
-      return;
-    }
-    setColecoesLoading(true);
-    fetch(`/api/colecoes?fotografoId=${fotografoId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setColecoes(data?.data ?? []);
-      })
-      .catch(() => {
-        setStatus({ type: "error", message: "Nao foi possivel carregar as colecoes." });
-      })
-      .finally(() => setColecoesLoading(false));
-  }, [fotografoId]);
-
-  const collectionSummary = useMemo(() => {
-    if (collectionMode === "existente") {
-      const col = colecoes.find((c) => c.id === selectedCollection);
-      return col ? `Publicando na colecao ${col.nome}` : "Selecione uma colecao";
-    }
-    if (collectionMode === "nova") {
-      return newCollection.nome ? `Nova colecao: ${newCollection.nome}` : "Informe o nome da nova colecao";
-    }
-    return "Fotos avulsas (cada foto vira produto individual)";
-  }, [collectionMode, colecoes, newCollection.nome, selectedCollection]);
-
   const handleCreateProfile = async () => {
-    if (!user?.id) return;
-    
+    if (!user) return;
     setCreatingProfile(true);
     try {
-      const response = await fetch("/api/fotografos/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/fotografos/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.id,
-          name: user.displayName || user.primaryEmail,
-          email: user.primaryEmail,
+          name: user.displayName || 'Fotógrafo',
+          email: user.primaryEmail || `${user.id}@gtclicks.temp`,
         }),
       });
-      
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.error || "Erro ao criar perfil");
-      }
+      if (!response.ok) throw new Error(data?.error || 'Erro ao criar perfil');
       
-      setFotografoLookup({ loading: false, error: "", data: data.data });
       setFotografoId(data.data.id);
-      setStatus({ type: "success", message: "Perfil de fotógrafo criado com sucesso!" });
+      setFotografoLookup({ loading: false, error: '', data: data.data });
+      setStatus({ type: 'success', message: 'Perfil criado com sucesso! Agora você pode publicar fotos.' });
     } catch (error) {
-      setStatus({ type: "error", message: error.message });
+      console.error(error);
+      setStatus({ type: 'error', message: error.message });
     } finally {
       setCreatingProfile(false);
     }
   };
 
-  const fotografoFieldHelper = (() => {
-    if (fotografoLookup.loading) {
-      return "Buscando seu perfil de fotografo...";
-    }
-    if (autoProfile?.username) {
-      const displayName = autoProfile?.nome
-        ? `${autoProfile.nome} (@${autoProfile.username})`
-        : `@${autoProfile.username}`;
-      return `Perfil conectado automaticamente: ${displayName}.`;
-    }
-    if (fotografoLookup.error) {
-      return null; // Will show create button instead
-    }
-    return "Cole aqui o ID gerado para voce na tabela Fotografo (cuid...).";
-  })();
-
-  const updatePhoto = (index, field, value) => {
-    setPhotos((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], [field]: value };
-      return next;
-    });
+  const addPhoto = () => {
+    setPhotos([...photos, blankPhoto()]);
   };
 
   const removePhoto = (index) => {
-    setPhotos((prev) => (prev.length === 1 ? prev : prev.filter((_, i) => i !== index)));
-    if (coverIndex === index) setCoverIndex(0);
-    if (coverIndex > index) setCoverIndex(coverIndex - 1);
+    setPhotos(photos.filter((_, i) => i !== index));
   };
 
-  const addPhoto = () => {
-    setPhotos((prev) => [...prev, blankPhoto()]);
+  const updatePhoto = (index, field, value) => {
+    setPhotos(photos.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
   };
 
-  const uploadFromDevice = async (index, targetField, file, variant) => {
+  const updateLicense = (index, licenseId, field, value) => {
+    setPhotos(photos.map((p, i) => {
+      if (i !== index) return p;
+      const currentLicenses = p.licencas || [];
+      const licenseIndex = currentLicenses.findIndex((l) => l.licencaId === licenseId);
+      
+      let newLicenses = [...currentLicenses];
+      if (licenseIndex >= 0) {
+        newLicenses[licenseIndex] = { ...newLicenses[licenseIndex], [field]: value };
+      } else {
+        newLicenses.push({ licencaId: licenseId, [field]: value });
+      }
+      return { ...p, licencas: newLicenses };
+    }));
+  };
+
+  const uploadFromDevice = async (index, file) => {
     if (!file) return;
-    setUploadState({ index, label: `Enviando ${file.name}...` });
+    setUploadState({ index, label: `Extraindo metadados...` });
 
     try {
-      const presignRes = await fetch("/api/upload", {
+      const metadata = await extractMetadata(file);
+      
+      setUploadState({ index, label: `Gerando preview...` });
+      const previewBlob = await generatePreview(file);
+      
+      setUploadState({ index, label: `Enviando arquivos...` });
+
+      const [originalPresign, previewPresign] = await Promise.all([
+        fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: file.name, contentType: file.type, folder: "originals" }),
+        }).then(r => r.json()),
+        fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: `preview_${file.name}`, contentType: "image/jpeg", folder: "previews" }),
+        }).then(r => r.json())
+      ]);
+
+      if (originalPresign.error || previewPresign.error) {
+        throw new Error("Falha ao gerar URLs de upload");
+      }
+
+      await Promise.all([
+        fetch(originalPresign.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type || "application/octet-stream" },
+          body: file,
+        }),
+        fetch(previewPresign.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": "image/jpeg" },
+          body: previewBlob,
+        })
+      ]);
+
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise((resolve) => { img.onload = resolve; });
+
+      const processRes = await fetch("/api/photos/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename: file.name, contentType: file.type, variant }),
-      });
-      const presignData = await presignRes.json();
-      if (!presignRes.ok) {
-        throw new Error(presignData?.error || "Falha ao gerar URL assinada");
-      }
-
-      const uploadRes = await fetch(presignData.uploadUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": file.type || "application/octet-stream",
-        },
-        body: file,
+        body: JSON.stringify({
+          s3Key: originalPresign.s3Key,
+          previewS3Key: previewPresign.s3Key,
+          width: img.width,
+          height: img.height,
+          titulo: file.name.split('.')[0],
+          ...metadata // Pass extracted metadata
+        }),
       });
 
-      if (!uploadRes.ok) {
-        throw new Error("Nao foi possivel enviar o arquivo para o storage");
-      }
+      const processData = await processRes.json();
+      if (!processRes.ok) throw new Error(processData?.error || "Erro ao processar foto");
 
-      // Update both previewUrl and originalUrl for now since we only have one input
       setPhotos((prev) => {
         const next = [...prev];
         next[index] = {
           ...next[index],
-          [targetField]: presignData.fileUrl,
-          // If we are setting the preview, also set the original as a fallback so the API doesn't complain
-          ...(targetField === "previewUrl" ? { originalUrl: presignData.fileUrl } : {}),
+          id: processData.foto.id,
+          s3Key: originalPresign.s3Key,
+          previewS3Key: previewPresign.s3Key,
+          previewUrl: processData.foto.previewUrl,
+          titulo: processData.foto.titulo,
+          ...metadata // Update local state with metadata
         };
         return next;
       });
 
-      setUploadState({ index: null, label: "" });
-      setStatus({ type: "success", message: "Arquivo enviado e URL preenchida automaticamente." });
+      setUploadState({ index: null, label: '' });
+      setStatus({ type: 'success', message: 'Upload concluído! Preencha os detalhes e publique.' });
     } catch (error) {
-      setUploadState({ index: null, label: "" });
-      setStatus({ type: "error", message: error.message });
+      console.error(error);
+      setUploadState({ index: null, label: '' });
+      setStatus({ type: 'error', message: error.message });
     }
   };
 
   const handleFileSelect = async (index, file) => {
     if (!file) return;
 
-    // Validate file type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      setStatus({ 
-        type: "error", 
-        message: "Formato inválido. Use apenas JPG, PNG ou WebP." 
-      });
+      setStatus({ type: 'error', message: 'Formato inválido. Use apenas JPG, PNG ou WebP.' });
       return;
     }
-
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
-      setStatus({ 
-        type: "error", 
-        message: "Arquivo muito grande. Tamanho máximo: 10MB" 
-      });
+      setStatus({ type: 'error', message: 'Arquivo muito grande. Tamanho máximo: 50MB' });
       return;
     }
-
-    // Auto-detect orientation
     const img = new Image();
     img.onload = () => {
-      const orientation = img.width > img.height ? "HORIZONTAL" : "VERTICAL";
-      updatePhoto(index, "orientacao", orientation);
+      const orientation = img.width > img.height ? 'HORIZONTAL' : 'VERTICAL';
+      updatePhoto(index, 'orientacao', orientation);
     };
     img.src = URL.createObjectURL(file);
 
-    try {
-      setUploadState({ index, label: "Gerando marca d'água..." });
-      const watermarkedFile = await addWatermark(file);
-      
-      // Upload Preview (Watermarked)
-      await uploadFromDevice(index, "previewUrl", watermarkedFile, "preview");
-      
-      // Upload Original (Clean)
-      await uploadFromDevice(index, "originalUrl", file, "original");
-      
-    } catch (error) {
-      console.error("Erro ao processar imagem:", error);
-      setStatus({ type: "error", message: "Erro ao processar imagem para upload." });
-      setUploadState({ index: null, label: "" });
-    }
+    await uploadFromDevice(index, file);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!fotografoId) {
-      setStatus({
-        type: "error",
-        message:
-          "Nao conseguimos identificar seu ID de fotografo. Confirme se o perfil foi criado e cole o ID manualmente.",
-      });
+      setStatus({ type: 'error', message: 'ID de fotógrafo não encontrado.' });
       return;
     }
 
     setSubmitting(true);
-    setStatus({ type: "", message: "" });
-
-    const novaColecaoPayload = collectionMode === "nova" ? newCollection : undefined;
+    setStatus({ type: '', message: '' });
 
     const payload = {
       fotografoId,
-      modoColecao: collectionMode,
-      colecaoId: collectionMode === "existente" ? selectedCollection : undefined,
-      novaColecao: novaColecaoPayload,
-      coverIndex: collectionMode === "nova" ? coverIndex : undefined,
-      fotos: photos,
+      fotos: photos.filter((p) => p.id).map((p) => ({ ...p, licencas: p.licencas?.filter((l) => l.enabled && l.preco) || [] })),
     };
 
     try {
-      const response = await fetch("/api/fotos/batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/fotos/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.error || "Falha ao salvar as fotos");
-      }
-      const total = Array.isArray(data?.data) ? data.data.length : photos.length;
-      setStatus({ type: "success", message: `${total} foto(s) publicadas.` });
+      if (!response.ok) throw new Error(data?.error || 'Falha ao salvar as fotos');
+      setStatus({ type: 'success', message: 'Fotos publicadas com sucesso!' });
       setPhotos([blankPhoto()]);
-      if (collectionMode === "nova" && data?.colecaoId) {
-        setCollectionMode("existente");
-        setSelectedCollection(data.colecaoId);
-        setNewCollection({ nome: "", descricao: "", capaUrl: "" });
-        setColecoes((prev) => {
-          if (prev.some((col) => col.id === data.colecaoId)) {
-            return prev;
-          }
-          return [
-            {
-              id: data.colecaoId,
-              nome: novaColecaoPayload?.nome ?? "Nova colecao",
-              descricao: novaColecaoPayload?.descricao ?? "",
-            },
-            ...prev,
-          ];
-        });
-      }
-      if (collectionMode === "avulso") {
-        setSelectedCollection("");
-      }
     } catch (error) {
-      setStatus({ type: "error", message: error.message });
+      setStatus({ type: 'error', message: error.message });
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (fotografoLookup.loading) {
+    return <div>Carregando perfil...</div>;
+  }
+
+  if (fotografoLookup.error && !fotografoLookup.data?.id) {
+    return (
+      <Card className="text-center">
+        <CardHeader>
+          <CardTitle>Bem-vindo ao GTClicks!</CardTitle>
+          <CardDescription>Para começar a publicar, crie seu perfil de fotógrafo.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={handleCreateProfile} disabled={creatingProfile}>
+            {creatingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {creatingProfile ? 'Criando perfil...' : 'Criar Perfil de Fotógrafo'}
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <div className={styles.uploadCard}>
+    <div className="flex flex-col gap-8">
       {status.message && (
-        <div
-          className={`${styles.statusMessage} ${
-            status.type === "error" ? styles.statusError : styles.statusSuccess
-          }`}
-        >
-          {status.message}
-        </div>
+        <Alert variant={status.type === 'error' ? 'destructive' : 'default'}>
+          {status.type === 'error' ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+          <AlertTitle>{status.type === 'error' ? 'Erro' : 'Sucesso'}</AlertTitle>
+          <AlertDescription>{status.message}</AlertDescription>
+        </Alert>
       )}
 
-      {fotografoLookup.error && !autoProfile?.id && (
-        <div className={styles.createProfilePrompt}>
-          <h3>Bem-vindo ao GTClicks!</h3>
-          <p>
-            Para começar a publicar suas fotos, você precisa criar seu perfil de fotógrafo.
-            Clique no botão abaixo para criar automaticamente.
-          </p>
-          <button
-            type="button"
-            onClick={handleCreateProfile}
-            disabled={creatingProfile}
-            className={styles.primaryButton}
-          >
-            {creatingProfile ? "Criando perfil..." : "Criar Perfil de Fotógrafo"}
-          </button>
-        </div>
-      )}
-
-      <div className={styles.fieldGroup}>
-        <h3 className={styles.sectionTitle}>1. Organização</h3>
-        <div className={styles.modeRow}>
-          <label className={styles.radioLabel}>
-            <input
-              type="radio"
-              name="collectionMode"
-              value="avulso"
-              checked={collectionMode === "avulso"}
-              onChange={(e) => setCollectionMode(e.target.value)}
-            />
-            Fotos Avulsas
-          </label>
-          <label className={styles.radioLabel}>
-            <input
-              type="radio"
-              name="collectionMode"
-              value="existente"
-              checked={collectionMode === "existente"}
-              onChange={(e) => setCollectionMode(e.target.value)}
-            />
-            Adicionar a Coleção Existente
-          </label>
-          <label className={styles.radioLabel}>
-            <input
-              type="radio"
-              name="collectionMode"
-              value="nova"
-              checked={collectionMode === "nova"}
-              onChange={(e) => setCollectionMode(e.target.value)}
-            />
-            Criar Nova Coleção
-          </label>
-        </div>
-      </div>
-
-      {collectionMode === "existente" && (
-        <div className={styles.fieldGroup}>
-          <label>Selecione a Coleção</label>
-          <select
-            value={selectedCollection}
-            onChange={(e) => setSelectedCollection(e.target.value)}
-            disabled={colecoesLoading}
-          >
-            <option value="">Selecione...</option>
-            {colecoes.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nome}
-              </option>
-            ))}
-          </select>
-          {collectionSummary && (
-            <small className={styles.helper}>
-              {collectionSummary.nome} • {collectionSummary.totalFotos} fotos já publicadas
-            </small>
-          )}
-        </div>
-      )}
-
-      {collectionMode === "nova" && (
-        <div className={styles.newCollectionGrid}>
-          <div className={styles.fieldGroup}>
-            <label>Nome da Coleção</label>
-            <input
-              placeholder="Ex: Verão 2025, Retratos Urbanos..."
-              value={newCollection.nome}
-              onChange={(e) => setNewCollection({ ...newCollection, nome: e.target.value })}
-            />
-          </div>
-
-          <div className={styles.fieldGroup} style={{ gridColumn: "1 / -1" }}>
-            <label>Descrição da Série</label>
-            <textarea
-              placeholder="Conte a história por trás dessa série de fotos..."
-              value={newCollection.descricao}
-              onChange={(e) => setNewCollection({ ...newCollection, descricao: e.target.value })}
-            />
-          </div>
-        </div>
-      )}
-
-      <div className={styles.fieldGroup}>
-        <h3 className={styles.sectionTitle}>2. Fotos</h3>
-        <div className={styles.photosGrid}>
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {photos.map((photo, index) => (
-            <div key={index} className={styles.photoCard}>
-              <div className={styles.photoHeader}>
-                <span style={{ fontWeight: 600, color: "var(--color-heading)" }}>Foto #{index + 1}</span>
+            <Card key={index} className="flex flex-col">
+              <CardHeader className="flex-row items-center justify-between">
+                <CardTitle>Foto #{index + 1}</CardTitle>
                 {photos.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(index)}
-                    className={styles.removeButton}
-                  >
-                    Remover
-                  </button>
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removePhoto(index)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 )}
-              </div>
-
-              <div className={styles.fileUpload}>
-                <label className={styles.fileUploadLabel}>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileSelect(index, e.target.files?.[0])}
-                  />
-                  {photo.previewUrl ? (
-                    <span style={{ color: "var(--color-success)" }}>✓ Arquivo selecionado</span>
-                  ) : (
-                    <>
-                      <span>Clique para selecionar</span> ou arraste aqui
-                    </>
-                  )}
-                </label>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label>Título</label>
-                <input
-                  placeholder="Título da foto"
-                  value={photo.titulo}
-                  onChange={(e) => updatePhoto(index, "titulo", e.target.value)}
-                />
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label>Descrição</label>
-                <textarea
-                  placeholder="Descreva a foto..."
-                  value={photo.descricao}
-                  onChange={(e) => updatePhoto(index, "descricao", e.target.value)}
-                  rows={2}
-                />
-              </div>
-
-              <div className={styles.inlineFields}>
-                <div className={styles.fieldGroup}>
-                  <label>Orientação</label>
-                  <select
-                    value={photo.orientacao}
-                    onChange={(e) => updatePhoto(index, "orientacao", e.target.value)}
-                  >
-                    {orientationOptions.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
+              </CardHeader>
+              <CardContent className="flex flex-grow flex-col gap-4">
+                <div className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed">
+                  <Label htmlFor={`file-upload-${index}`} className="flex cursor-pointer flex-col items-center gap-2 text-center text-muted-foreground">
+                    <UploadCloud className="h-8 w-8" />
+                    <input id={`file-upload-${index}`} type="file" accept="image/*" onChange={(e) => handleFileSelect(index, e.target.files?.[0])} className="hidden" />
+                    {uploadState.index === index ? (
+                      <span>{uploadState.label}</span>
+                    ) : photo.s3Key ? (
+                      <span className="text-green-500">✓ Upload Concluído</span>
+                    ) : (
+                      <span>Clique ou arraste para enviar</span>
+                    )}
+                  </Label>
                 </div>
-                <div className={styles.fieldGroup}>
-                  <label>Categoria</label>
-                  <select
-                    value={photo.categoria}
-                    onChange={(e) => updatePhoto(index, "categoria", e.target.value)}
-                  >
-                    <option value="">Selecione...</option>
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`titulo-${index}`}>Título</Label>
+                  <Input id={`titulo-${index}`} placeholder="Título da foto" value={photo.titulo} onChange={(e) => updatePhoto(index, 'titulo', e.target.value)} />
                 </div>
-              </div>
-
-              <div className={styles.fieldGroup}>
-                <label>Tags</label>
-                <input
-                  placeholder="natureza, brasil..."
-                  value={photo.tags}
-                  onChange={(e) => updatePhoto(index, "tags", e.target.value)}
-                />
-              </div>
-
-              {collectionMode === "nova" && (
-                <div style={{ marginTop: "0.5rem" }}>
-                  <label className={styles.radioLabel} style={{ fontSize: "0.9rem" }}>
-                    <input
-                      type="radio"
-                      name="coverSelection"
-                      checked={coverIndex === index}
-                      onChange={() => setCoverIndex(index)}
-                    />
-                    Usar como capa da coleção
-                  </label>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`descricao-${index}`}>Descrição</Label>
+                  <Textarea id={`descricao-${index}`} placeholder="Descreva a foto..." value={photo.descricao} onChange={(e) => updatePhoto(index, 'descricao', e.target.value)} />
                 </div>
-              )}
-            </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`orientacao-${index}`}>Orientação</Label>
+                  <Select value={photo.orientacao} onValueChange={(value) => updatePhoto(index, 'orientacao', value)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {orientationOptions.map((opt) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`tags-${index}`}>Tags</Label>
+                  <Input id={`tags-${index}`} placeholder="natureza, brasil (separadas por vírgula)" value={photo.tags} onChange={(e) => updatePhoto(index, 'tags', e.target.value)} />
+                </div>
+                <div className="space-y-3">
+                  <Label>Licenças e Preços</Label>
+                  {availableLicenses.map((licenca) => {
+                    const currentLicense = photo.licencas?.find((l) => l.licencaId === licenca.id);
+                    const isEnabled = currentLicense?.enabled ?? false;
+                    return (
+                      <div key={licenca.id} className="flex items-center gap-4 rounded-md border p-3">
+                        <Checkbox
+                          id={`licenca-${index}-${licenca.id}`}
+                          checked={isEnabled}
+                          onCheckedChange={(checked) => updateLicense(index, licenca.id, 'enabled', checked)}
+                        />
+                        <Label htmlFor={`licenca-${index}-${licenca.id}`} className="flex-grow">{licenca.nome}</Label>
+                        {isEnabled && (
+                          <Input
+                            type="number"
+                            placeholder="R$ 0,00"
+                            value={currentLicense?.preco ?? ''}
+                            onChange={(e) => updateLicense(index, licenca.id, 'preco', e.target.value)}
+                            className="w-28"
+                            step="0.01" min="0"
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
-      </div>
-
-      <div className={styles.actionsRow}>
-        <button type="button" onClick={addPhoto} className={styles.secondaryButton}>
-          + Adicionar outra foto
-        </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={submitting || !isAuthenticated}
-          className={styles.primaryButton}
-        >
-          {submitting ? "Enviando..." : "Publicar Fotos"}
-        </button>
-      </div>
+        <div className="mt-8 flex items-center justify-between border-t pt-6">
+          <Button type="button" variant="ghost" onClick={addPhoto}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Adicionar outra foto
+          </Button>
+          <Button type="submit" size="lg" disabled={submitting || !isAuthenticated}>
+            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {submitting ? 'Publicando...' : 'Publicar Fotos'}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

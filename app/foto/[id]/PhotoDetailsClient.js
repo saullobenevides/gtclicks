@@ -1,41 +1,45 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useCart } from "@/components/CartContext";
-import styles from "./photodetails.module.css";
+import { useState } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { useCart } from '@/components/CartContext';
+import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/avatar';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import ImageWithFallback from '@/components/ImageWithFallback';
+import { Heart, Share2, Info, CheckCircle2, ShoppingCart } from 'lucide-react';
 
 export default function PhotoDetailsClient({ photo }) {
   const { addToCart } = useCart();
   const [selectedLicense, setSelectedLicense] = useState(null);
   const [addedToCart, setAddedToCart] = useState(false);
-  const [licenses, setLicenses] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch("/api/licencas")
-      .then((res) => res.json())
-      .then((data) => {
-        setLicenses(data.data || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch licenses:", err);
-        setLoading(false);
-      });
-  }, []);
+  const licenses = photo.licencas || [];
 
   const handleAddToCart = () => {
     if (!selectedLicense) return;
 
-    const license = licenses.find(l => l.id === selectedLicense);
+    const license = licenses.find((l) => l.id === selectedLicense);
     if (!license) return;
 
     addToCart({
       fotoId: photo.id,
       licencaId: license.id,
       titulo: photo.titulo,
-      preco: Number(license.precoPadrao),
+      preco: Number(license.preco),
       licenca: license.nome,
       previewUrl: photo.previewUrl,
     });
@@ -45,96 +49,222 @@ export default function PhotoDetailsClient({ photo }) {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.imageSection}>
-        <div className="protected-container">
-          <img 
-            src={photo.previewUrl} 
-            alt={photo.titulo}
-            className="protected-image"
-          />
-        </div>
-        <div className={styles.imageInfo}>
-          <span>{photo.orientacao}</span>
-          {photo.categoria && <span>• {photo.categoria}</span>}
-        </div>
+    <div className="min-h-screen pb-20">
+      {/* Background Blur Effect */}
+      <div className="fixed inset-0 z-0 opacity-20 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/90 to-black" />
+        <img src={photo.previewUrl} alt="" className="h-full w-full object-cover blur-3xl" />
       </div>
 
-      <div className={styles.detailsSection}>
-  <div className={styles.header}>
-    <h1>{photo.titulo}</h1>
-    {photo.descricao && <p className={styles.description}>{photo.descricao}</p>}
-  </div>
+      <div className="container-wide relative z-10 grid grid-cols-1 gap-12 py-12 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
+        {/* Left Column - Image */}
+        <div className="flex flex-col gap-6">
+          <div className="sticky top-24 overflow-hidden rounded-2xl border border-white/10 bg-black/50 shadow-2xl backdrop-blur-sm">
+            <div className="relative aspect-[4/3] w-full">
+              <ImageWithFallback
+                src={photo.previewUrl}
+                alt={photo.titulo}
+                className="pointer-events-none block h-full w-full select-none object-contain"
+                onContextMenu={(e) => e.preventDefault()}
+              />
+              <div
+                className="pointer-events-none absolute inset-0 z-10 opacity-20"
+                style={{
+                  backgroundImage: 'url(/watermark-pattern.png)',
+                  backgroundRepeat: 'repeat',
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between border-t border-white/10 bg-black/40 p-4 backdrop-blur-md">
+              <div className="flex gap-4 text-sm font-medium text-white">
+                <span className="flex items-center gap-2">
+                  <Info className="h-4 w-4 text-primary" />
+                  {photo.width} x {photo.height}px
+                </span>
+                <span className="text-white/20">|</span>
+                <span>{photo.orientacao}</span>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                  <Share2 className="h-4 w-4" />
+                </Button>
+                <LikeButton photoId={photo.id} initialLikes={photo.likes || 0} />
+              </div>
+            </div>
+          </div>
 
-  {photo.tags && (
-    <div className={styles.tags}>
-      {(Array.isArray(photo.tags) ? photo.tags : photo.tags.split(",")).map((tag, i) => (
-        <span key={i} className={styles.tag}>{tag.trim()}</span>
-      ))}
-    </div>
-  )}
+          {/* Metadata Grid */}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+            <MetadataItem label="Câmera" value={photo.camera} />
+            <MetadataItem label="Lente" value={photo.lens} />
+            <MetadataItem label="Distância Focal" value={photo.focalLength} />
+            <MetadataItem label="ISO" value={photo.iso} />
+            <MetadataItem label="Obturador" value={photo.shutterSpeed} />
+            <MetadataItem label="Abertura" value={photo.aperture} />
+          </div>
+        </div>
 
-  <h3>Escolha uma licença</h3>
-  {loading ? (
-    <p>Carregando licenças...</p>
-  ) : licenses.length === 0 ? (
-    <p>Nenhuma licença disponível no momento.</p>
-  ) : (
-    licenses.map((license) => (
-      <div
-        key={license.id}
-        className={`${styles.licenseCard} ${selectedLicense === license.id ? styles.selected : ''}`}
-        onClick={() => setSelectedLicense(license.id)}
-      >
-        <div className={styles.licenseInfo}>
-          <h4>{license.nome}</h4>
-          <p>{license.descricao}</p>
-        </div>
-        <div className={styles.licensePrice}>
-          R$ {Number(license.precoPadrao).toFixed(2)}
-        </div>
-      </div>
-    ))
-  )}
-</div>
-        <div className={styles.actions}>
-          <button
-            className="btn btn-primary"
-            onClick={handleAddToCart}
-            disabled={!selectedLicense}
-            style={{ width: "100%" }}
-          >
-            {addedToCart ? "✓ Adicionado!" : "Adicionar ao Carrinho"}
-          </button>
-          {addedToCart && (
-            <Link href="/carrinho" className="btn btn-outline" style={{ width: "100%" }}>
-              Ver Carrinho
+        {/* Right Column - Details & Actions */}
+        <div className="flex flex-col gap-8">
+          <div>
+            <div className="mb-4 flex flex-wrap gap-2">
+              {photo.categoria && (
+                <Badge variant="outline" className="border-primary/50 text-primary bg-primary/10">
+                  {photo.categoria}
+                </Badge>
+              )}
+              {photo.tags && (Array.isArray(photo.tags) ? photo.tags : photo.tags.split(',')).map((tag, i) => (
+                <Badge key={i} variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
+                  {tag.trim()}
+                </Badge>
+              ))}
+            </div>
+            
+            <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">{photo.titulo}</h1>
+            
+            {photo.descricao && (
+              <p className="text-lg leading-relaxed text-gray-400">
+                {photo.descricao}
+              </p>
+            )}
+          </div>
+
+          {/* Photographer Card */}
+          {photo.fotografo && (
+            <Link href={`/fotografo/${photo.fotografo.username}`}>
+              <Card className="glass-panel border-white/10 bg-white/5 transition-all hover:bg-white/10">
+                <CardHeader className="flex flex-row items-center gap-4 p-4">
+                  <Avatar className="h-12 w-12 border-2 border-white/10">
+                    <AvatarImage src={photo.fotografo.avatarUrl} alt={photo.fotografo.name} />
+                    <AvatarFallback>{photo.fotografo.name?.charAt(0) || 'F'}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-base text-white">{photo.fotografo.name || photo.fotografo.username}</CardTitle>
+                    <CardDescription className="text-gray-400">Ver perfil completo</CardDescription>
+                  </div>
+                </CardHeader>
+              </Card>
             </Link>
           )}
-        </div>
-        {photo.fotografo ? (
-          <div className={styles.photographer}>
-            <h4>Fotógrafo</h4>
-            <Link href={`/fotografo/${photo.fotografo.username}`}>
-              <div className={styles.photographerCard}>
-                <div className={styles.photographerAvatar}>
-                  {photo.fotografo.username?.[0]?.toUpperCase() || 'F'}
-                </div>
-                <div>
-                  <div className={styles.photographerName}>
-                    {photo.fotografo.username}
-                  </div>
-                  {photo.fotografo.bio && (
-                    <div className={styles.photographerBio}>
-                      {photo.fotografo.bio}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Link>
+
+          {/* License Selection */}
+          <Card className="glass-panel border-white/10 bg-black/40">
+            <CardHeader>
+              <CardTitle className="text-xl text-white">Escolha uma licença</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {licenses.length === 0 ? (
+                <p className="text-muted-foreground">
+                  Nenhuma licença disponível para esta foto.
+                </p>
+              ) : (
+                <RadioGroup
+                  value={selectedLicense}
+                  onValueChange={setSelectedLicense}
+                  className="flex flex-col gap-3"
+                >
+                  {licenses.map((license) => (
+                    <Label
+                      key={license.id}
+                      htmlFor={license.id}
+                      className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all ${
+                        selectedLicense === license.id
+                          ? 'border-primary bg-primary/10 ring-1 ring-primary'
+                          : 'border-white/10 bg-white/5 hover:bg-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <RadioGroupItem value={license.id} id={license.id} className="border-white/50 text-primary" />
+                        <div>
+                          <h4 className="font-bold text-white">{license.nome}</h4>
+                          <p className="text-sm text-gray-400">
+                            {license.descricao}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-xl font-bold text-white">
+                        R$ {Number(license.preco).toFixed(2)}
+                      </div>
+                    </Label>
+                  ))}
+                </RadioGroup>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Actions */}
+          <div className="flex flex-col gap-4">
+            <Button
+              onClick={handleAddToCart}
+              disabled={!selectedLicense || addedToCart}
+              size="lg"
+              className={`h-14 text-lg font-bold transition-all ${
+                addedToCart 
+                  ? 'bg-green-600 hover:bg-green-700 text-white' 
+                  : 'bg-primary hover:bg-primary/90 text-white'
+              }`}
+            >
+              {addedToCart ? (
+                <span className="flex items-center gap-2">
+                  <CheckCircle2 className="h-6 w-6" />
+                  Adicionado ao Carrinho!
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <ShoppingCart className="h-6 w-6" />
+                  Adicionar ao Carrinho
+                </span>
+              )}
+            </Button>
+            
+            {addedToCart && (
+              <Button asChild variant="outline" size="lg" className="h-12 border-white/10 bg-white/5 text-white hover:bg-white/10">
+                <Link href="/carrinho">Ir para o Carrinho</Link>
+              </Button>
+            )}
           </div>
-        ) : null
+        </div>
       </div>
     </div>
+  );
+}
+
+function MetadataItem({ label, value }) {
+  return (
+    <div className="glass-panel flex flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 p-3 text-center">
+      <span className="mb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="text-sm font-semibold text-white">{value || "-"}</span>
+    </div>
+  );
+}
+
+function LikeButton({ photoId, initialLikes }) {
+  const [likes, setLikes] = useState(initialLikes);
+  const [liked, setLiked] = useState(false); 
+  const [loading, setLoading] = useState(false);
+
+  const toggleLike = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/photos/${photoId}/like`, { method: 'POST' });
+      const data = await res.json();
+      if (data.liked !== undefined) {
+        setLiked(data.liked);
+        setLikes(prev => data.liked ? prev + 1 : prev - 1);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Button variant="ghost" size="sm" onClick={toggleLike} disabled={loading} className="gap-2 text-white hover:bg-white/10">
+      <Heart
+        className={`h-5 w-5 transition-colors ${liked ? "fill-red-500 text-red-500" : "text-white"}`}
+      />
+      <span className="font-medium">{likes}</span>
+    </Button>
   );
 }

@@ -1,41 +1,51 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@stackframe/stack";
-import { useCart } from "@/components/CartContext";
-import styles from "./page.module.css";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@stackframe/stack';
+import { useCart } from '@/components/CartContext';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const user = useUser();
+  const { user } = useUser();
   const { items, getTotalPrice, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (items.length === 0) {
-      router.push("/carrinho");
+      router.push('/carrinho');
     }
   }, [items, router]);
 
   const handleCheckout = async () => {
     if (!user) {
-      router.push("/login");
+      router.push('/login?redirect=/checkout');
       return;
     }
 
     setLoading(true);
-    setError("");
+    setError('');
 
     try {
       // Create order in database
-      const orderResponse = await fetch("/api/pedidos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const orderResponse = await fetch('/api/pedidos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clienteId: user.id,
-          itens: items.map(item => ({
+          itens: items.map((item) => ({
             fotoId: item.fotoId,
             licencaId: item.licencaId,
             precoUnitario: item.preco,
@@ -46,43 +56,42 @@ export default function CheckoutPage() {
 
       if (!orderResponse.ok) {
         const errorData = await orderResponse.json();
-        throw new Error(errorData.error || "Erro ao criar pedido");
+        throw new Error(errorData.error || 'Erro ao criar pedido');
       }
 
       const orderData = await orderResponse.json();
       const pedidoId = orderData.data.id;
 
       // Create Mercado Pago preference
-      const mpResponse = await fetch("/api/mercadopago/create-preference", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const mpResponse = await fetch('/api/mercadopago/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pedidoId,
-          items: items.map(item => ({
+          items: items.map((item) => ({
             title: item.titulo,
             quantity: 1,
             unit_price: item.preco,
-            currency_id: "BRL",
+            currency_id: 'BRL',
           })),
           payer: {
-            email: user.primaryEmail || user.email,
-            name: user.displayName || user.name,
+            email: user.email,
+            name: user.name,
           },
         }),
       });
 
       if (!mpResponse.ok) {
         const errorData = await mpResponse.json();
-        throw new Error(errorData.error || "Erro ao criar pagamento");
+        throw new Error(errorData.error || 'Erro ao criar pagamento');
       }
 
       const mpData = await mpResponse.json();
-      
-      // Clear cart and redirect to Mercado Pago
+
       clearCart();
       window.location.href = mpData.init_point;
     } catch (err) {
-      console.error("Checkout error:", err);
+      console.error('Checkout error:', err);
       setError(err.message);
       setLoading(false);
     }
@@ -93,69 +102,85 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container">
-      <section className={styles.page}>
-        <div className={styles.header}>
-          <h1>Finalizar Compra</h1>
-          <p>Revise seu pedido e prossiga para o pagamento</p>
-        </div>
+    <div className="container mx-auto py-16">
+      <div className="mb-12 text-center">
+        <h1 className="text-4xl font-bold">Finalizar Compra</h1>
+        <p className="text-lg text-muted-foreground">
+          Revise seu pedido e prossiga para o pagamento
+        </p>
+      </div>
 
-        <div className={styles.content}>
-          <div className={styles.orderSummary}>
-            <h2>Resumo do Pedido</h2>
+      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-12 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Resumo do Pedido</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
             {items.map((item) => (
-              <div key={`${item.fotoId}-${item.licencaId}`} className={styles.summaryItem}>
-                <div className={styles.summaryInfo}>
-                  <h4>{item.titulo}</h4>
-                  <p>{item.licenca}</p>
+              <div
+                key={`${item.fotoId}-${item.licencaId}`}
+                className="flex items-center justify-between border-b pb-4"
+              >
+                <div>
+                  <h4 className="font-semibold">{item.titulo}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {item.licenca}
+                  </p>
                 </div>
-                <div className={styles.summaryPrice}>
+                <div className="font-medium">
                   R$ {Number(item.preco).toFixed(2)}
                 </div>
               </div>
             ))}
-            
-            <div className={styles.summaryTotal}>
+          </CardContent>
+          <CardFooter className="text-xl font-bold">
+            <div className="flex w-full justify-between">
               <span>Total</span>
-              <strong>R$ {getTotalPrice().toFixed(2)}</strong>
+              <span>R$ {getTotalPrice().toFixed(2)}</span>
             </div>
-          </div>
+          </CardFooter>
+        </Card>
 
-          <div className={styles.paymentSection}>
-            <h2>Pagamento</h2>
-            <div className={styles.paymentInfo}>
-              <p>
-                Você será redirecionado para o Mercado Pago para completar o pagamento
-                de forma segura.
-              </p>
-              <p>
-                Aceitamos cartão de crédito, débito e PIX.
-              </p>
-            </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Pagamento</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-6 text-muted-foreground">
+              Você será redirecionado para o Mercado Pago para completar o
+              pagamento de forma segura. Aceitamos cartão de crédito, débito e
+              PIX.
+            </p>
 
             {error && (
-              <div className={styles.error}>
-                ❌ {error}
-              </div>
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Erro no Checkout</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             )}
-
-            <button
+          </CardContent>
+          <CardFooter className="flex flex-col items-stretch">
+            <Button
               onClick={handleCheckout}
               disabled={loading || !user}
-              className="btn btn-primary"
-              style={{ width: "100%", fontSize: "1.1rem", padding: "1rem" }}
+              size="lg"
             >
-              {loading ? "Processando..." : "Ir para Pagamento"}
-            </button>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading ? 'Processando...' : 'Ir para Pagamento'}
+            </Button>
 
             {!user && (
-              <p className={styles.loginPrompt}>
-                Você precisa estar logado para finalizar a compra.
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                <a href="/login?redirect=/checkout" className="underline">
+                  Faça login
+                </a>{' '}
+                para finalizar a compra.
               </p>
             )}
-          </div>
-        </div>
-      </section>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   );
 }

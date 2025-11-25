@@ -2,12 +2,8 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-const VARIANT_FOLDERS = {
-  preview: "previews",
-  original: "originais",
-  raw: "uploads",
-};
+import { stackServerApp } from "@/stack/server";
+import prisma from "@/lib/prisma";
 
 const bucket = process.env.S3_UPLOAD_BUCKET;
 const region = process.env.S3_UPLOAD_REGION;
@@ -26,60 +22,57 @@ const s3Client =
     : null;
 
 export async function POST(request) {
+  const user = await stackServerApp.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
+  }
+
+  const fotografo = await prisma.fotografo.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (!fotografo) {
+    return NextResponse.json({ error: "Perfil de fotografo nao encontrado ou nao autorizado" }, { status: 403 });
+  }
+
   if (!s3Client) {
     return NextResponse.json(
-      { error: "S3 nao configurado. Ajuste as variaveis S3_UPLOAD_* no arquivo .env." },
+      { error: "S3 nao configurado." },
       { status: 500 }
     );
   }
 
   try {
     const body = await request.json();
-    const {
-      filename,
-      contentType = "application/octet-stream",
-      variant = "raw",
-    } = body ?? {};
+    const { filename, contentType, folder = "uploads" } = body;
 
     if (!filename) {
       return NextResponse.json(
-        { error: "Informe o nome do arquivo." },
+        { error: "Nome do arquivo obrigatorio" },
         { status: 400 }
       );
     }
 
-    const normalizedVariant =
-      typeof variant === "string" ? variant.toLowerCase() : "raw";
-    const folder = VARIANT_FOLDERS[normalizedVariant] ?? VARIANT_FOLDERS.raw;
-
-    const safeName = filename
-      .toLowerCase()
-      .replace(/[^a-z0-9.\-_]/g, "-")
-      .replace(/-+/g, "-");
-    const uniqueSuffix = `${Date.now()}-${randomUUID()}`;
-    const key = `${folder}/${uniqueSuffix}-${safeName}`;
+    const fileExtension = filename.split(".").pop();
+    const uniqueId = randomUUID();
+    const s3Key = `${folder}/${uniqueId}.${fileExtension}`;
 
     const command = new PutObjectCommand({
       Bucket: bucket,
-      Key: key,
-      ContentType: contentType,
+      Key: s3Key,
+      ContentType: contentType || "application/octet-stream",
     });
 
-    const expiresIn = 15 * 60; // 15 minutos
-    const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn });
-    const encodedKey = key.split("/").map(encodeURIComponent).join("/");
-    const fileUrl = `https://${bucket}.s3.${region}.amazonaws.com/${encodedKey}`;
+    const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
 
     return NextResponse.json({
       uploadUrl,
-      fileUrl,
-      key,
-      expiresIn,
-      variant: normalizedVariant,
+      s3Key,
     });
   } catch (error) {
+    console.error("Error generating signed URL:", error);
     return NextResponse.json(
-      { error: "Falha ao gerar URL assinada.", details: error.message },
+      { error: "Erro ao gerar URL de upload" },
       { status: 500 }
     );
   }

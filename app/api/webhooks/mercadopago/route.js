@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { generateDownloadUrl, extractS3Key } from "@/lib/s3-download";
 
 export async function POST(request) {
   try {
@@ -43,7 +42,7 @@ export async function POST(request) {
           },
         });
 
-        // Generate download URLs for all items in the order
+        // Fetch items to calculate commissions
         const items = await prisma.itemPedido.findMany({
           where: { pedidoId },
           include: { 
@@ -56,41 +55,13 @@ export async function POST(request) {
         });
 
         for (const item of items) {
-          // Generate presigned URL for download (valid for 30 days)
-          let downloadUrl = item.foto.originalUrl;
-          let expiresAt = new Date();
-          expiresAt.setDate(expiresAt.getDate() + 30);
-
-          // Try to generate presigned URL if S3 is configured
-          if (process.env.S3_UPLOAD_BUCKET && item.foto.originalUrl) {
-            try {
-              const s3Key = extractS3Key(item.foto.originalUrl);
-              if (s3Key) {
-                // Generate URL valid for 30 days (2592000 seconds)
-                downloadUrl = await generateDownloadUrl(s3Key, 2592000);
-              }
-            } catch (error) {
-              console.warn("Failed to generate presigned URL, using original:", error);
-              // Fallback to original URL
-            }
-          }
-
-          await prisma.itemPedido.update({
-            where: { id: item.id },
-            data: {
-              downloadUrlAssinada: downloadUrl,
-              expiresAt,
-            },
-          });
-
           // Calculate commission (80% for photographer, 20% for platform)
           const fotografoId = item.foto.fotografoId;
-          const precoTotal = parseFloat(item.precoUnitario);
-          const comissaoPlataforma = precoTotal * 0.20;
+          const precoTotal = parseFloat(item.precoPago || item.precoUnitario || 0);
           const valorFotografo = precoTotal * 0.80;
 
           // Ensure photographer has a balance record
-          const saldo = await prisma.saldo.upsert({
+          await prisma.saldo.upsert({
             where: { fotografoId },
             create: {
               fotografoId,
@@ -107,20 +78,6 @@ export async function POST(request) {
               tipo: "VENDA",
               valor: valorFotografo,
               descricao: `Venda de "${item.foto.titulo}"`,
-              pedidoId,
-              status: "PROCESSADO",
-            },
-          });
-
-          // Create transaction for platform commission
-          await prisma.transacao.create({
-            data: {
-              fotografoId,
-              tipo: "COMISSAO",
-              valor: -comissaoPlataforma,
-              descricao: `Comissão da plataforma (20%)`,
-              pedidoId,
-              status: "PROCESSADO",
             },
           });
 
@@ -134,7 +91,7 @@ export async function POST(request) {
             },
           });
 
-          console.log(`💰 Fotógrafo ${fotografoId} recebeu R$ ${valorFotografo.toFixed(2)} (Comissão: R$ ${comissaoPlataforma.toFixed(2)})`);
+          console.log(`💰 Fotógrafo ${fotografoId} recebeu R$ ${valorFotografo.toFixed(2)}`);
         }
 
         console.log(`✅ Order ${pedidoId} marked as PAGO`);

@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import styles from "../sucesso/page.module.css";
+import { Button } from "@/components/ui/button";
 
 export default function PaymentPendingPage() {
   const searchParams = useSearchParams();
@@ -10,15 +10,15 @@ export default function PaymentPendingPage() {
 
   return (
     <div className="container">
-      <section className={styles.page}>
-        <div className={styles.pending}>
-          <div className={styles.icon}>⏱</div>
-          <h1>Pagamento Pendente</h1>
-          <p className={styles.subtitle}>
+      <section className="py-24">
+        <div className="text-center max-w-2xl mx-auto p-12 bg-card border rounded-lg">
+          <div className="w-20 h-20 mx-auto mb-8 rounded-full flex items-center justify-center text-5xl font-bold text-white bg-yellow-500">⏱</div>
+          <h1 className="text-4xl font-bold mb-4 text-heading">Pagamento Pendente</h1>
+          <p className="text-xl text-body mb-8">
             Seu pagamento está sendo processado.
           </p>
 
-          <div className={styles.orderInfo}>
+          <div className="bg-background p-6 rounded-md my-8 text-left">
             <p>
               <strong>Pedido:</strong> #{pedidoId?.slice(0, 8)}
             </p>
@@ -28,13 +28,17 @@ export default function PaymentPendingPage() {
             </p>
           </div>
 
-          <div className={styles.actions}>
-            <Link href="/meus-downloads" className="btn btn-primary">
-              Ver Meus Pedidos
-            </Link>
-            <Link href="/busca" className="btn btn-outline">
-              Continuar Navegando
-            </Link>
+          <div className="flex flex-col gap-4 mt-8">
+            <Button asChild>
+              <Link href="/meus-downloads">
+                Ver Meus Pedidos
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/busca">
+                Continuar Navegando
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

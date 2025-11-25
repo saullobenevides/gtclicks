@@ -1,7 +1,6 @@
 import { OrientacaoFoto } from "@prisma/client";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { slugify } from "@/lib/slug";
 
 function resolveOrientation(value) {
   if (!value) return OrientacaoFoto.HORIZONTAL;
@@ -11,26 +10,10 @@ function resolveOrientation(value) {
     : OrientacaoFoto.HORIZONTAL;
 }
 
-async function ensureUniqueSlug(base, model) {
-  const client = model === "colecao" ? prisma.colecao : prisma.foto;
-  let slug = base;
-  let suffix = 1;
-  let exists = await client.findUnique({ where: { slug } });
-  while (exists) {
-    slug = `${base}-${suffix++}`;
-    exists = await client.findUnique({ where: { slug } });
-  }
-  return slug;
-}
-
 export async function POST(request) {
   try {
     const {
       fotografoId,
-      modoColecao = "avulso",
-      colecaoId,
-      novaColecao,
-      coverIndex,
       fotos = [],
     } = await request.json();
 
@@ -48,94 +31,93 @@ export async function POST(request) {
       );
     }
 
-    let colecaoDestinoId = null;
-
-    if (modoColecao === "existente") {
-      if (!colecaoId) {
-        return NextResponse.json(
-          { error: "Selecione uma colecao existente." },
-          { status: 400 }
-        );
-      }
-      colecaoDestinoId = colecaoId;
-    }
-
-    if (modoColecao === "nova") {
-      if (!novaColecao?.nome) {
-        return NextResponse.json(
-          { error: "Informe o nome da nova colecao." },
-          { status: 400 }
-        );
-      }
-
-      const slug = await ensureUniqueSlug(slugify(novaColecao.nome), "colecao");
-
-      // Determine cover URL
-      let finalCapaUrl = novaColecao.capaUrl;
-      if (
-        typeof coverIndex === "number" &&
-        coverIndex >= 0 &&
-        coverIndex < fotos.length &&
-        fotos[coverIndex]?.previewUrl
-      ) {
-        finalCapaUrl = fotos[coverIndex].previewUrl;
-      }
-
-      const created = await prisma.colecao.create({
-        data: {
-          nome: novaColecao.nome,
-          slug,
-          descricao: novaColecao.descricao,
-          capaUrl: finalCapaUrl,
-          fotografoId,
-        },
-      });
-      colecaoDestinoId = created.id;
-    }
-
-    const createdFotos = [];
+    const processedFotos = [];
 
     for (const foto of fotos) {
-      if (!foto.previewUrl || !foto.originalUrl) {
-        return NextResponse.json(
-          { error: "Cada foto precisa de previewUrl e originalUrl." },
-          { status: 400 }
-        );
+      // Common data supported by the current schema
+      const commonData = {
+        titulo: foto.titulo || "Foto sem titulo",
+        descricao: foto.descricao,
+        tags: Array.isArray(foto.tags)
+          ? foto.tags
+          : typeof foto.tags === "string" && foto.tags.length
+          ? foto.tags.split(",").map((tag) => tag.trim()).filter(Boolean)
+          : [],
+        orientacao: resolveOrientation(foto.orientacao),
+        status: "PUBLICADA", // Auto-publish for MVP
+      };
+
+      let processedFoto;
+
+      if (foto.id) {
+        // Update existing photo
+        processedFoto = await prisma.foto.update({
+          where: { id: foto.id },
+          data: {
+            ...commonData,
+            licencas: {
+              deleteMany: {}, // Clear existing licenses
+              create: foto.licencas?.map(l => ({
+                licencaId: l.licencaId,
+                preco: parseFloat(l.preco)
+              })) || []
+            }
+          },
+        });
+      } else {
+        // Create new photo
+        if (!foto.s3Key) {
+           // Skip invalid photos without s3Key
+           continue;
+        }
+        
+        // Generate Signed URL for preview
+        const { S3Client, GetObjectCommand } = await import("@aws-sdk/client-s3");
+        const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+        
+        const s3Client = new S3Client({
+          region: process.env.S3_UPLOAD_REGION,
+          credentials: {
+            accessKeyId: process.env.S3_UPLOAD_ACCESS_KEY_ID,
+            secretAccessKey: process.env.S3_UPLOAD_SECRET_ACCESS_KEY,
+          },
+        });
+
+        const command = new GetObjectCommand({
+          Bucket: process.env.S3_UPLOAD_BUCKET,
+          Key: foto.s3Key,
+        });
+
+        const previewUrl = await getSignedUrl(s3Client, command, { expiresIn: 604800 });
+
+        processedFoto = await prisma.foto.create({
+          data: {
+            ...commonData,
+            s3Key: foto.s3Key,
+            previewUrl: previewUrl,
+            width: foto.width || 0,
+            height: foto.height || 0,
+            formato: "jpg", // Default/Mock
+            tamanhoBytes: 0, // Default/Mock
+            fotografoId,
+            licencas: {
+              create: foto.licencas?.map(l => ({
+                licencaId: l.licencaId,
+                preco: parseFloat(l.preco)
+              })) || []
+            }
+          },
+        });
       }
 
-      const slug = await ensureUniqueSlug(
-        slugify(foto.titulo || `foto-${Date.now()}`),
-        "foto"
-      );
-
-      const createdFoto = await prisma.foto.create({
-        data: {
-          titulo: foto.titulo || "Foto sem titulo",
-          slug,
-          descricao: foto.descricao,
-          tags: Array.isArray(foto.tags)
-            ? foto.tags
-            : typeof foto.tags === "string" && foto.tags.length
-            ? foto.tags.split(",").map((tag) => tag.trim()).filter(Boolean)
-            : [],
-          orientacao: resolveOrientation(foto.orientacao),
-          categoria: foto.categoria,
-          corPredominante: foto.corPredominante,
-          previewUrl: foto.previewUrl,
-          originalUrl: foto.originalUrl,
-          fotografoId,
-          colecaoId: colecaoDestinoId,
-        },
-      });
-
-      createdFotos.push(createdFoto);
+      processedFotos.push(processedFoto);
     }
 
     return NextResponse.json({
-      data: createdFotos,
-      colecaoId: colecaoDestinoId,
+      data: processedFotos,
     });
   } catch (error) {
+    console.error("Batch error:", error);
     return NextResponse.json(
       { error: "Nao foi possivel salvar as fotos.", details: error.message },
       { status: 500 }

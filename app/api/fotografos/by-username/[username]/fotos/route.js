@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function GET(request, { params }) {
-  const { username } = params;
+export async function GET(request, props) {
+  const params = await props.params;
+  const username = decodeURIComponent(params.username);
+
+  console.log(`[API] Fetching photos for username: ${username}`);
 
   if (!username) {
     return NextResponse.json(
@@ -36,12 +39,8 @@ export async function GET(request, { params }) {
         id: true,
         titulo: true,
         previewUrl: true,
-        categoria: true,
         orientacao: true,
         tags: true,
-        views: true,
-        likes: true,
-        downloads: true,
         createdAt: true,
       },
     });

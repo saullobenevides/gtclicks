@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getUser } from "@stackframe/stack";
+import { stackServerApp } from "@/stack/server";
 import prisma from "@/lib/prisma";
 
 export async function PATCH(request, { params }) {
   // Verify admin access
-  const user = await getUser();
+  const user = await stackServerApp.getUser();
   
   if (!user) {
     return NextResponse.json(

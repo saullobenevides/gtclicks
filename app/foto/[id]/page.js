@@ -3,7 +3,7 @@ import { getPhotoById } from "@/lib/data/marketplace";
 import PhotoDetailsClient from "./PhotoDetailsClient";
 
 export default async function PhotoPage({ params }) {
-  const { id } = params;
+  const { id } = await params;
   
   const photo = await getPhotoById(id);
 

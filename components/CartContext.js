@@ -5,28 +5,24 @@ import { createContext, useContext, useState, useEffect } from "react";
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]);
-  const [loaded, setLoaded] = useState(false);
-
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("gtclicks_cart");
-    if (stored) {
-      try {
-        setItems(JSON.parse(stored));
-      } catch (e) {
-        console.error("Failed to parse cart from localStorage", e);
+  const [items, setItems] = useState(() => {
+    if (typeof window !== 'undefined') { // Ensure localStorage is available
+      const stored = localStorage.getItem('gtclicks_cart');
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error('Failed to parse cart from localStorage', e);
+        }
       }
     }
-    setLoaded(true);
-  }, []);
+    return [];
+  });
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    if (loaded) {
-      localStorage.setItem("gtclicks_cart", JSON.stringify(items));
-    }
-  }, [items, loaded]);
+    localStorage.setItem('gtclicks_cart', JSON.stringify(items));
+  }, [items]);
 
   const addToCart = (item) => {
     // item = { fotoId, licencaId, titulo, preco, licenca, previewUrl }
