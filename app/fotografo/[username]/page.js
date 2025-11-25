@@ -27,15 +27,15 @@ export default async function PhotographerProfilePage(props) {
     return (
       <div className="min-h-screen pb-20">
         {/* Immersive Header */}
-        <div className="relative h-[300px] w-full overflow-hidden md:h-[400px]">
+        <div className="relative min-h-[450px] w-full overflow-hidden md:h-[400px]">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-black/60 to-black z-10" />
           <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-20 z-0" />
           
           {/* Optional Cover Image - using a gradient fallback for now */}
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800" />
           
-          <div className="container-wide relative z-20 flex h-full flex-col justify-end pb-8 md:pb-12">
-            <div className="flex flex-col items-start gap-6 md:flex-row md:items-end">
+          <div className="container-wide relative z-20 flex h-full flex-col justify-end pb-8 pt-20 md:pb-12">
+            <div className="flex flex-col items-start gap-4 md:flex-row md:items-end md:gap-6">
               <div className="relative">
                 <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-orange-500 opacity-75 blur-sm" />
                 <Avatar className="h-32 w-32 border-4 border-black md:h-40 md:w-40">
@@ -79,7 +79,7 @@ export default async function PhotographerProfilePage(props) {
           </div>
         </div>
 
-        <div className="container-wide mt-12 grid grid-cols-1 gap-12 lg:grid-cols-[1fr_300px]">
+        <div className="container-wide mt-6 grid grid-cols-1 gap-12 lg:mt-12 lg:grid-cols-[1fr_300px]">
           {/* Main Content */}
           <div className="space-y-12">
             {/* Stats Grid - Mobile Only (Hidden on Desktop, moved to sidebar) */}
