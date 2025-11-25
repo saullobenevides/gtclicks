@@ -38,13 +38,15 @@ export default function RootLayout({ children }) {
           <Suspense fallback={null}>
             <UserSync />
           </Suspense>
-          <CartProvider>
-            <StackTheme appearance="dark">
-              <Header />
-              <main className="flex-1 w-full pt-20">{children}</main>
-              <Footer />
-            </StackTheme>
-          </CartProvider>
+          <Suspense fallback={null}>
+            <CartProvider>
+              <StackTheme appearance="dark">
+                <Header />
+                <main className="flex-1 w-full pt-20">{children}</main>
+                <Footer />
+              </StackTheme>
+            </CartProvider>
+          </Suspense>
         </StackProvider>
       </body>
     </html>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { stackServerApp } from '@/stack';
+import { stackServerApp } from '@/stack/server';
 
 export async function POST(request) {
   const user = await stackServerApp.getUser();
@@ -53,15 +53,7 @@ export async function POST(request) {
         itens: {
           include: {
             foto: true,
-            licenca: {
-              include: {
-                fotos: {
-                  where: {
-                    fotoId: { in: cart.itens.map(i => i.fotoId) } // Optimization? No, this is tricky.
-                  }
-                }
-              }
-            },
+            licenca: true,
           },
         },
       },
@@ -84,7 +76,7 @@ export async function POST(request) {
         licencaId: item.licencaId,
         titulo: item.foto.titulo,
         preco: fotoLicenca ? Number(fotoLicenca.preco) : 0,
-        licenca: item.licenca,
+        licenca: item.licenca.nome,
         previewUrl: item.foto.previewUrl,
        };
     }));
