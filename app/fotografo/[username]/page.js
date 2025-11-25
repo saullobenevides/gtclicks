@@ -1,11 +1,6 @@
-import { getPhotographerByUsername } from "@/lib/data/marketplace";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { MapPin, Camera, Image as ImageIcon, Download, Share2 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { getPhotographerByUsername, getPhotosByPhotographerUsername } from "@/lib/data/marketplace";
+
+// ... existing imports ...
 
 export default async function PhotographerProfilePage(props) {
   const params = await props.params;
@@ -19,13 +14,8 @@ export default async function PhotographerProfilePage(props) {
     notFound();
   }
 
-  // Fetch photographer photos
-  const photosResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/fotografos/by-username/${username}/fotos`,
-    { cache: 'no-store' }
-  );
-  
-  const { data: photos = [] } = photosResponse.ok ? await photosResponse.json() : { data: [] };
+  // Fetch photographer photos directly from DB
+  const photos = await getPhotosByPhotographerUsername(username);
 
   return (
     <div className="min-h-screen pb-20">
