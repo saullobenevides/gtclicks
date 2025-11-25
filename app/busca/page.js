@@ -38,13 +38,14 @@ function SearchFilters({ filters }) {
                 placeholder="Ex: natureza, retrato..."
                 defaultValue={filters.q}
                 className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-primary/50 focus:ring-primary/20"
+                suppressHydrationWarning
               />
             </div>
 
             <div className="grid w-full items-center gap-2">
               <Label htmlFor="cor" className="text-gray-400">Cor predominante</Label>
               <Select name="cor" defaultValue={filters.cor}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/20">
+                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/20" suppressHydrationWarning>
                   <SelectValue placeholder="Todas as cores" />
                 </SelectTrigger>
                 <SelectContent className="bg-black border-white/10 text-white">
@@ -62,7 +63,7 @@ function SearchFilters({ filters }) {
             <div className="grid w-full items-center gap-2">
               <Label htmlFor="categoria" className="text-gray-400">Categoria</Label>
               <Select name="categoria" defaultValue={filters.categoria}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/20">
+                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/20" suppressHydrationWarning>
                   <SelectValue placeholder="Todas as categorias" />
                 </SelectTrigger>
                 <SelectContent className="bg-black border-white/10 text-white">
@@ -79,7 +80,7 @@ function SearchFilters({ filters }) {
             <div className="grid w-full items-center gap-2">
               <Label htmlFor="orientacao" className="text-gray-400">Orientação</Label>
               <Select name="orientacao" defaultValue={filters.orientacao}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/20">
+                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/20" suppressHydrationWarning>
                   <SelectValue placeholder="Qualquer formato" />
                 </SelectTrigger>
                 <SelectContent className="bg-black border-white/10 text-white">
@@ -92,7 +93,7 @@ function SearchFilters({ filters }) {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-3 pt-2">
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-semibold">
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-semibold" suppressHydrationWarning>
               Aplicar Filtros
             </Button>
             {Object.values(filters).some(Boolean) && (

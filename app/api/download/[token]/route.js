@@ -1,27 +1,25 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-const bucket = process.env.S3_UPLOAD_BUCKET;
-const region = process.env.S3_UPLOAD_REGION;
-const accessKeyId = process.env.S3_UPLOAD_ACCESS_KEY_ID;
-const secretAccessKey = process.env.S3_UPLOAD_SECRET_ACCESS_KEY;
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const s3Client = new S3Client({
-  region,
-  credentials: { accessKeyId, secretAccessKey },
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
 export async function GET(request, { params }) {
   try {
-    const { token } = params;
+    const { token } = await params;
 
     if (!token) {
-      return NextResponse.json({ error: "Token invalido" }, { status: 400 });
+      return NextResponse.json({ error: 'Token inválido' }, { status: 400 });
     }
 
-    // Find ItemPedido by downloadToken
+    // 1. Find the order item by token
     const item = await prisma.itemPedido.findFirst({
       where: { downloadToken: token },
       include: {
@@ -31,33 +29,38 @@ export async function GET(request, { params }) {
     });
 
     if (!item) {
-      return NextResponse.json({ error: "Link invalido ou expirado" }, { status: 404 });
+      return NextResponse.json({ error: 'Download não encontrado' }, { status: 404 });
     }
 
-    // Check if order is paid
-    if (item.pedido.status !== "PAGO") {
-      return NextResponse.json({ error: "Pedido nao processado" }, { status: 403 });
+    // 2. Verify if the order is PAID
+    if (item.pedido.status !== 'PAGO') {
+      return NextResponse.json({ error: 'Pedido não finalizado ou pagamento pendente' }, { status: 403 });
     }
 
-    // Generate S3 Signed URL for download
+    // 3. Generate Signed URL (valid for 5 minutes)
     const command = new GetObjectCommand({
-      Bucket: bucket,
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: item.foto.s3Key,
-      ResponseContentDisposition: `attachment; filename="${item.foto.titulo}.jpg"`,
+      ResponseContentDisposition: `attachment; filename="${item.foto.titulo}.jpg"`, // Force download
     });
 
-    const url = await getSignedUrl(s3Client, command, { expiresIn: 300 }); // 5 minutes
+    const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 }); // 300 seconds = 5 minutes
 
-    // Increment download count
+    // 4. Update download count (optional but good for analytics)
     await prisma.itemPedido.update({
       where: { id: item.id },
-      data: { downloadsCount: { increment: 1 } },
+      data: {
+        downloadsCount: {
+          increment: 1,
+        },
+      },
     });
 
-    // Redirect to S3 URL
-    return NextResponse.redirect(url);
+    // 5. Redirect to the signed URL
+    return NextResponse.redirect(signedUrl);
+
   } catch (error) {
-    console.error("Download error:", error);
-    return NextResponse.json({ error: "Erro ao processar download" }, { status: 500 });
+    console.error('Download error:', error);
+    return NextResponse.json({ error: 'Erro ao processar download' }, { status: 500 });
   }
 }

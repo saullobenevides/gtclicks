@@ -133,9 +133,9 @@ export default function DownloadsPage() {
                   {new Date(item.createdAt).toLocaleDateString('pt-BR')}
                 </p>
               </div>
-              {item.downloadUrlAssinada ? (
+              {item.downloadToken ? (
                 <Button asChild className="w-full">
-                  <a href={item.downloadUrlAssinada} download>
+                  <a href={`/api/download/${item.downloadToken}`} target="_blank" rel="noopener noreferrer">
                     Baixar Original
                   </a>
                 </Button>

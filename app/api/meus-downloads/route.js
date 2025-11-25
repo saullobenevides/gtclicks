@@ -17,7 +17,7 @@ export async function GET(request) {
     const purchases = await prisma.itemPedido.findMany({
       where: {
         pedido: {
-          clienteId: userId,
+          userId: userId,
           status: "PAGO",
         },
       },
@@ -27,7 +27,6 @@ export async function GET(request) {
             id: true,
             titulo: true,
             previewUrl: true,
-            originalUrl: true,
           },
         },
         licenca: {
@@ -44,7 +43,9 @@ export async function GET(request) {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        pedido: {
+          createdAt: 'desc',
+        }
       },
     });
 

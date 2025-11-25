@@ -204,13 +204,13 @@ async function main() {
             fotoId: createdColecoes[0].fotos[0].id,
             licencaId: licEditorial.id,
             precoUnitario: 89,
-            downloadUrlAssinada: "https://cdn.gtclicks.com/downloads/linha-azul",
+
           },
           {
             fotoId: createdColecoes[1].fotos[0].id,
             licencaId: licComercial.id,
             precoUnitario: 249,
-            downloadUrlAssinada: "https://cdn.gtclicks.com/downloads/bruma-verde",
+
           },
         ],
       },
