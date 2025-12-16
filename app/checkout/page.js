@@ -18,7 +18,7 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user } = useUser();
+  const user = useUser();
   const { items, getTotalPrice, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

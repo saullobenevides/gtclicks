@@ -1,49 +1,84 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function POST(request) {
   try {
     const body = await request.json();
     
     // Mercado Pago sends notifications for different events
-    if (body.type === "payment") {
-      const paymentId = body.data.id;
-      
-      // Fetch payment details from Mercado Pago
-      const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
-      
-      const paymentResponse = await fetch(
-        `https://api.mercadopago.com/v1/payments/${paymentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+    // We filter for "payment" type or "payment.updated" action (depending on API version, but 'payment' is safer)
+    // The notification structure usually has `type` or `topic`
+    
+    let paymentId = null;
 
-      if (!paymentResponse.ok) {
-        console.error("Failed to fetch payment from Mercado Pago");
-        return NextResponse.json({ error: "Failed to fetch payment" }, { status: 500 });
+    if (body.type === "payment") {
+       paymentId = body.data.id;
+    } else if (body.topic === "payment") { // Legacy or specific topic
+       paymentId = body.resource; // Usually the resource URL or ID
+       if (paymentId && typeof paymentId === 'string' && paymentId.includes('/')) {
+         paymentId = paymentId.split('/').pop();
+       }
+    }
+
+    if (!paymentId) {
+        // If it's just a test ping or unrelated event, we acknowledge it
+        return NextResponse.json({ received: true });
+    }
+      
+    // Fetch payment details from Mercado Pago
+    const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+    
+    const paymentResponse = await fetch(
+      `https://api.mercadopago.com/v1/payments/${paymentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (!paymentResponse.ok) {
+      console.error(`Failed to fetch payment ${paymentId} from Mercado Pago`);
+      return NextResponse.json({ error: "Failed to fetch payment" }, { status: 500 });
+    }
+
+    const payment = await paymentResponse.json();
+    const pedidoId = payment.external_reference;
+
+    console.log(`Payment ${paymentId} status: ${payment.status} for order ${pedidoId}`);
+
+    if (payment.status === "approved") {
+      // 1. Verify if order exists and is not already paid
+      const pedido = await prisma.pedido.findUnique({
+          where: { id: pedidoId },
+          include: { itens: true }
+      });
+
+      if (!pedido) {
+          console.error(`Order ${pedidoId} not found`);
+          return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
 
-      const payment = await paymentResponse.json();
-      const pedidoId = payment.external_reference;
+      if (pedido.status === "PAGO") {
+          console.log(`Order ${pedidoId} is already paid. Skipping.`);
+          return NextResponse.json({ received: true, message: "Already processed" });
+      }
 
-      console.log(`Payment ${paymentId} status: ${payment.status} for order ${pedidoId}`);
-
-      if (payment.status === "approved") {
-        // Update order status to PAGO
-        await prisma.pedido.update({
+      // 2. Transaction: Update Order Status + Distribute Funds
+      await prisma.$transaction(async (tx) => {
+        // Update order status
+        await tx.pedido.update({
           where: { id: pedidoId },
           data: {
             status: "PAGO",
-            checkoutSessionId: paymentId.toString(),
-            paymentProvider: "MERCADOPAGO",
+            paymentId: paymentId.toString(),
+            // checkoutSessionId and paymentProvider do not exist in schema, so we skip them
           },
         });
 
-        // Fetch items to calculate commissions
-        const items = await prisma.itemPedido.findMany({
+        // Fetch items with photographer details to calculate commissions
+        const items = await tx.itemPedido.findMany({
           where: { pedidoId },
           include: { 
             foto: {
@@ -57,53 +92,52 @@ export async function POST(request) {
         for (const item of items) {
           // Calculate commission (80% for photographer, 20% for platform)
           const fotografoId = item.foto.fotografoId;
-          const precoTotal = parseFloat(item.precoPago || item.precoUnitario || 0);
-          const valorFotografo = precoTotal * 0.80;
+          
+          // Using Prisma.Decimal for precise calculation
+          const precoPago = new Prisma.Decimal(item.precoPago);
+          const comissaoPercent = new Prisma.Decimal(0.80);
+          const valorFotografo = precoPago.mul(comissaoPercent);
 
           // Ensure photographer has a balance record
-          await prisma.saldo.upsert({
+          // Note: using upsert inside transaction
+          await tx.saldo.upsert({
             where: { fotografoId },
             create: {
               fotografoId,
-              disponivel: 0,
+              disponivel: valorFotografo,
               bloqueado: 0,
             },
-            update: {},
+            update: {
+                disponivel: {
+                    increment: valorFotografo
+                }
+            },
           });
 
-          // Create transaction for photographer earnings
-          await prisma.transacao.create({
+          // Create transaction record for photographer earnings
+          await tx.transacao.create({
             data: {
               fotografoId,
               tipo: "VENDA",
               valor: valorFotografo,
-              descricao: `Venda de "${item.foto.titulo}"`,
+              descricao: `Venda de foto: ${item.foto.titulo}`,
             },
           });
 
-          // Update photographer's available balance
-          await prisma.saldo.update({
-            where: { fotografoId },
-            data: {
-              disponivel: {
-                increment: valorFotografo,
-              },
-            },
-          });
-
-          console.log(`💰 Fotógrafo ${fotografoId} recebeu R$ ${valorFotografo.toFixed(2)}`);
+          console.log(`💰 Fotógrafo ${fotografoId} creditado: R$ ${valorFotografo.toString()}`);
         }
+      });
 
-        console.log(`✅ Order ${pedidoId} marked as PAGO`);
-      } else if (payment.status === "rejected") {
-        await prisma.pedido.update({
-          where: { id: pedidoId },
-          data: {
-            status: "CANCELADO",
-          },
-        });
-        console.log(`❌ Order ${pedidoId} marked as CANCELADO`);
-      }
+      console.log(`✅ Order ${pedidoId} successfully processed and paid.`);
+      
+    } else if (payment.status === "rejected" || payment.status === "cancelled") {
+      await prisma.pedido.update({
+        where: { id: pedidoId },
+        data: {
+          status: "CANCELADO",
+        },
+      });
+      console.log(`❌ Order ${pedidoId} marked as CANCELADO`);
     }
 
     return NextResponse.json({ received: true });
@@ -116,7 +150,7 @@ export async function POST(request) {
   }
 }
 
-// Mercado Pago also sends GET requests to verify the webhook
+// Mercado Pago verification
 export async function GET() {
   return NextResponse.json({ status: "ok" });
 }
