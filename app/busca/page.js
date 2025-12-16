@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ImageWithFallback from '@/components/ImageWithFallback';
-import { searchPhotos } from '@/lib/data/marketplace';
+import { searchCollections } from '@/lib/data/marketplace';
 import { CATEGORIES } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -122,7 +122,7 @@ export default async function SearchPage(props) {
     return acc;
   }, {});
 
-  const results = await searchPhotos(filters);
+  const results = await searchCollections(filters);
 
   return (
     <div className="container-wide py-24">
@@ -131,10 +131,10 @@ export default async function SearchPage(props) {
           Explore
         </Badge>
         <h1 className="text-5xl font-black tracking-tighter text-white sm:text-6xl">
-          Encontre a foto <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-600">perfeita</span>
+          Encontre a coleção <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-600">perfeita</span>
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-gray-400">
-          Explore nosso acervo de fotos exclusivas. Use os filtros para refinar
+          Explore nosso acervo de coleções exclusivas. Use os filtros para refinar
           sua busca e encontrar exatamente o que você precisa.
         </p>
       </div>
@@ -146,7 +146,7 @@ export default async function SearchPage(props) {
           {results.length === 0 ? (
             <Card className="col-span-full py-24 px-8 text-center glass-panel border-dashed border-white/10 bg-transparent">
               <CardHeader>
-                <CardTitle className="text-2xl text-white">Nenhum resultado encontrado</CardTitle>
+                <CardTitle className="text-2xl text-white">Nenhuma coleção encontrada</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-400 text-lg">
@@ -156,34 +156,34 @@ export default async function SearchPage(props) {
             </Card>
           ) : (
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {results.map((result) => (
-                <Link key={result.id} href={`/foto/${result.id}`}>
-                  <Card className="group relative overflow-hidden rounded-2xl border-0 bg-gray-900 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10">
-                    <CardContent className="aspect-[4/3] relative p-0">
-                      <ImageWithFallback
-                        src={result.previewUrl}
-                        alt={result.titulo}
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                      
-                      <div className="absolute bottom-0 left-0 w-full p-6 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                        <h3 className="font-bold text-white text-lg mb-1">{result.titulo}</h3>
-                        <div className="flex items-center gap-2 text-sm text-gray-300">
-                          <Badge variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border-0">
-                            {result.orientacao}
-                          </Badge>
-                          {result.corPredominante && (
-                            <Badge variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border-0">
-                              {result.corPredominante}
-                            </Badge>
-                          )}
-                        </div>
+              {results.map((collection, index) => {
+                 const isUrl = collection.cover?.startsWith("http");
+                 const isGradient = collection.cover?.startsWith("linear-gradient");
+                 
+                 const backgroundStyle = isUrl
+                    ? { backgroundImage: `url(${collection.cover})` }
+                    : isGradient
+                    ? { backgroundImage: collection.cover }
+                    : { backgroundColor: collection.cover };
+                
+                return (
+                  <Link
+                    key={collection.id ?? index}
+                    href={`/colecoes/${collection.slug}`}
+                    className="group bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg h-[400px] block"
+                    style={{ ...backgroundStyle, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                  >
+                     <div className="p-6 bg-black/50 h-full flex flex-col justify-end">
+                      <h3 className="text-xl font-bold mb-2 text-white">{collection.name}</h3>
+                      <p className="text-white/80 text-sm mb-4 line-clamp-2">{collection.description}</p>
+                      <div className="flex justify-between text-xs text-white/70">
+                        <span>{collection.totalPhotos || 0} fotos</span>
+                        <span>Por {collection.photographerName || 'GT Clicks'}</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </main>

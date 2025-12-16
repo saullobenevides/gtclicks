@@ -24,7 +24,7 @@ export default function CategoriesPage() {
             >
               <div>
                 <h2 className="text-2xl font-bold mb-4 text-heading">{category}</h2>
-                <span className="text-accent font-medium opacity-0 transform translate-y-2 transition-all group-hover:opacity-100 group-hover:translate-y-0">Ver fotos &rarr;</span>
+                <span className="text-accent font-medium opacity-0 transform translate-y-2 transition-all group-hover:opacity-100 group-hover:translate-y-0">Ver coleções &rarr;</span>
               </div>
             </Link>
           ))}

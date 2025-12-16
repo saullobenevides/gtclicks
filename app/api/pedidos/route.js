@@ -28,13 +28,13 @@ export async function POST(request) {
         paymentProvider,
         itens: {
           create: itens.map((item) => {
-            if (!item.fotoId || !item.licencaId) {
-              throw new Error("Cada item precisa de fotoId e licencaId.");
+            if (!item.fotoId) {
+              throw new Error("Cada item precisa de fotoId.");
             }
 
             return {
               foto: { connect: { id: item.fotoId } },
-              licenca: { connect: { id: item.licencaId } },
+              // licencaId is optional
               precoUnitario: item.precoUnitario ?? 0,
             };
           }),
@@ -69,7 +69,6 @@ export async function GET(request) {
         itens: {
           include: {
             foto: { select: { titulo: true } },
-            licenca: { select: { nome: true } },
           },
         },
       },

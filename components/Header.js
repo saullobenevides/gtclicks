@@ -71,7 +71,6 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-2">
              <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-white hover:bg-white/5">
               <Link href="/carrinho">
-                <span className="mr-2 text-lg">🛒</span>
                 Carrinho
               </Link>
             </Button>

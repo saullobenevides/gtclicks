@@ -25,23 +25,16 @@ import { useUser } from '@stackframe/stack';
 
 export default function PhotoDetailsClient({ photo }) {
   const { addToCart } = useCart();
-  const [selectedLicense, setSelectedLicense] = useState(null);
   const [addedToCart, setAddedToCart] = useState(false);
-
-  const licenses = photo.licencas || [];
+  
+  const price = photo.colecao?.precoFoto || 0;
 
   const handleAddToCart = () => {
-    if (!selectedLicense) return;
-
-    const license = licenses.find((l) => l.id === selectedLicense);
-    if (!license) return;
-
     addToCart({
       fotoId: photo.id,
-      licencaId: license.id,
       titulo: photo.titulo,
-      preco: Number(license.preco),
-      licenca: license.nome,
+      preco: price,
+      licenca: 'Uso Padrão', // Default license name
       previewUrl: photo.previewUrl,
     });
 
@@ -130,6 +123,23 @@ export default function PhotoDetailsClient({ photo }) {
             )}
           </div>
 
+          {/* Collection Card */}
+          {photo.colecao && (
+            <Link href={`/colecoes/${photo.colecao.slug}`}>
+              <Card className="glass-panel border-white/10 bg-white/5 transition-all hover:bg-white/10">
+                <CardHeader className="flex flex-row items-center gap-4 p-4">
+                   <div className="h-12 w-12 flex items-center justify-center rounded bg-primary/20 text-primary">
+                      <span className="text-xl">📚</span>
+                   </div>
+                  <div>
+                    <CardTitle className="text-base text-white">{photo.colecao.nome}</CardTitle>
+                    <CardDescription className="text-gray-400">Ver coleção completa</CardDescription>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+          )}
+
           {/* Photographer Card */}
           {photo.fotografo && (
             <Link href={`/fotografo/${photo.fotografo.username}`}>
@@ -148,48 +158,21 @@ export default function PhotoDetailsClient({ photo }) {
             </Link>
           )}
 
-          {/* License Selection */}
+          {/* Price Card */}
           <Card className="glass-panel border-white/10 bg-black/40">
             <CardHeader>
-              <CardTitle className="text-xl text-white">Escolha uma licença</CardTitle>
+              <CardTitle className="text-xl text-white">Valor da Foto</CardTitle>
             </CardHeader>
             <CardContent>
-              {licenses.length === 0 ? (
-                <p className="text-muted-foreground">
-                  Nenhuma licença disponível para esta foto.
-                </p>
-              ) : (
-                <RadioGroup
-                  value={selectedLicense}
-                  onValueChange={setSelectedLicense}
-                  className="flex flex-col gap-3"
-                >
-                  {licenses.map((license) => (
-                    <Label
-                      key={license.id}
-                      htmlFor={license.id}
-                      className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all ${
-                        selectedLicense === license.id
-                          ? 'border-primary bg-primary/10 ring-1 ring-primary'
-                          : 'border-white/10 bg-white/5 hover:bg-white/10'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <RadioGroupItem value={license.id} id={license.id} className="border-white/50 text-primary" />
-                        <div>
-                          <h4 className="font-bold text-white">{license.nome}</h4>
-                          <p className="text-sm text-gray-400">
-                            {license.descricao}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-xl font-bold text-white">
-                        R$ {Number(license.preco).toFixed(2)}
-                      </div>
-                    </Label>
-                  ))}
-                </RadioGroup>
-              )}
+              <div className="flex items-end gap-2">
+                <span className="text-4xl font-bold text-primary">
+                  R$ {Number(price).toFixed(2)}
+                </span>
+                <span className="text-muted-foreground mb-1 font-medium">/ unidade</span>
+              </div>
+              <p className="text-sm text-gray-400 mt-2">
+                Licença de uso padrão incluída.
+              </p>
             </CardContent>
           </Card>
 
@@ -197,7 +180,7 @@ export default function PhotoDetailsClient({ photo }) {
           <div className="flex flex-col gap-4">
             <Button
               onClick={handleAddToCart}
-              disabled={!selectedLicense || addedToCart}
+              disabled={addedToCart}
               size="lg"
               className={`h-14 text-lg font-bold transition-all ${
                 addedToCart 

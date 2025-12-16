@@ -1,6 +1,7 @@
 import { OrientacaoFoto } from "@prisma/client";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { logError } from "@/lib/logger";
 
 function resolveOrientation(value) {
   if (!value) return OrientacaoFoto.HORIZONTAL;
@@ -15,6 +16,7 @@ export async function POST(request) {
     const {
       fotografoId,
       fotos = [],
+      deletedPhotoIds = [] // Read deleted IDs
     } = await request.json();
 
     if (!fotografoId) {
@@ -24,9 +26,19 @@ export async function POST(request) {
       );
     }
 
-    if (!Array.isArray(fotos) || fotos.length === 0) {
+    // Delete removed photos
+    if (deletedPhotoIds.length > 0) {
+      await prisma.foto.deleteMany({
+        where: {
+          id: { in: deletedPhotoIds },
+          fotografoId: fotografoId // Security check: ensure they belong to this photographer
+        }
+      });
+    }
+
+    if ((!Array.isArray(fotos) || fotos.length === 0) && deletedPhotoIds.length === 0) {
       return NextResponse.json(
-        { error: "Envie ao menos uma foto." },
+        { error: "Nenhuma alteração enviada." },
         { status: 400 }
       );
     }
@@ -44,6 +56,7 @@ export async function POST(request) {
           ? foto.tags.split(",").map((tag) => tag.trim()).filter(Boolean)
           : [],
         orientacao: resolveOrientation(foto.orientacao),
+        folderId: foto.folderId || null, // Handle folderId
         status: "PUBLICADA", // Auto-publish for MVP
       };
 
@@ -99,7 +112,9 @@ export async function POST(request) {
             height: foto.height || 0,
             formato: "jpg", // Default/Mock
             tamanhoBytes: 0, // Default/Mock
-            fotografoId,
+            fotografo: {
+                connect: { id: fotografoId }
+            },
             licencas: {
               create: foto.licencas?.map(l => ({
                 licencaId: l.licencaId,
@@ -118,6 +133,7 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("Batch error:", error);
+    logError(error, "Batch API");
     return NextResponse.json(
       { error: "Nao foi possivel salvar as fotos.", details: error.message },
       { status: 500 }

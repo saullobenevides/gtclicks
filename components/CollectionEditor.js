@@ -1,0 +1,537 @@
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { UploadCloud, Trash2, PlusCircle, Loader2, AlertCircle, CheckCircle2, Save, ArrowLeft, Star } from 'lucide-react';
+import EXIF from 'exif-js';
+import FolderManager from './FolderManager';
+import Breadcrumbs from './Breadcrumbs';
+import { CATEGORIES } from '@/lib/constants';
+
+// Re-using helper functions from UploadDashboard
+const orientationOptions = ['HORIZONTAL', 'VERTICAL', 'PANORAMICA', 'QUADRADO'];
+const blankPhoto = () => ({
+  id: null,
+  titulo: '',
+  descricao: '',
+  previewUrl: '',
+  s3Key: '',
+  previewS3Key: '',
+  tags: '',
+  orientacao: 'HORIZONTAL',
+  tags: '',
+  orientacao: 'HORIZONTAL',
+});
+
+const extractMetadata = (file) => {
+  // (Implementation copied from UploadDashboard)
+  return new Promise((resolve) => {
+    EXIF.getData(file, function() {
+      const make = EXIF.getTag(this, "Make");
+      const model = EXIF.getTag(this, "Model");
+      const iso = EXIF.getTag(this, "ISOSpeedRatings");
+      const focalLength = EXIF.getTag(this, "FocalLength");
+      const aperture = EXIF.getTag(this, "FNumber");
+      const shutterSpeed = EXIF.getTag(this, "ExposureTime");
+      const lens = EXIF.getTag(this, "LensModel") || EXIF.getTag(this, "LensInfo");
+      let formattedShutterSpeed = null;
+      if (shutterSpeed) {
+        if (shutterSpeed < 1) {
+          formattedShutterSpeed = `1/${Math.round(1/shutterSpeed)}`;
+        } else {
+          formattedShutterSpeed = `${shutterSpeed}`;
+        }
+      }
+      resolve({ camera: make && model ? `${make} ${model}` : (model || make || null), lens, focalLength: focalLength ? `${focalLength}mm` : null, iso, shutterSpeed: formattedShutterSpeed, aperture: aperture ? `f/${aperture}` : null });
+    });
+  });
+};
+
+const generatePreview = (file) => {
+  // (Implementation copied from UploadDashboard)
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const MAX_WIDTH = 1200, MAX_HEIGHT = 1200;
+      let width = img.width, height = img.height;
+      if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
+      else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+      canvas.width = width; canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+      ctx.save(); ctx.globalAlpha = 0.4; ctx.font = `bold ${width*0.08}px Arial`; ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.translate(width/2, height/2); ctx.rotate(-30 * Math.PI / 180); ctx.fillText('GT Clicks Preview', 0, 0);
+      ctx.restore();
+      canvas.toBlob((blob) => { if (blob) resolve(blob); else reject(new Error("Failed to generate preview blob")); }, 'image/jpeg', 0.60);
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+};
+
+
+export default function CollectionEditor({ collection: initialCollection }) {
+  const router = useRouter();
+  
+  const [collectionData, setCollectionData] = useState({
+    nome: initialCollection.nome || '',
+    descricao: initialCollection.descricao || '',
+    categoria: initialCollection.categoria || '',
+    categoria: initialCollection.categoria || '',
+    status: initialCollection.status || 'RASCUNHO',
+    precoFoto: initialCollection.precoFoto || 0,
+    capaUrl: initialCollection.capaUrl || '',
+  });
+  
+  // Folder Navigation State
+  const [currentFolder, setCurrentFolder] = useState(null); // null = root
+  const [folderPath, setFolderPath] = useState([{ id: null, nome: 'Raiz' }]);
+  
+  // Photos State (Filtered by current folder)
+  const [allPhotos, setAllPhotos] = useState(initialCollection.fotos || []);
+  const [currentPhotos, setCurrentPhotos] = useState([]);
+
+  const [status, setStatus] = useState({ type: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [uploadState, setUploadState] = useState({ index: null, label: '' });
+  const [deletedPhotoIds, setDeletedPhotoIds] = useState([]);
+
+  // Filter photos when folder changes or photos update
+  useEffect(() => {
+    const filtered = allPhotos.filter(p => {
+      if (currentFolder === null) {
+        return !p.folderId; // Root photos have no folderId
+      }
+      return p.folderId === currentFolder.id;
+    });
+    setCurrentPhotos(filtered);
+  }, [allPhotos, currentFolder]);
+
+  const handleCollectionDataChange = (field, value) => {
+    setCollectionData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSetCover = (photo) => {
+    if (photo.previewUrl) {
+      setCollectionData(prev => ({ ...prev, capaUrl: photo.previewUrl }));
+    }
+  };
+
+  const handleNavigate = (folder) => {
+    if (folder.id === null) {
+      setCurrentFolder(null);
+      setFolderPath([{ id: null, nome: 'Raiz' }]);
+    } else {
+      // Check if we are navigating back or forward (simplified: just rebuild path if needed or append)
+      // For now, simple append if not in path, or slice if in path
+      const index = folderPath.findIndex(f => f.id === folder.id);
+      if (index !== -1) {
+        setFolderPath(folderPath.slice(0, index + 1));
+      } else {
+        setFolderPath([...folderPath, { id: folder.id, nome: folder.nome }]);
+      }
+      setCurrentFolder(folder);
+    }
+  };
+
+  // Photo management functions
+  const addPhoto = () => {
+    const newPhoto = { ...blankPhoto(), folderId: currentFolder?.id || null };
+    setAllPhotos([...allPhotos, newPhoto]);
+  };
+
+  const removePhoto = (photoToRemove) => {
+    if (photoToRemove.id) {
+        setDeletedPhotoIds([...deletedPhotoIds, photoToRemove.id]);
+    }
+    setAllPhotos(allPhotos.filter(p => p !== photoToRemove));
+    if (collectionData.capaUrl === photoToRemove.previewUrl) {
+      setCollectionData(prev => ({ ...prev, capaUrl: '' }));
+    }
+  };
+
+  const updatePhoto = (photoToUpdate, field, value) => {
+    setAllPhotos(allPhotos.map(p => p === photoToUpdate ? { ...p, [field]: value } : p));
+  };
+
+
+  const uploadFromDevice = async (photoToUpload, file) => {
+    if (!file) return;
+    const index = currentPhotos.indexOf(photoToUpload); // Index for UI feedback only
+    setUploadState({ index, label: `Extraindo metadados...` });
+
+    try {
+      const metadata = await extractMetadata(file);
+      const previewBlob = await generatePreview(file);
+      
+      setUploadState({ index, label: `Enviando arquivos...` });
+      const [originalPresign, previewPresign] = await Promise.all([
+        fetch("/api/upload", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: file.name, contentType: file.type, folder: "originals" }) }).then(r => r.json()),
+        fetch("/api/upload", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: `preview_${file.name}`, contentType: "image/jpeg", folder: "previews" }) }).then(r => r.json()),
+      ]);
+
+      if (originalPresign.error || previewPresign.error) throw new Error("Falha ao gerar URLs de upload");
+
+      await Promise.all([
+        fetch(originalPresign.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type || "application/octet-stream" }, body: file }),
+        fetch(previewPresign.uploadUrl, { method: "PUT", headers: { "Content-Type": "image/jpeg" }, body: previewBlob }),
+      ]);
+
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise((resolve) => { img.onload = resolve; });
+
+      const processRes = await fetch("/api/photos/process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          s3Key: originalPresign.s3Key,
+          previewS3Key: previewPresign.s3Key,
+          width: img.width, height: img.height,
+          titulo: file.name.split('.')[0],
+          ...metadata,
+          colecaoId: initialCollection.id,
+          folderId: currentFolder?.id || null, // Use folderId instead of string path
+        }),
+      });
+
+      const processData = await processRes.json();
+      if (!processRes.ok) throw new Error(processData?.error || "Erro ao processar foto");
+
+      setAllPhotos((prev) => prev.map(p => p === photoToUpload ? {
+        ...p,
+        id: processData.foto.id,
+        s3Key: originalPresign.s3Key,
+        previewS3Key: previewPresign.s3Key,
+        previewUrl: processData.foto.previewUrl,
+        titulo: processData.foto.titulo,
+        ...metadata,
+        folderId: currentFolder?.id || null
+      } : p));
+
+      setUploadState({ index: null, label: '' });
+      setStatus({ type: 'success', message: 'Upload concluído! Preencha os detalhes e publique.' });
+    } catch (error) {
+      console.error(error);
+      setUploadState({ index: null, label: '' });
+      setStatus({ type: 'error', message: error.message });
+    }
+  };
+
+  const handleFileSelect = async (photo, file) => {
+    if (!file) return;
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) { setStatus({ type: 'error', message: 'Formato inválido. Use apenas JPG, PNG ou WebP.' }); return; }
+    const maxSize = 50 * 1024 * 1024;
+    if (file.size > maxSize) { setStatus({ type: 'error', message: 'Arquivo muito grande. Tamanho máximo: 50MB' }); return; }
+    const img = new Image();
+    img.onload = () => { const orientation = img.width > img.height ? 'HORIZONTAL' : 'VERTICAL'; updatePhoto(photo, 'orientacao', orientation); };
+    img.src = URL.createObjectURL(file);
+    await uploadFromDevice(photo, file);
+  };
+  
+  const handleSaveChanges = async () => {
+    setSubmitting(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      // Logic to set default cover if none selected
+      let finalCapaUrl = collectionData.capaUrl;
+      if (!finalCapaUrl) {
+         // Find the last photo with a previewUrl
+         const validPhotos = allPhotos.filter(p => p.previewUrl && !deletedPhotoIds.includes(p.id));
+         if (validPhotos.length > 0) {
+           finalCapaUrl = validPhotos[validPhotos.length - 1].previewUrl;
+           setCollectionData(prev => ({ ...prev, capaUrl: finalCapaUrl }));
+         }
+      }
+
+      // 1. Save Collection Details
+      const colResponse = await fetch(`/api/colecoes/${initialCollection.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...collectionData, capaUrl: finalCapaUrl }),
+      });
+      if (!colResponse.ok) {
+          const text = await colResponse.text();
+          let errorMsg = 'Falha ao salvar detalhes da coleção';
+          try {
+             const json = JSON.parse(text);
+             if (json?.error) errorMsg = json.error;
+          } catch (e) {
+             console.warn('Response was not JSON:', text);
+          }
+          throw new Error(errorMsg);
+      }
+
+      // 2. Save Photo Details (batch update)
+      const payload = {
+        fotografoId: initialCollection.fotografoId,
+        fotos: allPhotos.filter(p => p.id).map(p => ({
+          id: p.id,
+          titulo: p.titulo,
+          descricao: p.descricao,
+          tags: typeof p.tags === 'string' ? p.tags.split(',').map(tag => tag.trim()).filter(Boolean) : (p.tags || []),
+          orientacao: p.orientacao,
+          orientacao: p.orientacao,
+          folderId: p.folderId, // Ensure folderId is sent
+        })),
+        deletedPhotoIds, // Send deleted IDs
+      };
+      if (payload.fotos.length > 0 || payload.deletedPhotoIds.length > 0) {
+        const photoResponse = await fetch('/api/fotos/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!photoResponse.ok) {
+            const text = await photoResponse.text();
+            let errorMsg = 'Falha ao salvar detalhes das fotos';
+            try {
+               const json = JSON.parse(text);
+               if (json?.error) errorMsg = json.error;
+            } catch (e) {
+               console.warn('Response was not JSON:', text);
+            }
+            throw new Error(errorMsg);
+        }
+      }
+
+      setStatus({ type: 'success', message: 'Alterações salvas com sucesso!' });
+      router.refresh(); 
+    } catch (error) {
+      console.error(error);
+      setStatus({ type: 'error', message: error.message });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteCollection = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/colecoes/${initialCollection.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Falha ao excluir coleção');
+      }
+
+      router.push('/dashboard/fotografo/colecoes');
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      setStatus({ type: 'error', message: error.message });
+      setDeleteOpen(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+
+  return (
+    <div className="flex flex-col gap-8">
+       {status.message && (
+        <Alert variant={status.type === 'error' ? 'destructive' : 'default'}>
+          {status.type === 'error' ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+          <AlertTitle>{status.type === 'error' ? 'Erro' : 'Sucesso'}</AlertTitle>
+          <AlertDescription>{status.message}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Collection Details Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Detalhes da Coleção</CardTitle>
+          <CardDescription>Edite o título, descrição e categoria da sua coleção.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="collection-name">Título</Label>
+            <Input id="collection-name" value={collectionData.nome} onChange={(e) => handleCollectionDataChange('nome', e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="collection-category">Categoria</Label>
+            <Select value={collectionData.categoria} onValueChange={(value) => handleCollectionDataChange('categoria', value)}>
+              <SelectTrigger id="collection-category">
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((cat) => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="collection-status">Status</Label>
+            <Select value={collectionData.status} onValueChange={(value) => handleCollectionDataChange('status', value)}>
+              <SelectTrigger id="collection-status">
+                <SelectValue placeholder="Selecione o status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="RASCUNHO">Rascunho (Oculto)</SelectItem>
+                <SelectItem value="PUBLICADA">Publicada (Visível)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="collection-price">Preço por Foto (R$)</Label>
+            <Input 
+              id="collection-price" 
+              type="number" 
+              min="0" 
+              step="0.01" 
+              placeholder="0.00"
+              value={collectionData.precoFoto} 
+              onChange={(e) => handleCollectionDataChange('precoFoto', e.target.value)} 
+            />
+          </div>
+          <div className="md:col-span-2 space-y-1.5">
+            <Label htmlFor="collection-description">Descrição</Label>
+            <Textarea id="collection-description" value={collectionData.descricao} onChange={(e) => handleCollectionDataChange('descricao', e.target.value)} />
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Folder & Photo Management Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Conteúdo da Coleção</CardTitle>
+          <CardDescription>Gerencie pastas e fotos.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+           {/* Breadcrumbs */}
+           <div className="flex items-center justify-between border-b pb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground">Você está em:</span>
+                <Breadcrumbs path={folderPath} onNavigate={handleNavigate} />
+              </div>
+           </div>
+
+           {/* Folder Manager */}
+           <FolderManager 
+             collectionId={initialCollection.id} 
+             currentFolder={currentFolder} 
+             onNavigate={(folder) => handleNavigate(folder)}
+           />
+           
+           <div className="border-t pt-6">
+             <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium">Fotos ({currentPhotos.length})</h3>
+                <Button type="button" variant="ghost" onClick={addPhoto}><PlusCircle className="mr-2 h-4 w-4" />Adicionar foto</Button>
+             </div>
+
+             {/* Photos Grid */}
+             {currentPhotos.length === 0 ? (
+                <div className="text-center p-8 border-2 border-dashed rounded-lg text-muted-foreground">
+                  <p>Nenhuma foto nesta pasta.</p>
+                  <Button variant="link" onClick={addPhoto}>Adicionar agora</Button>
+                </div>
+             ) : (
+               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {currentPhotos.map((photo, index) => (
+                    <Card key={index} className={`flex flex-col relative ${collectionData.capaUrl === photo.previewUrl ? 'ring-2 ring-primary' : ''}`}>
+                      <CardHeader className="flex-row items-center justify-between p-4 pb-2">
+                        <CardTitle className="text-sm font-medium">Foto #{index + 1}</CardTitle>
+                        <div className="flex items-center gap-1">
+                          {photo.previewUrl && (
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="icon" 
+                              className={`h-6 w-6 ${collectionData.capaUrl === photo.previewUrl ? 'text-yellow-500 hover:text-yellow-600' : 'text-muted-foreground hover:text-yellow-500'}`}
+                              onClick={() => handleSetCover(photo)}
+                              title={collectionData.capaUrl === photo.previewUrl ? "Capa da coleção" : "Definir como capa"}
+                            >
+                              <Star className={`h-4 w-4 ${collectionData.capaUrl === photo.previewUrl ? 'fill-current' : ''}`} />
+                            </Button>
+                          )}
+                          <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => removePhoto(photo)}><Trash2 className="h-4 w-4" /></Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="flex flex-grow flex-col gap-4 p-4 pt-0">
+                        <div className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed relative overflow-hidden bg-muted/10">
+                          {photo.previewUrl ? (
+                            <img src={photo.previewUrl} alt="Preview" className="h-full w-full object-contain" />
+                          ) : (
+                            <Label htmlFor={`file-upload-${index}`} className="flex cursor-pointer flex-col items-center gap-2 text-center text-muted-foreground w-full h-full justify-center hover:bg-muted/20 transition-colors">
+                              <UploadCloud className="h-8 w-8" />
+                              <input id={`file-upload-${index}`} type="file" accept="image/*" onChange={(e) => handleFileSelect(photo, e.target.files?.[0])} className="hidden" />
+                              {uploadState.index === currentPhotos.indexOf(photo) ? (
+                                <span className="text-xs">{uploadState.label}</span>
+                              ) : (
+                                <span className="text-xs">Clique para enviar</span>
+                              )}
+                            </Label>
+                          )}
+                          {photo.id && <div className="absolute top-2 right-2 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">Salvo</div>}
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <Label className="text-xs">Título</Label>
+                          <Input className="h-8 text-sm" placeholder="Título" value={photo.titulo} onChange={(e) => updatePhoto(photo, 'titulo', e.target.value)} />
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <Label className="text-xs">Tags</Label>
+                          <Input className="h-8 text-sm" placeholder="tags..." value={photo.tags} onChange={(e) => updatePhoto(photo, 'tags', e.target.value)} />
+                        </div>
+
+                      </CardContent>
+                    </Card>
+                  ))}
+               </div>
+             )}
+           </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-between mt-8">
+          <Button type="button" variant="destructive" size="lg" onClick={() => setDeleteOpen(true)}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            Excluir Coleção
+          </Button>
+
+          <Button type="button" size="lg" onClick={handleSaveChanges} disabled={submitting}>
+            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Save className="mr-2 h-4 w-4" />
+            Salvar Alterações
+          </Button>
+      </div>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Excluir Coleção</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir esta coleção? Esta ação não pode ser desfeita e todas as fotos serão perdidas.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleDeleteCollection} disabled={deleting}>
+              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Excluir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

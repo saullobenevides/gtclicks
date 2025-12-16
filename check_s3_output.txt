@@ -1,0 +1,8 @@
+Debug Credentials:
+Region: sa-east-1
+Key ID Present: true
+Secret Present: true
+Checking ACL for: previews/a53cc612-1283-4150-a2dc-8de138528fd2.png in gtclicks
+Grants found: 1
+ - Grantee: 5e26ccac07ca18583d37b6680e56c08ab5f4e57ecdbb8459cb841173f9b1d510
+   Permission: FULL_CONTROL

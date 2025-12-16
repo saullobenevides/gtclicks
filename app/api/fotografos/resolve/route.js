@@ -40,6 +40,12 @@ export async function GET(request) {
             email: true,
           },
         },
+        _count: {
+          select: {
+            colecoes: true,
+            fotos: true,
+          },
+        },
       },
     });
 
@@ -57,6 +63,7 @@ export async function GET(request) {
         username: fotografo.username,
         nome: fotografo.user?.name ?? null,
         email: fotografo.user?.email ?? null,
+        _count: fotografo._count,
       },
     });
   } catch (error) {

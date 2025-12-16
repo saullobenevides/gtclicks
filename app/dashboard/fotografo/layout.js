@@ -13,8 +13,7 @@ export default function PhotographerLayout({ children }) {
 
   const navItems = [
     { href: '/dashboard/fotografo', label: 'Início' },
-    { href: '/dashboard/fotografo/fotos', label: 'Minhas Fotos' },
-    { href: '/dashboard/fotografo/upload', label: 'Enviar Fotos' },
+    { href: '/dashboard/fotografo/colecoes', label: 'Minhas Coleções' },
     { href: '/dashboard/fotografo/financeiro', label: 'Financeiro' },
   ];
 

@@ -1,4 +1,4 @@
-import { getPhotographerByUsername, getPhotosByPhotographerUsername } from "@/lib/data/marketplace";
+import { getPhotographerByUsername, getCollectionsByPhotographerUsername } from "@/lib/data/marketplace";
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -21,8 +21,9 @@ export default async function PhotographerProfilePage(props) {
       notFound();
     }
 
-    // Fetch photographer photos directly from DB
-    const photos = await getPhotosByPhotographerUsername(username);
+    // Fetch photographer collections directly from DB
+    const collections = await getCollectionsByPhotographerUsername(username);
+    const totalPhotos = collections.reduce((acc, col) => acc + (col.totalPhotos || 0), 0);
 
     return (
       <div className="min-h-screen pb-20">
@@ -84,8 +85,8 @@ export default async function PhotographerProfilePage(props) {
           <div className="space-y-12">
             {/* Stats Grid - Mobile Only (Hidden on Desktop, moved to sidebar) */}
             <div className="grid grid-cols-3 gap-4 lg:hidden">
-              <StatsCard label="Coleções" value={photographer.colecoesPublicadas || 0} icon={<ImageIcon className="h-4 w-4" />} />
-              <StatsCard label="Fotos" value={photos.length} icon={<Camera className="h-4 w-4" />} />
+              <StatsCard label="Coleções" value={collections.length || 0} icon={<ImageIcon className="h-4 w-4" />} />
+              <StatsCard label="Fotos" value={totalPhotos} icon={<Camera className="h-4 w-4" />} />
               <StatsCard label="Downloads" value={photographer.downloads || 0} icon={<Download className="h-4 w-4" />} />
             </div>
 
@@ -97,51 +98,51 @@ export default async function PhotographerProfilePage(props) {
               </div>
             )}
 
-            {/* Photos Grid */}
+            {/* Collections Grid */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Galeria</h2>
-                <div className="text-sm text-muted-foreground">{photos.length} fotos publicadas</div>
+                <h2 className="text-2xl font-bold text-white">Coleções</h2>
+                <div className="text-sm text-muted-foreground">{collections.length} coleções publicadas</div>
               </div>
 
-              {photos.length === 0 ? (
+              {collections.length === 0 ? (
                 <Card className="glass-panel border-dashed border-white/10 bg-transparent py-12 text-center">
                   <CardContent>
-                    <Camera className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
-                    <p className="text-lg font-medium text-white">Nenhuma foto publicada</p>
-                    <p className="text-muted-foreground">Este fotógrafo ainda não publicou nenhuma foto.</p>
+                    <ImageIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+                    <p className="text-lg font-medium text-white">Nenhuma coleção publicada</p>
+                    <p className="text-muted-foreground">Este fotógrafo ainda não publicou nenhuma coleção.</p>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {photos.map((foto) => (
-                    <Link
-                      key={foto.id}
-                      href={`/foto/${foto.id}`}
-                      className="group relative aspect-[4/5] overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10"
-                    >
-                      {foto.previewUrl ? (
-                        <img 
-                          src={foto.previewUrl} 
-                          alt={foto.titulo} 
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-                          <ImageIcon className="h-12 w-12 opacity-20" />
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2">
+                  {collections.map((collection, index) => {
+                     const isUrl = collection.cover?.startsWith("http");
+                     const isGradient = collection.cover?.startsWith("linear-gradient");
+                     
+                     const backgroundStyle = isUrl
+                        ? { backgroundImage: `url(${collection.cover})` }
+                        : isGradient
+                        ? { backgroundImage: collection.cover }
+                        : { backgroundColor: collection.cover };
+                    
+                    return (
+                      <Link
+                        key={collection.id ?? index}
+                        href={`/colecoes/${collection.slug}`}
+                        className="group bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg h-[400px] block"
+                        style={{ ...backgroundStyle, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                      >
+                         <div className="p-6 bg-black/50 h-full flex flex-col justify-end">
+                          <h3 className="text-xl font-bold mb-2 text-white">{collection.name}</h3>
+                          <p className="text-white/80 text-sm mb-4 line-clamp-2">{collection.description}</p>
+                          <div className="flex justify-between text-xs text-white/70">
+                            <span>{collection.totalPhotos || 0} fotos</span>
+                            <span>Por {collection.photographerName || 'GT Clicks'}</span>
+                          </div>
                         </div>
-                      )}
-                      
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                      
-                      <div className="absolute bottom-0 left-0 w-full p-4 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                        <h3 className="font-bold text-white line-clamp-1">{foto.titulo}</h3>
-                        {foto.categoria && (
-                          <span className="text-xs text-gray-300">{foto.categoria}</span>
-                        )}
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -152,8 +153,8 @@ export default async function PhotographerProfilePage(props) {
             <Card className="glass-panel border-white/10 bg-black/40 p-6">
               <h3 className="mb-6 text-lg font-bold text-white">Estatísticas</h3>
               <div className="space-y-6">
-                <SidebarStat label="Coleções Publicadas" value={photographer.colecoesPublicadas || 0} icon={<ImageIcon className="h-5 w-5 text-primary" />} />
-                <SidebarStat label="Total de Fotos" value={photos.length} icon={<Camera className="h-5 w-5 text-primary" />} />
+                <SidebarStat label="Coleções Publicadas" value={collections.length || 0} icon={<ImageIcon className="h-5 w-5 text-primary" />} />
+                <SidebarStat label="Total de Fotos" value={totalPhotos} icon={<Camera className="h-5 w-5 text-primary" />} />
                 <SidebarStat label="Total de Downloads" value={photographer.downloads || 0} icon={<Download className="h-5 w-5 text-primary" />} />
               </div>
             </Card>

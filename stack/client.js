@@ -9,8 +9,14 @@ if (!projectId || !publishableClientKey) {
   );
 }
 
-export const stackClientApp = new StackClientApp({
+const globalForStack = global;
+
+export const stackClientApp = globalForStack.stackClientApp || new StackClientApp({
   projectId,
   publishableClientKey,
   tokenStore: "cookie",
 });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForStack.stackClientApp = stackClientApp;
+}

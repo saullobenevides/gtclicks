@@ -1,0 +1,434 @@
+[2025-12-16T01:28:18.408Z] [ERROR] Photo Process API: PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.create()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__fbc33251._.js:264:156
+
+  261 if (folderId) {
+  262     photoData.folderId = folderId;
+  263 }
+→ 264 const foto = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.create({
+        data: {
+          titulo: "unnamed (1)",
+          descricao: undefined,
+          tags: [],
+          orientacao: "HORIZONTAL",
+          s3Key: "originals/897957dc-f53d-4569-8e6e-5441191acb2e.jpg",
+          width: 747,
+          height: 1024,
+          formato: "jpg",
+          tamanhoBytes: 0,
+          previewUrl: "https://gtclicks.s3.sa-east-1.amazonaws.com/previews/7e9ae2d4-9bf4-4ad3-8558-dd475034dc20.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA5AIL5ZTOCVIOHV7F%2F20251216%2Fsa-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251216T012818Z&X-Amz-Expires=604800&X-Amz-Signature=c06022e3394148e22a4c3a6f52aa28d8b1c7d5d96f2935108f3367440f0df0df&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+          camera: null,
+          lens: undefined,
+          focalLength: null,
+          iso: null,
+          shutterSpeed: null,
+          aperture: null,
+          fotografoId: "cmifc0d0c0005e2ygxztc8rz8",
+          status: "PUBLICADA",
+          colecoes: {
+            connect: {
+              id: "cmj4p4or40003e2445trdxmb0"
+            }
+          },
+          folderId: "cmj7wezeg0007e2pkwjjrc19i",
+      +   fotografo: {
+      +     create: FotografoCreateWithoutFotosInput | FotografoUncheckedCreateWithoutFotosInput,
+      +     connectOrCreate: FotografoCreateOrConnectWithoutFotosInput,
+      +     connect: FotografoWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `fotografo` is missing.
+    at Nn (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at ei.handleRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6911)
+    at ei.handleAndLogRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6593)
+    at ei.request (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6300)
+    at async a (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:130:9551)
+    at async POST (C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__fbc33251._.js:264:22)
+    at async AppRouteRouteModule.do (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:37913)
+    at async AppRouteRouteModule.handle (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:45132)
+    at async responseGenerator (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16097:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:19:132654)
+    at async handleResponse (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16159:32)
+    at async handler (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16212:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1415:9)
+    at async DevServer.renderPageComponent (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1467:24)
+    at async DevServer.renderToResponseImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1517:32)
+    at async DevServer.pipeImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1023:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:914:17)
+    at async C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (C:\Users\saull\gtclicks\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:369:24)
+    at async invokeRender (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\start-server.js:226:13)
+[2025-12-16T01:30:23.264Z] [ERROR] Photo Process API: PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.create()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__fbc33251._.js:269:156
+
+  266 if (folderId) {
+  267     photoData.folderId = folderId;
+  268 }
+→ 269 const foto = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.create({
+        data: {
+          titulo: "unnamed (1)",
+          descricao: undefined,
+          tags: [],
+          orientacao: "HORIZONTAL",
+          s3Key: "originals/4b4e8a7b-fb6b-4227-bbeb-e74a197558b1.jpg",
+          width: 747,
+          height: 1024,
+          formato: "jpg",
+          tamanhoBytes: 0,
+          previewUrl: "https://gtclicks.s3.sa-east-1.amazonaws.com/previews/af5398ea-a4b1-4ca7-af7d-460a7e505770.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA5AIL5ZTOCVIOHV7F%2F20251216%2Fsa-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251216T013023Z&X-Amz-Expires=604800&X-Amz-Signature=4bd7f7385533965b6d1759e21361a79ed036135b740ea5aada950a9d41558936&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+          camera: null,
+          lens: undefined,
+          focalLength: null,
+          iso: null,
+          shutterSpeed: null,
+          aperture: null,
+          fotografo: {
+            connect: {
+              id: "cmifc0d0c0005e2ygxztc8rz8"
+            }
+          },
+          status: "PUBLICADA",
+          colecoes: {
+            connect: {
+              id: "cmj4p4or40003e2445trdxmb0"
+            }
+          },
+          folderId: "cmj7wezeg0007e2pkwjjrc19i",
+      +   colecao: {
+      +     create: ColecaoCreateWithoutFotosInput | ColecaoUncheckedCreateWithoutFotosInput,
+      +     connectOrCreate: ColecaoCreateOrConnectWithoutFotosInput,
+      +     connect: ColecaoWhereUniqueInput
+      +   }
+        }
+      })
+
+Argument `colecao` is missing.
+    at Nn (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at ei.handleRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6911)
+    at ei.handleAndLogRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6593)
+    at ei.request (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6300)
+    at async a (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:130:9551)
+    at async POST (C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__fbc33251._.js:269:22)
+    at async AppRouteRouteModule.do (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:37913)
+    at async AppRouteRouteModule.handle (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:45132)
+    at async responseGenerator (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16097:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:19:132654)
+    at async handleResponse (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16159:32)
+    at async handler (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16212:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1415:9)
+    at async DevServer.renderPageComponent (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1467:24)
+    at async DevServer.renderToResponseImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1517:32)
+    at async DevServer.pipeImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1023:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:914:17)
+    at async C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (C:\Users\saull\gtclicks\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:369:24)
+    at async invokeRender (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\start-server.js:226:13)
+[2025-12-16T01:31:42.087Z] [ERROR] Photo Process API: PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.create()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__fbc33251._.js:269:156
+
+  266 if (folderId) {
+  267     photoData.folderId = folderId;
+  268 }
+→ 269 const foto = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.create({
+        data: {
+          titulo: "unnamed (1)",
+          descricao: undefined,
+          tags: [],
+          orientacao: "HORIZONTAL",
+          s3Key: "originals/23da4241-99c7-4f2a-9ad5-7f3f1a877e04.jpg",
+          width: 747,
+          height: 1024,
+          formato: "jpg",
+          tamanhoBytes: 0,
+          previewUrl: "https://gtclicks.s3.sa-east-1.amazonaws.com/previews/0606d5bf-4570-4ceb-9e5c-486fcbe3953c.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA5AIL5ZTOCVIOHV7F%2F20251216%2Fsa-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251216T013141Z&X-Amz-Expires=604800&X-Amz-Signature=e3430f4194b6d187be80605b4ba8f976c071be3e09081686925b322965b74d70&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+          camera: null,
+          lens: undefined,
+          focalLength: null,
+          iso: null,
+          shutterSpeed: null,
+          aperture: null,
+          fotografo: {
+            connect: {
+              id: "cmifc0d0c0005e2ygxztc8rz8"
+            }
+          },
+          status: "PUBLICADA",
+          colecao: {
+            connect: {
+              id: "cmj4p4or40003e2445trdxmb0"
+            }
+          },
+          folderId: "cmj7wezeg0007e2pkwjjrc19i",
+          ~~~~~~~~
+      ?   id?: String,
+      ?   likes?: Int,
+      ?   folder?: String | Null,
+      ?   createdAt?: DateTime,
+      ?   folderRef?: FolderCreateNestedOneWithoutFotosInput,
+      ?   licencas?: FotoLicencaCreateNestedManyWithoutFotoInput,
+      ?   itensPedido?: ItemPedidoCreateNestedManyWithoutFotoInput,
+      ?   itensCarrinho?: ItemCarrinhoCreateNestedManyWithoutFotoInput,
+      ?   likesList?: LikeCreateNestedManyWithoutFotoInput
+        }
+      })
+
+Unknown argument `folderId`. Did you mean `folder`? Available options are marked with ?.
+    at Nn (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at ei.handleRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6911)
+    at ei.handleAndLogRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6593)
+    at ei.request (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6300)
+    at async a (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:130:9551)
+    at async POST (C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__fbc33251._.js:269:22)
+    at async AppRouteRouteModule.do (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:37913)
+    at async AppRouteRouteModule.handle (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:45132)
+    at async responseGenerator (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16097:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:19:132654)
+    at async handleResponse (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16159:32)
+    at async handler (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16212:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1415:9)
+    at async DevServer.renderPageComponent (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1467:24)
+    at async DevServer.renderToResponseImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1517:32)
+    at async DevServer.pipeImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1023:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:914:17)
+    at async C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (C:\Users\saull\gtclicks\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:369:24)
+    at async invokeRender (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\start-server.js:226:13)
+[2025-12-16T03:00:40.169Z] [ERROR] Batch API: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.deleteMany()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__d17a374d._.js:146:147
+
+  143 }
+  144 // Delete removed photos
+  145 if (deletedPhotoIds.length > 0) {
+→ 146     await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.deleteMany(
+Foreign key constraint violated on the constraint: `Like_fotoId_fkey`
+    at ei.handleRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:7268)
+    at ei.handleAndLogRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6593)
+    at ei.request (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6300)
+    at async a (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:130:9551)
+    at async POST (C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__d17a374d._.js:146:13)
+    at async AppRouteRouteModule.do (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:37913)
+    at async AppRouteRouteModule.handle (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:45132)
+    at async responseGenerator (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_4b18f407._.js:17074:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:19:132654)
+    at async handleResponse (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_4b18f407._.js:17136:32)
+    at async handler (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_4b18f407._.js:17189:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1415:9)
+    at async DevServer.renderPageComponent (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1467:24)
+    at async DevServer.renderToResponseImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1517:32)
+    at async DevServer.pipeImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1023:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:914:17)
+    at async C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (C:\Users\saull\gtclicks\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:369:24)
+    at async invokeRender (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\start-server.js:226:13)
+[2025-12-16T03:03:00.419Z] [ERROR] Client Error at http://localhost:3000/dashboard/fotografo/colecoes/cmj4p4or40003e2445trdxmb0/editar: ReferenceError: availableLicenses is not defined
+    at eval (http://localhost:3000/_next/static/chunks/_25c1c797._.js?id=%255Bproject%255D%252Fcomponents%252FCollectionEditor.js+%255Bapp-client%255D+%2528ecmascript%2529:1076:83)
+    at Array.map (<anonymous>)
+    at CollectionEditor (http://localhost:3000/_next/static/chunks/_25c1c797._.js?id=%255Bproject%255D%252Fcomponents%252FCollectionEditor.js+%255Bapp-client%255D+%2528ecmascript%2529:897:65)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14746:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4636:24)
+    at updateFunctionComponent (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6091:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6672:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9487:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9381:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9365:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9030:47)
+    at performSyncWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10163:9)
+    at flushSyncWorkAcrossRoots_impl (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10079:316)
+    at flushSyncWork$1 (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9162:86)
+    at scheduleRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:294:13)
+    at S.scheduleRefresh (chrome-extension://fmkadmapgofadopljbjfkapdkoienihi/build/installHook.js:1:86461)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:391:33
+    at Set.forEach (<anonymous>)
+    at Object.performReactRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:384:38)
+    at applyUpdate (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:878:31)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:886:13
+[2025-12-16T03:03:00.454Z] [ERROR] Client Error at http://localhost:3000/dashboard/fotografo/colecoes/cmj4p4or40003e2445trdxmb0/editar: ReferenceError: availableLicenses is not defined
+    at eval (http://localhost:3000/_next/static/chunks/_25c1c797._.js?id=%255Bproject%255D%252Fcomponents%252FCollectionEditor.js+%255Bapp-client%255D+%2528ecmascript%2529:1076:83)
+    at Array.map (<anonymous>)
+    at CollectionEditor (http://localhost:3000/_next/static/chunks/_25c1c797._.js?id=%255Bproject%255D%252Fcomponents%252FCollectionEditor.js+%255Bapp-client%255D+%2528ecmascript%2529:897:65)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14746:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4636:24)
+    at updateFunctionComponent (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6091:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6672:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9487:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9381:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9365:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9030:47)
+    at performSyncWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10163:9)
+    at flushSyncWorkAcrossRoots_impl (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10079:316)
+    at flushSyncWork$1 (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9162:86)
+    at scheduleRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:294:13)
+    at S.scheduleRefresh (chrome-extension://fmkadmapgofadopljbjfkapdkoienihi/build/installHook.js:1:86461)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:391:33
+    at Set.forEach (<anonymous>)
+    at Object.performReactRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:384:38)
+    at applyUpdate (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:878:31)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:886:13
+[2025-12-16T03:04:48.373Z] [ERROR] Batch API: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.deleteMany()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__d17a374d._.js:146:147
+
+  143 }
+  144 // Delete removed photos
+  145 if (deletedPhotoIds.length > 0) {
+→ 146     await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.deleteMany(
+Foreign key constraint violated on the constraint: `Like_fotoId_fkey`
+    at ei.handleRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:7268)
+    at ei.handleAndLogRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6593)
+    at ei.request (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6300)
+    at async a (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:130:9551)
+    at async POST (C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__d17a374d._.js:146:13)
+    at async AppRouteRouteModule.do (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:37913)
+    at async AppRouteRouteModule.handle (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:45132)
+    at async responseGenerator (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_4b18f407._.js:17074:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:19:132654)
+    at async handleResponse (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_4b18f407._.js:17136:32)
+    at async handler (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_4b18f407._.js:17189:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1415:9)
+    at async DevServer.renderPageComponent (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1467:24)
+    at async DevServer.renderToResponseImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1517:32)
+    at async DevServer.pipeImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1023:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:914:17)
+    at async C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (C:\Users\saull\gtclicks\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:369:24)
+    at async invokeRender (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\start-server.js:226:13)
+[2025-12-16T03:10:48.448Z] [ERROR] Batch API: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.deleteMany()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__d17a374d._.js:146:147
+
+  143 }
+  144 // Delete removed photos
+  145 if (deletedPhotoIds.length > 0) {
+→ 146     await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.deleteMany(
+Foreign key constraint violated on the constraint: `Like_fotoId_fkey`
+    at ei.handleRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:7268)
+    at ei.handleAndLogRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6593)
+    at ei.request (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6300)
+    at async a (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:130:9551)
+    at async POST (C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__d17a374d._.js:146:13)
+    at async AppRouteRouteModule.do (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:37913)
+    at async AppRouteRouteModule.handle (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:45132)
+    at async responseGenerator (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_4b18f407._.js:17074:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:19:132654)
+    at async handleResponse (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_4b18f407._.js:17136:32)
+    at async handler (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_4b18f407._.js:17189:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1415:9)
+    at async DevServer.renderPageComponent (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1467:24)
+    at async DevServer.renderToResponseImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1517:32)
+    at async DevServer.pipeImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1023:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:914:17)
+    at async C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (C:\Users\saull\gtclicks\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:369:24)
+    at async invokeRender (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\start-server.js:226:13)
+[2025-12-16T03:16:50.312Z] [ERROR] Photo Process API: PrismaClientValidationError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.create()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__fbc33251._.js:267:156
+
+  264 if (folderId) {
+  265     photoData.folderId = folderId;
+  266 }
+→ 267 const foto = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].foto.create({
+        data: {
+          titulo: "capa",
+          descricao: undefined,
+          tags: [],
+          orientacao: "HORIZONTAL",
+          s3Key: "originals/0135551e-44bf-4974-956d-fec480c91457.webp",
+          width: 1863,
+          height: 759,
+          formato: "jpg",
+          tamanhoBytes: 0,
+          previewUrl: "https://gtclicks.s3.sa-east-1.amazonaws.com/previews/c7716d19-f6b5-4978-9bdd-45030416e91f.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA5AIL5ZTOCVIOHV7F%2F20251216%2Fsa-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251216T031650Z&X-Amz-Expires=604800&X-Amz-Signature=fb87c90c1e39c6ec1e4618a61c0783fa5f915c0df753a688d8c53563c0ac647b&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+          camera: null,
+          lens: undefined,
+          focalLength: null,
+          iso: null,
+          shutterSpeed: null,
+          aperture: null,
+          fotografo: {
+            connect: {
+              id: "cmifc0d0c0005e2ygxztc8rz8"
+            }
+          },
+          status: "PUBLICADA",
+          colecao: {
+            connect: {
+              id: "cmj4p4or40003e2445trdxmb0"
+            }
+          },
+          folderId: "cmj7wezeg0007e2pkwjjrc19i",
+          ~~~~~~~~
+      ?   id?: String,
+      ?   likes?: Int,
+      ?   createdAt?: DateTime,
+      ?   folder?: FolderCreateNestedOneWithoutFotosInput,
+      ?   licencas?: FotoLicencaCreateNestedManyWithoutFotoInput,
+      ?   itensPedido?: ItemPedidoCreateNestedManyWithoutFotoInput,
+      ?   itensCarrinho?: ItemCarrinhoCreateNestedManyWithoutFotoInput,
+      ?   likesList?: LikeCreateNestedManyWithoutFotoInput
+        }
+      })
+
+Unknown argument `folderId`. Did you mean `folder`? Available options are marked with ?.
+    at Nn (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:29:1363)
+    at ei.handleRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6911)
+    at ei.handleAndLogRequestError (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6593)
+    at ei.request (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:121:6300)
+    at async a (C:\Users\saull\gtclicks\node_modules\@prisma\client\runtime\library.js:130:9551)
+    at async POST (C:\Users\saull\gtclicks\.next\dev\server\chunks\[root-of-the-server]__fbc33251._.js:267:22)
+    at async AppRouteRouteModule.do (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:37913)
+    at async AppRouteRouteModule.handle (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:23:45132)
+    at async responseGenerator (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16097:38)
+    at async AppRouteRouteModule.handleResponse (C:\Users\saull\gtclicks\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:19:132654)
+    at async handleResponse (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16159:32)
+    at async handler (C:\Users\saull\gtclicks\.next\dev\server\chunks\node_modules_next_350e56fd._.js:16212:13)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1415:9)
+    at async DevServer.renderPageComponent (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1467:24)
+    at async DevServer.renderToResponseImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1517:32)
+    at async DevServer.pipeImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:1023:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\base-server.js:914:17)
+    at async C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (C:\Users\saull\gtclicks\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\dev\next-dev-server.js:369:24)
+    at async invokeRender (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (C:\Users\saull\gtclicks\node_modules\next\dist\server\lib\start-server.js:226:13)

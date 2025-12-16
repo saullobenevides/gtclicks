@@ -1,0 +1,19 @@
+'use client';
+
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackClientApp } from "@/stack/client";
+import { CartProvider } from "@/components/CartContext";
+import UserSync from "@/components/UserSync";
+
+export default function AppProviders({ children }) {
+  return (
+    <StackProvider app={stackClientApp}>
+      <StackTheme appearance="dark">
+        <UserSync />
+        <CartProvider>
+          {children}
+        </CartProvider>
+      </StackTheme>
+    </StackProvider>
+  );
+}

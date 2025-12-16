@@ -96,6 +96,9 @@ model Foto {
   colecaoId      String?
   colecao        Colecao?  @relation(fields: [colecaoId], references: [id])
 
+  folderId       String?
+  folder         Folder?   @relation(fields: [folderId], references: [id])
+
   licencas       FotoLicenca[]
   itensPedido    ItemPedido[]
   itensCarrinho  ItemCarrinho[]
@@ -109,7 +112,7 @@ model Like {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   fotoId    String
-  foto      Foto     @relation(fields: [fotoId], references: [id])
+  foto      Foto     @relation(fields: [fotoId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@unique([userId, fotoId])
@@ -121,12 +124,33 @@ model Colecao {
   slug           String    @unique
   descricao      String?
   capaUrl        String?
+  categoria      String?
+  status         String    @default("RASCUNHO")
+  precoFoto      Decimal   @default(0.0) @db.Decimal(10, 2)
   
   fotografoId    String
   fotografo      Fotografo @relation(fields: [fotografoId], references: [id])
   
   fotos          Foto[]
+  folders        Folder[]
   createdAt      DateTime  @default(now())
+}
+
+model Folder {
+  id          String   @id @default(cuid())
+  nome        String
+  
+  colecaoId   String
+  colecao     Colecao  @relation(fields: [colecaoId], references: [id], onDelete: Cascade)
+  
+  parentId    String?
+  parent      Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
+  children    Folder[] @relation("FolderToFolder")
+  
+  fotos       Foto[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 
@@ -148,7 +172,7 @@ model FotoLicenca {
   preco          Decimal   @db.Decimal(10, 2)
   
   fotoId         String
-  foto           Foto      @relation(fields: [fotoId], references: [id])
+  foto           Foto      @relation(fields: [fotoId], references: [id], onDelete: Cascade)
   
   licencaId      String
   licenca        Licenca   @relation(fields: [licencaId], references: [id])
@@ -172,11 +196,11 @@ model ItemCarrinho {
   carrinho    Carrinho @relation(fields: [carrinhoId], references: [id])
   
   fotoId      String
-  foto        Foto     @relation(fields: [fotoId], references: [id])
-  licencaId   String
-  licenca     Licenca  @relation(fields: [licencaId], references: [id])
+  foto        Foto     @relation(fields: [fotoId], references: [id], onDelete: Cascade)
+  licencaId   String?
+  licenca     Licenca? @relation(fields: [licencaId], references: [id])
 
-  @@unique([carrinhoId, fotoId, licencaId])
+  @@unique([carrinhoId, fotoId])
 }
 
 enum PedidoStatus {
@@ -205,8 +229,8 @@ model ItemPedido {
   
   fotoId          String
   foto            Foto      @relation(fields: [fotoId], references: [id])
-  licencaId       String
-  licenca         Licenca   @relation(fields: [licencaId], references: [id])
+  licencaId       String?
+  licenca         Licenca?  @relation(fields: [licencaId], references: [id])
   
   precoPago       Decimal   @db.Decimal(10, 2) // Preço congelado
   

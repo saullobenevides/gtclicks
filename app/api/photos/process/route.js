@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { stackServerApp } from "@/stack/server";
+import { logError } from "@/lib/logger";
 // import sharp from "sharp"; // Sharp might be too heavy for some environments, using basic metadata if possible or just saving dimensions from client if needed. 
 // For this MVP, we will try to read metadata. If sharp is not available, we might need another way or rely on client sending dimensions.
 // The spec mentions "Lib Sharp / Exif-Parser". I'll assume I can use a lightweight exif parser or just mock the extraction if dependencies are missing.
@@ -30,7 +31,10 @@ export async function POST(request) {
     return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
   }
 
+
   try {
+    console.log("Invoked /api/photos/process"); // Debug: Force rebuild
+
     const body = await request.json();
     const { 
       s3Key, 
@@ -46,7 +50,9 @@ export async function POST(request) {
       focalLength,
       iso,
       shutterSpeed,
-      aperture
+      aperture,
+      colecaoId, // Added
+      folderId   // Added
     } = body;
 
     if (!s3Key) {
@@ -72,8 +78,8 @@ export async function POST(request) {
     const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
     const previewUrl = await getSignedUrl(s3Client, command, { expiresIn: 604800 });
     
-    const foto = await prisma.foto.create({
-      data: {
+    // Build creating data
+    const photoData = {
         titulo: titulo || "Sem titulo",
         descricao,
         tags: tags || [],
@@ -93,14 +99,32 @@ export async function POST(request) {
         shutterSpeed,
         aperture,
 
-        fotografoId: fotografo.id,
+
+
+        fotografo: {
+            connect: { id: fotografo.id }
+        },
         status: "PUBLICADA", // Auto-publish for MVP
-      },
+    };
+
+    if (colecaoId) {
+        photoData.colecao = {
+            connect: { id: colecaoId }
+        };
+    }
+    
+    if (folderId) {
+        photoData.folder = { connect: { id: folderId } };
+    }
+
+    const foto = await prisma.foto.create({
+      data: photoData
     });
 
     return NextResponse.json({ success: true, foto });
   } catch (error) {
     console.error("Error processing photo:", error);
-    return NextResponse.json({ error: "Erro ao processar foto" }, { status: 500 });
+    logError(error, "Photo Process API"); // Use logger
+    return NextResponse.json({ error: "Erro ao processar foto: " + error.message }, { status: 500 });
   }
 }

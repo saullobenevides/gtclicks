@@ -31,7 +31,7 @@ export async function POST(request) {
       for (const item of items) {
         // Check if item already exists in DB cart
         const exists = cart.itens.some(
-          (dbItem) => dbItem.fotoId === item.fotoId && dbItem.licencaId === item.licencaId
+          (dbItem) => dbItem.fotoId === item.fotoId
         );
 
         if (!exists) {
@@ -39,7 +39,7 @@ export async function POST(request) {
             data: {
               carrinhoId: cart.id,
               fotoId: item.fotoId,
-              licencaId: item.licencaId,
+              // licencaId is now optional/ignored
             },
           });
         }
@@ -52,34 +52,26 @@ export async function POST(request) {
       include: {
         itens: {
           include: {
-            foto: true,
-            licenca: true,
+            foto: {
+              include: { colecao: true }
+            },
           },
         },
       },
     });
 
-    // Better approach: Fetch prices separately or use a more complex query.
-    // Let's iterate and fetch prices.
-    const formattedItems = await Promise.all(updatedCart.itens.map(async (item) => {
-       const fotoLicenca = await prisma.fotoLicenca.findUnique({
-         where: {
-           fotoId_licencaId: {
-             fotoId: item.fotoId,
-             licencaId: item.licencaId,
-           }
-         }
-       });
-
+    const formattedItems = updatedCart.itens.map((item) => {
+       const preco = item.foto.colecao?.precoFoto ? Number(item.foto.colecao.precoFoto) : 0;
+       
        return {
         fotoId: item.fotoId,
-        licencaId: item.licencaId,
+        licencaId: null, // No longer used
         titulo: item.foto.titulo,
-        preco: fotoLicenca ? Number(fotoLicenca.preco) : 0,
-        licenca: item.licenca.nome,
+        preco: preco,
+        licenca: 'Uso Padrão',
         previewUrl: item.foto.previewUrl,
        };
-    }));
+    });
 
     return NextResponse.json({ items: formattedItems });
 

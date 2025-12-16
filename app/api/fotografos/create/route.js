@@ -19,7 +19,7 @@ function generateUniqueUsername(baseName) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { userId, name, email } = body;
+    const { userId, name, email, username, bio, telefone, cidade, estado, instagram, chavePix } = body;
 
     if (!userId) {
       return NextResponse.json(
@@ -44,7 +44,6 @@ export async function POST(request) {
     }
 
     // Verify or create user in Prisma
-    // Stack Auth manages users separately, so we need to sync them
     let user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -59,46 +58,48 @@ export async function POST(request) {
           role: "FOTOGRAFO",
         },
       });
+    } else {
+        // Upgrade existing user to FOTOGRAFO
+        await prisma.user.update({
+            where: { id: userId },
+            data: { role: "FOTOGRAFO" }
+        });
     }
 
-    // Generate unique username
-    const baseName = name || email?.split("@")[0] || "fotografo";
-    let username = generateUniqueUsername(baseName);
-    
-    // Ensure username is truly unique
-    let attempt = 0;
-    while (attempt < 10) {
-      const usernameExists = await prisma.fotografo.findUnique({
-        where: { username },
-      });
-      
-      if (!usernameExists) break;
-      
-      username = generateUniqueUsername(baseName);
-      attempt++;
+    // Process username (use provided or generate)
+    let finalUsername = username;
+    if (!finalUsername) {
+         // Generate unique username fallback
+         const baseName = name || email?.split("@")[0] || "fotografo";
+         finalUsername = generateUniqueUsername(baseName);
+         let attempt = 0;
+         while (attempt < 10) {
+            const usernameExists = await prisma.fotografo.findUnique({ where: { username: finalUsername } });
+            if (!usernameExists) break;
+            finalUsername = generateUniqueUsername(baseName);
+            attempt++;
+         }
+         if (attempt >= 10) throw new Error("Não foi possível gerar um username único");
+    } else {
+        // Remove @ if present
+        if (finalUsername.startsWith('@')) finalUsername = finalUsername.substring(1);
     }
 
-    if (attempt >= 10) {
-      return NextResponse.json(
-        { error: "Não foi possível gerar um username único" },
-        { status: 500 }
-      );
-    }
-
-    // Create photographer profile
+    // Create photographer profile with full details
     const fotografo = await prisma.fotografo.create({
       data: {
         userId,
-        username,
-        bio: "Fotógrafo profissional",
+        username: finalUsername,
+        bio: bio || "Fotógrafo profissional",
+        telefone,
+        cidade,
+        estado,
+        instagram,
+        chavePix,
       },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+          select: { id: true, name: true, email: true },
         },
       },
     });
@@ -110,6 +111,9 @@ export async function POST(request) {
         username: fotografo.username,
         nome: fotografo.user?.name,
         email: fotografo.user?.email,
+        telefone: fotografo.telefone,
+        cidade: fotografo.cidade,
+        estado: fotografo.estado
       },
     });
   } catch (error) {
