@@ -15,6 +15,7 @@ export default function PhotographerLayout({ children }) {
     { href: '/dashboard/fotografo', label: 'Início' },
     { href: '/dashboard/fotografo/colecoes', label: 'Minhas Coleções' },
     { href: '/dashboard/fotografo/financeiro', label: 'Financeiro' },
+    { href: '/dashboard/fotografo/perfil', label: 'Meu Perfil' },
   ];
 
   useEffect(() => {

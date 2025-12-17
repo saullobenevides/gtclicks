@@ -1,5 +1,6 @@
 'use client';
 
+
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -10,14 +11,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { UploadCloud, Trash2, PlusCircle, Loader2, AlertCircle, CheckCircle2, Save, ArrowLeft, Star } from 'lucide-react';
+import { UploadCloud, Trash2, PlusCircle, Loader2, Save, ArrowLeft, Star } from 'lucide-react';
 import EXIF from 'exif-js';
 import FolderManager from './FolderManager';
 import Breadcrumbs from './Breadcrumbs';
 import { CATEGORIES } from '@/lib/constants';
+import { toast } from "sonner";
 
-// Re-using helper functions from UploadDashboard
+// ... (keep constants and helper functions)
 const orientationOptions = ['HORIZONTAL', 'VERTICAL', 'PANORAMICA', 'QUADRADO'];
 const blankPhoto = () => ({
   id: null,
@@ -28,12 +29,10 @@ const blankPhoto = () => ({
   previewS3Key: '',
   tags: '',
   orientacao: 'HORIZONTAL',
-  tags: '',
-  orientacao: 'HORIZONTAL',
 });
 
+// ... (keep extractMetadata and generatePreview)
 const extractMetadata = (file) => {
-  // (Implementation copied from UploadDashboard)
   return new Promise((resolve) => {
     EXIF.getData(file, function() {
       const make = EXIF.getTag(this, "Make");
@@ -57,28 +56,26 @@ const extractMetadata = (file) => {
 };
 
 const generatePreview = (file) => {
-  // (Implementation copied from UploadDashboard)
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const MAX_WIDTH = 1200, MAX_HEIGHT = 1200;
-      let width = img.width, height = img.height;
-      if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
-      else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-      canvas.width = width; canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
-      ctx.save(); ctx.globalAlpha = 0.4; ctx.font = `bold ${width*0.08}px Arial`; ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.translate(width/2, height/2); ctx.rotate(-30 * Math.PI / 180); ctx.fillText('GT Clicks Preview', 0, 0);
-      ctx.restore();
-      canvas.toBlob((blob) => { if (blob) resolve(blob); else reject(new Error("Failed to generate preview blob")); }, 'image/jpeg', 0.60);
-    };
-    img.onerror = reject;
-    img.src = URL.createObjectURL(file);
-  });
-};
-
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const MAX_WIDTH = 1200, MAX_HEIGHT = 1200;
+        let width = img.width, height = img.height;
+        if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
+        else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+        canvas.width = width; canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        ctx.save(); ctx.globalAlpha = 0.4; ctx.font = `bold ${width*0.08}px Arial`; ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.translate(width/2, height/2); ctx.rotate(-30 * Math.PI / 180); ctx.fillText('GT Clicks Preview', 0, 0);
+        ctx.restore();
+        canvas.toBlob((blob) => { if (blob) resolve(blob); else reject(new Error("Failed to generate preview blob")); }, 'image/jpeg', 0.60);
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
 
 export default function CollectionEditor({ collection: initialCollection }) {
   const router = useRouter();
@@ -86,7 +83,6 @@ export default function CollectionEditor({ collection: initialCollection }) {
   const [collectionData, setCollectionData] = useState({
     nome: initialCollection.nome || '',
     descricao: initialCollection.descricao || '',
-    categoria: initialCollection.categoria || '',
     categoria: initialCollection.categoria || '',
     status: initialCollection.status || 'RASCUNHO',
     precoFoto: initialCollection.precoFoto || 0,
@@ -101,7 +97,6 @@ export default function CollectionEditor({ collection: initialCollection }) {
   const [allPhotos, setAllPhotos] = useState(initialCollection.fotos || []);
   const [currentPhotos, setCurrentPhotos] = useState([]);
 
-  const [status, setStatus] = useState({ type: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [uploadState, setUploadState] = useState({ index: null, label: '' });
   const [deletedPhotoIds, setDeletedPhotoIds] = useState([]);
@@ -124,6 +119,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
   const handleSetCover = (photo) => {
     if (photo.previewUrl) {
       setCollectionData(prev => ({ ...prev, capaUrl: photo.previewUrl }));
+      toast.success("Capa definida com sucesso!");
     }
   };
 
@@ -132,8 +128,6 @@ export default function CollectionEditor({ collection: initialCollection }) {
       setCurrentFolder(null);
       setFolderPath([{ id: null, nome: 'Raiz' }]);
     } else {
-      // Check if we are navigating back or forward (simplified: just rebuild path if needed or append)
-      // For now, simple append if not in path, or slice if in path
       const index = folderPath.findIndex(f => f.id === folder.id);
       if (index !== -1) {
         setFolderPath(folderPath.slice(0, index + 1));
@@ -158,6 +152,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
     if (collectionData.capaUrl === photoToRemove.previewUrl) {
       setCollectionData(prev => ({ ...prev, capaUrl: '' }));
     }
+    toast.success("Foto removida.");
   };
 
   const updatePhoto = (photoToUpdate, field, value) => {
@@ -220,20 +215,20 @@ export default function CollectionEditor({ collection: initialCollection }) {
       } : p));
 
       setUploadState({ index: null, label: '' });
-      setStatus({ type: 'success', message: 'Upload concluído! Preencha os detalhes e publique.' });
+      toast.success('Upload concluído! Preencha os detalhes e publique.');
     } catch (error) {
       console.error(error);
       setUploadState({ index: null, label: '' });
-      setStatus({ type: 'error', message: error.message });
+      toast.error(error.message);
     }
   };
 
   const handleFileSelect = async (photo, file) => {
     if (!file) return;
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type)) { setStatus({ type: 'error', message: 'Formato inválido. Use apenas JPG, PNG ou WebP.' }); return; }
+    if (!validTypes.includes(file.type)) { toast.error('Formato inválido. Use apenas JPG, PNG ou WebP.'); return; }
     const maxSize = 50 * 1024 * 1024;
-    if (file.size > maxSize) { setStatus({ type: 'error', message: 'Arquivo muito grande. Tamanho máximo: 50MB' }); return; }
+    if (file.size > maxSize) { toast.error('Arquivo muito grande. Tamanho máximo: 50MB'); return; }
     const img = new Image();
     img.onload = () => { const orientation = img.width > img.height ? 'HORIZONTAL' : 'VERTICAL'; updatePhoto(photo, 'orientacao', orientation); };
     img.src = URL.createObjectURL(file);
@@ -242,7 +237,6 @@ export default function CollectionEditor({ collection: initialCollection }) {
   
   const handleSaveChanges = async () => {
     setSubmitting(true);
-    setStatus({ type: '', message: '' });
 
     try {
       // Logic to set default cover if none selected
@@ -307,11 +301,11 @@ export default function CollectionEditor({ collection: initialCollection }) {
         }
       }
 
-      setStatus({ type: 'success', message: 'Alterações salvas com sucesso!' });
+      toast.success('Alterações salvas com sucesso!');
       router.refresh(); 
     } catch (error) {
       console.error(error);
-      setStatus({ type: 'error', message: error.message });
+      toast.error(error.message);
     } finally {
       setSubmitting(false);
     }
@@ -331,12 +325,13 @@ export default function CollectionEditor({ collection: initialCollection }) {
         const data = await res.json();
         throw new Error(data.error || 'Falha ao excluir coleção');
       }
-
+      
+      toast.success("Coleção excluída com sucesso.");
       router.push('/dashboard/fotografo/colecoes');
       router.refresh();
     } catch (error) {
       console.error(error);
-      setStatus({ type: 'error', message: error.message });
+      toast.error(error.message);
       setDeleteOpen(false);
     } finally {
       setDeleting(false);
@@ -346,14 +341,6 @@ export default function CollectionEditor({ collection: initialCollection }) {
 
   return (
     <div className="flex flex-col gap-8">
-       {status.message && (
-        <Alert variant={status.type === 'error' ? 'destructive' : 'default'}>
-          {status.type === 'error' ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
-          <AlertTitle>{status.type === 'error' ? 'Erro' : 'Sucesso'}</AlertTitle>
-          <AlertDescription>{status.message}</AlertDescription>
-        </Alert>
-      )}
-
       {/* Collection Details Form */}
       <Card>
         <CardHeader>

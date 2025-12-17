@@ -1,5 +1,6 @@
 'use client';
 
+
 import { useEffect, useState } from 'react';
 import { useUser } from '@stackframe/stack';
 import { Button } from '@/components/ui/button';
@@ -9,8 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { UploadCloud, Trash2, PlusCircle, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { toast } from "sonner";
+
+// ... (existing constants)
 
 const orientationOptions = ['HORIZONTAL', 'VERTICAL', 'PANORAMICA', 'QUADRADO'];
 
@@ -28,6 +31,7 @@ const blankPhoto = () => ({
 
 import EXIF from 'exif-js';
 
+// ... (keep extractMetadata and generatePreview as is)
 const extractMetadata = (file) => {
   return new Promise((resolve) => {
     EXIF.getData(file, function() {
@@ -147,7 +151,6 @@ export default function UploadDashboard() {
   const [fotografoLookup, setFotografoLookup] = useState({ loading: true, error: '', data: null });
   const [creatingProfile, setCreatingProfile] = useState(false);
   const [photos, setPhotos] = useState([blankPhoto()]);
-  const [status, setStatus] = useState({ type: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [uploadState, setUploadState] = useState({ index: null, label: '' });
   const [availableLicenses, setAvailableLicenses] = useState([]);
@@ -204,10 +207,10 @@ export default function UploadDashboard() {
       
       setFotografoId(data.data.id);
       setFotografoLookup({ loading: false, error: '', data: data.data });
-      setStatus({ type: 'success', message: 'Perfil criado com sucesso! Agora você pode publicar fotos.' });
+      toast.success('Perfil criado com sucesso! Agora você pode publicar fotos.');
     } catch (error) {
       console.error(error);
-      setStatus({ type: 'error', message: error.message });
+      toast.error(error.message);
     } finally {
       setCreatingProfile(false);
     }
@@ -318,11 +321,11 @@ export default function UploadDashboard() {
       });
 
       setUploadState({ index: null, label: '' });
-      setStatus({ type: 'success', message: 'Upload concluído! Preencha os detalhes e publique.' });
+      toast.success('Upload concluído! Preencha os detalhes e publique.');
     } catch (error) {
       console.error(error);
       setUploadState({ index: null, label: '' });
-      setStatus({ type: 'error', message: error.message });
+      toast.error(error.message);
     }
   };
 
@@ -331,12 +334,12 @@ export default function UploadDashboard() {
 
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      setStatus({ type: 'error', message: 'Formato inválido. Use apenas JPG, PNG ou WebP.' });
+      toast.error('Formato inválido. Use apenas JPG, PNG ou WebP.');
       return;
     }
     const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
-      setStatus({ type: 'error', message: 'Arquivo muito grande. Tamanho máximo: 50MB' });
+      toast.error('Arquivo muito grande. Tamanho máximo: 50MB');
       return;
     }
     const img = new Image();
@@ -352,12 +355,11 @@ export default function UploadDashboard() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!fotografoId) {
-      setStatus({ type: 'error', message: 'ID de fotógrafo não encontrado.' });
+      toast.error('ID de fotógrafo não encontrado.');
       return;
     }
 
     setSubmitting(true);
-    setStatus({ type: '', message: '' });
 
     const payload = {
       fotografoId,
@@ -372,10 +374,10 @@ export default function UploadDashboard() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data?.error || 'Falha ao salvar as fotos');
-      setStatus({ type: 'success', message: 'Fotos publicadas com sucesso!' });
+      toast.success('Fotos publicadas com sucesso!');
       setPhotos([blankPhoto()]);
     } catch (error) {
-      setStatus({ type: 'error', message: error.message });
+        toast.error(error.message);
     } finally {
       setSubmitting(false);
     }
@@ -404,14 +406,6 @@ export default function UploadDashboard() {
 
   return (
     <div className="flex flex-col gap-8">
-      {status.message && (
-        <Alert variant={status.type === 'error' ? 'destructive' : 'default'}>
-          {status.type === 'error' ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
-          <AlertTitle>{status.type === 'error' ? 'Erro' : 'Sucesso'}</AlertTitle>
-          <AlertDescription>{status.message}</AlertDescription>
-        </Alert>
-      )}
-
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {photos.map((photo, index) => (

@@ -13,9 +13,17 @@ function UserSyncInner() {
 
       const syncUser = async () => {
         try {
-          // Assuming an API endpoint to sync user data if needed
-          // await fetch('/api/users/sync', { method: 'POST', body: JSON.stringify({ userId: user.id }) });
-          console.log('User synced (placeholder for actual sync logic)');
+          await fetch('/api/users/sync', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              id: user.id,
+              name: user.displayName,
+              email: user.primaryEmail,
+              image: user.profileImageUrl
+            }) 
+          });
+          console.log('User synced with DB');
         } catch (error) {
           console.error('Failed to sync user:', error);
         }

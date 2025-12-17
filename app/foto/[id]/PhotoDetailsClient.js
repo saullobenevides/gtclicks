@@ -24,7 +24,7 @@ import { Heart, Share2, Info, CheckCircle2, ShoppingCart } from 'lucide-react';
 import { useUser } from '@stackframe/stack';
 
 export default function PhotoDetailsClient({ photo }) {
-  const { addToCart } = useCart();
+  const { addToCart, setIsCartOpen } = useCart();
   const [addedToCart, setAddedToCart] = useState(false);
   
   const price = photo.colecao?.precoFoto || 0;
@@ -39,7 +39,10 @@ export default function PhotoDetailsClient({ photo }) {
     });
 
     setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 3000);
+    // Remove auto-close timeout as we are opening the cart
+    // setTimeout(() => setAddedToCart(false), 3000); 
+    
+    setIsCartOpen(true);
   };
 
   return (
@@ -191,7 +194,7 @@ export default function PhotoDetailsClient({ photo }) {
               {addedToCart ? (
                 <span className="flex items-center gap-2">
                   <CheckCircle2 className="h-6 w-6" />
-                  Adicionado ao Carrinho!
+                  No Carrinho
                 </span>
               ) : (
                 <span className="flex items-center gap-2">

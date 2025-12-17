@@ -15,7 +15,7 @@ export default function HeroSection() {
           Marketplace Premium
         </Badge>
         
-        <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl md:text-8xl lg:text-9xl leading-none">
+        <h1 className="text-4xl xs:text-5xl font-black tracking-tighter text-white sm:text-7xl md:text-8xl lg:text-9xl leading-[0.9]">
           CAPTURE <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-600">MOMENTOS</span>
           <br />
           VENDA <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">ARTE</span>

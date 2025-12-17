@@ -3,17 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
-// UserButton removed as it is redundant with NavUserActions
 import NavUserActions from "./NavUserActions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingCart } from "lucide-react";
+import { useCart } from "@/components/CartContext";
 
 export default function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { setIsCartOpen, itemCount } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,17 +27,19 @@ export default function Header() {
   return (
     <header 
       className={cn(
-        "fixed top-0 z-50 w-full transition-all duration-300 border-b border-transparent",
-        scrolled ? "bg-black/80 backdrop-blur-md border-white/5 py-2" : "bg-transparent py-4"
+        "fixed top-0 z-50 w-full transition-all duration-300 border-b",
+        scrolled
+          ? "bg-black/80 backdrop-blur-md border-white/5 py-2" // Scrolled state (always glass)
+          : "bg-black border-transparent py-4" // Initial state (solid black for all pages)
       )}
     >
-      <div className="container-wide flex items-center justify-between">
+      <div className="container-wide flex h-[var(--header-height)] items-center justify-between">
         <div className="flex items-center gap-12">
-          <Link href="/" className="group flex items-center gap-2">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20 transition-transform group-hover:scale-105 group-hover:shadow-primary/40">
-              <span className="text-xl font-black">GT</span>
+          <Link href="/" className="group flex items-center gap-3">
+            <div className="relative flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20 transition-transform group-hover:scale-105 group-hover:shadow-primary/40">
+              <span className="text-lg md:text-xl font-black">GT</span>
             </div>
-            <span className="text-2xl font-black tracking-tighter text-white">
+            <span className="text-xl md:text-2xl font-black tracking-tighter text-white">
               CLICKS
             </span>
           </Link>
@@ -62,21 +65,29 @@ export default function Header() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="hidden md:flex items-center gap-2">
-             <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-white hover:bg-white/5">
-              <Link href={siteConfig.links.cart}>
-                Carrinho
-              </Link>
-            </Button>
-          </div>
+        <div className="flex items-center gap-3 md:gap-6">
+          {/* Cart - Visible on Mobile now */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="text-muted-foreground hover:text-white hover:bg-white/5 relative"
+            onClick={() => setIsCartOpen(true)}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-bold flex items-center justify-center text-white border-2 border-black">
+                {itemCount}
+              </span>
+            )}
+            <span className="sr-only">Carrinho</span>
+          </Button>
 
           <div className="h-6 w-px bg-white/10 hidden md:block" />
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
             <Suspense
               fallback={
-                <Button asChild variant="default" size="sm" className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5">
+                <Button asChild variant="default" size="sm" className="hidden md:flex bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5">
                   <Link href={siteConfig.links.signup}>
                     Seja Fotógrafo
                   </Link>
@@ -88,40 +99,44 @@ export default function Header() {
             
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 text-muted-foreground hover:text-white transition-colors"
+              className="md:hidden p-2 text-muted-foreground hover:text-white transition-colors active:scale-95"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Menu"
             >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full border-t border-white/10 bg-black/95 backdrop-blur-xl animate-in slide-in-from-top-5">
-          <div className="space-y-1 px-4 pb-6 pt-4">
+        <div className="md:hidden absolute top-[var(--header-height)] left-0 w-full h-[calc(100vh-var(--header-height))] bg-black/95 backdrop-blur-xl animate-in slide-in-from-top-5 z-40 overflow-y-auto">
+          <div className="flex flex-col p-6 gap-2">
             {siteConfig.navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={cn(
-                  "block rounded-lg px-4 py-3 text-base font-medium transition-colors",
+                  "flex items-center justify-between rounded-xl px-4 py-4 text-lg font-medium transition-all",
                   pathname === item.href
-                    ? "bg-white/10 text-white"
-                    : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                    ? "bg-white/10 text-white shadow-inner"
+                    : "text-muted-foreground hover:bg-white/5 hover:text-white active:bg-white/10"
                 )}
               >
                 {item.label}
               </Link>
             ))}
+            
+            <div className="my-4 h-px bg-white/10 w-full" />
+            
             <Link
-              href={siteConfig.links.cart}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="block rounded-lg px-4 py-3 text-base font-medium text-muted-foreground hover:bg-white/5 hover:text-white"
+               href={siteConfig.links.signup}
+               onClick={() => setIsMobileMenuOpen(false)}
+               className="flex items-center justify-center w-full rounded-xl bg-primary px-4 py-4 text-lg font-bold text-white shadow-lg shadow-primary/20 transition-transform active:scale-95"
             >
-              🛒 Carrinho
+              Começar a Vender Fotos
             </Link>
           </div>
         </div>

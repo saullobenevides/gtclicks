@@ -76,8 +76,8 @@ export default function NavUserActions() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 hover:text-white focus:ring-0 focus:ring-offset-0">
             <Avatar className="h-9 w-9">
-              <AvatarImage src={user.avatarUrl} alt={user.name} className="object-cover" />
-              <AvatarFallback className="bg-primary/20 text-primary font-bold">{getInitials(user.name)}</AvatarFallback>
+              <AvatarImage src={user.profileImageUrl} alt={user.displayName} className="object-cover" />
+              <AvatarFallback className="bg-primary/20 text-primary font-bold">{getInitials(user.displayName)}</AvatarFallback>
             </Avatar>
             <span className="sr-only">Toggle user menu</span>
           </Button>
@@ -85,55 +85,50 @@ export default function NavUserActions() {
         <DropdownMenuContent align="end" className="w-64 glass-panel border-white/10 bg-black/80 p-2 text-white shadow-2xl backdrop-blur-xl">
           <DropdownMenuLabel className="p-4">
             <div className="flex flex-col space-y-2">
-              <p className="text-base font-bold leading-none text-white">{user.name}</p>
+              <p className="text-base font-bold leading-none text-white">{user.displayName}</p>
               <p className="text-xs leading-none text-muted-foreground">
-                {user.email}
+                {user.primaryEmail}
               </p>
             </div>
           </DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-white/10" />
-          <div className="p-1">
-            {username && (
-              <DropdownMenuItem asChild className="cursor-pointer rounded-md p-3 focus:bg-white/10 focus:text-white">
-                <Link href={`/fotografo/${username}`} className="flex items-center gap-2">
+          <DropdownMenuSeparator className="-mx-2 bg-white/10" />            {username && (
+              <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5 focus:bg-white/10 focus:text-white">
+                <Link href={`/fotografo/${username}`} className="flex items-center gap-3">
                   <span className="text-sm font-medium">Meu Perfil Público</span>
                 </Link>
               </DropdownMenuItem>
             )}
             {dashboardUrl && (
-              <DropdownMenuItem asChild className="cursor-pointer rounded-md p-3 focus:bg-white/10 focus:text-white">
-                <Link href={dashboardUrl} className="flex items-center gap-2">
+              <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5 focus:bg-white/10 focus:text-white">
+                <Link href={dashboardUrl} className="flex items-center gap-3">
                   <span className="text-sm font-medium">Meu Painel</span>
                 </Link>
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem asChild className="cursor-pointer rounded-md p-3 focus:bg-white/10 focus:text-white">
-              <Link href="/handler/account-settings" className="flex items-center gap-2">
+            <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5 focus:bg-white/10 focus:text-white">
+              <Link href="/handler/account-settings" className="flex items-center gap-3">
                 <span className="text-sm font-medium">Minha Conta</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer rounded-md p-3 focus:bg-white/10 focus:text-white">
-              <Link href="/meus-downloads" className="flex items-center gap-2">
+            <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5 focus:bg-white/10 focus:text-white">
+              <Link href="/meus-downloads" className="flex items-center gap-3">
                 <span className="text-sm font-medium">Meus Downloads</span>
               </Link>
             </DropdownMenuItem>
             {!username && (
-              <DropdownMenuItem asChild className="cursor-pointer rounded-md p-3 focus:bg-white/10 focus:text-white">
-                <Link href="/cadastro" className="flex items-center gap-2">
+              <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5 focus:bg-white/10 focus:text-white">
+                <Link href="/cadastro" className="flex items-center gap-3">
                   <span className="text-sm font-medium">Seja Fotógrafo</span>
                 </Link>
               </DropdownMenuItem>
             )}
-          </div>
-          <DropdownMenuSeparator className="bg-white/10" />
-          <div className="p-1">
+          <DropdownMenuSeparator className="-mx-2 bg-white/10" />
             <DropdownMenuItem 
               onSelect={() => app.signOut()} 
-              className="cursor-pointer rounded-md p-3 text-red-400 focus:bg-red-500/10 focus:text-red-400"
+              className="cursor-pointer rounded-md px-3 py-2.5 text-red-400 focus:bg-red-500/10 focus:text-red-400 mt-1"
             >
               <span className="text-sm font-medium">Sair</span>
             </DropdownMenuItem>
-          </div>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

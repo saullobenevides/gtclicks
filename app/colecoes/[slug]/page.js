@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getCollectionBySlug } from "@/lib/data/marketplace";
 import { Button } from "@/components/ui/button";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import PhotoCard from "@/components/PhotoCard";
 import { Folder, ArrowLeft } from "lucide-react";
 
 export default async function CollectionDetail({ params, searchParams }) {
@@ -30,10 +31,10 @@ export default async function CollectionDetail({ params, searchParams }) {
 
   return (
     <section className="py-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container-wide">
         <div className="text-center mb-16">
           <Badge>Coleção</Badge>
-          <h1 className="text-5xl font-bold my-4">{collection.title}</h1>
+          <h1 className="text-4xl xs:text-5xl font-bold my-4 leading-tight">{collection.title}</h1>
           <p className="text-xl text-body">{collection.description}</p>
           <p className="text-body">
             por <strong>{collection.photographer}</strong>
@@ -87,22 +88,7 @@ export default async function CollectionDetail({ params, searchParams }) {
         ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {currentLevelPhotos.map((photo) => (
-                <Link 
-                  key={photo.id} 
-                  href={`/foto/${photo.id}`} 
-                  className="group relative aspect-[4/5] overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10"
-                >
-                  <ImageWithFallback
-                    src={photo.previewUrl}
-                    alt={photo.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  <div className="absolute bottom-0 left-0 w-full p-4 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                      <h3 className="font-bold text-white line-clamp-1">{photo.title}</h3>
-                      <span className="text-xs text-gray-300">ID #{photo.id}</span>
-                  </div>
-                </Link>
+                <PhotoCard key={photo.id} photo={photo} />
               ))}
             </div>
         )}

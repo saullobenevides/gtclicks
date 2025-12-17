@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { StackProvider, StackTheme } from "@stackframe/stack";
 import { stackClientApp } from "@/stack/client";
 import { CartProvider } from "@/components/CartContext";
@@ -9,10 +10,12 @@ export default function AppProviders({ children }) {
   return (
     <StackProvider app={stackClientApp}>
       <StackTheme appearance="dark">
-        <UserSync />
-        <CartProvider>
-          {children}
-        </CartProvider>
+        <Suspense fallback={<div />}>
+          <UserSync />
+          <CartProvider>
+            {children}
+          </CartProvider>
+        </Suspense>
       </StackTheme>
     </StackProvider>
   );
