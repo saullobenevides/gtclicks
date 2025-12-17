@@ -118,6 +118,11 @@ model Like {
   @@unique([userId, fotoId])
 }
 
+enum ColecaoStatus {
+  RASCUNHO
+  PUBLICADA
+}
+
 model Colecao {
   id             String    @id @default(cuid())
   nome           String
@@ -125,7 +130,7 @@ model Colecao {
   descricao      String?
   capaUrl        String?
   categoria      String?
-  status         String    @default("RASCUNHO")
+  status         ColecaoStatus @default(RASCUNHO)
   precoFoto      Decimal   @default(0.0) @db.Decimal(10, 2)
   
   fotografoId    String
