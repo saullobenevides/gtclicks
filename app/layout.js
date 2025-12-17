@@ -60,6 +60,7 @@ export default function RootLayout({ children }) {
             <main className="flex-1 w-full pt-20">{children}</main>
             <Footer />
         </AppProviders>
+        <SpeedInsights />
       </body>
     </html>
   );
