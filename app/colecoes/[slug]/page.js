@@ -7,6 +7,28 @@ import ImageWithFallback from "@/components/ImageWithFallback";
 import PhotoCard from "@/components/PhotoCard";
 import { Folder, ArrowLeft } from "lucide-react";
 
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const collection = await getCollectionBySlug(slug);
+
+  if (!collection) {
+    return {
+      title: "Coleção não encontrada | GTClicks",
+      description: "A coleção que você procura não está disponível.",
+    };
+  }
+
+  return {
+    title: `${collection.title} por ${collection.photographer} | GTClicks`,
+    description: collection.description || `Confira a coleção ${collection.title} no GTClicks.`,
+    openGraph: {
+      title: collection.title,
+      description: collection.description,
+      images: collection.photos?.[0]?.previewUrl ? [collection.photos[0].previewUrl] : [],
+    },
+  };
+}
+
 export default async function CollectionDetail({ params, searchParams }) {
   const { slug } = await params;
   const { folderId } = await searchParams;

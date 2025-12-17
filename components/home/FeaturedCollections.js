@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ImageWithFallback from '@/components/ImageWithFallback';
 
 export default function FeaturedCollections({ collections = [] }) {
   if (!collections || collections.length === 0) return null;
@@ -20,20 +21,29 @@ export default function FeaturedCollections({ collections = [] }) {
             const isUrl = collection.cover?.startsWith("http");
             const isGradient = collection.cover?.startsWith("linear-gradient");
             
-            const backgroundStyle = isUrl
-              ? { backgroundImage: `url(${collection.cover})` }
-              : isGradient
-              ? { backgroundImage: collection.cover }
-              : { backgroundColor: collection.cover };
-
             return (
               <Link
                 key={collection.slug ?? index}
                 href={`/colecoes/${collection.slug}`}
-                className="group bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg aspect-video block"
-                style={{ ...backgroundStyle, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                className="group relative bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg aspect-video block"
               >
-                <div className="p-6 bg-black/50 h-full flex flex-col justify-end">
+                {/* Background Image */}
+                {isUrl ? (
+                  <ImageWithFallback
+                    src={collection.cover}
+                    alt={collection.name}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                ) : (
+                  <div 
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    style={isGradient ? { backgroundImage: collection.cover } : { backgroundColor: collection.cover }}
+                  />
+                )}
+
+                {/* Content Overlay */}
+                <div className="absolute inset-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end z-10">
                   <h3 className="text-xl font-bold mb-2 text-white">{collection.name}</h3>
                   <p className="text-white/80 text-sm mb-4 line-clamp-2">{collection.description}</p>
                   <div className="flex justify-between text-xs text-white/70">

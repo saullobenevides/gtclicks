@@ -60,22 +60,27 @@ export async function POST(request) {
           return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
 
-      if (pedido.status === "PAGO") {
-          console.log(`Order ${pedidoId} is already paid. Skipping.`);
-          return NextResponse.json({ received: true, message: "Already processed" });
-      }
+
 
       // 2. Transaction: Update Order Status + Distribute Funds
-      await prisma.$transaction(async (tx) => {
-        // Update order status
-        await tx.pedido.update({
-          where: { id: pedidoId },
+      const result = await prisma.$transaction(async (tx) => {
+        // Atomic Transition: Only update if status is NOT already 'PAGO' (or specifically 'PENDENTE')
+        // This acts as a lock. If count is 0, it means another request likely beat us to it.
+        const updateResult = await tx.pedido.updateMany({
+          where: { 
+            id: pedidoId, 
+            status: { not: 'PAGO' } // Idempotency Key
+          },
           data: {
             status: "PAGO",
             paymentId: paymentId.toString(),
-            // checkoutSessionId and paymentProvider do not exist in schema, so we skip them
           },
         });
+
+        if (updateResult.count === 0) {
+            // Already paid or doesn't exist (previously checked existance, so likely race condition occurred)
+            return { processed: false, reason: 'ALREADY_PROCESSED' };
+        }
 
         // Fetch items with photographer details to calculate commissions
         const items = await tx.itemPedido.findMany({
@@ -126,7 +131,14 @@ export async function POST(request) {
 
           console.log(`💰 Fotógrafo ${fotografoId} creditado: R$ ${valorFotografo.toString()}`);
         }
+        
+        return { processed: true };
       });
+
+      if (!result.processed) {
+         console.log(`Order ${pedidoId} was already processed (Atomic Check).`);
+         return NextResponse.json({ received: true, message: "Already processed" });
+      }
 
       console.log(`✅ Order ${pedidoId} successfully processed and paid.`);
       

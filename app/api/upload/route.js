@@ -2,8 +2,9 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { stackServerApp } from "@/stack/server";
 import prisma from "@/lib/prisma";
+import { uploadRequestSchema } from "@/lib/validations";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 const bucket = process.env.S3_UPLOAD_BUCKET;
 const region = process.env.S3_UPLOAD_REGION;
@@ -22,7 +23,7 @@ const s3Client =
     : null;
 
 export async function POST(request) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
   }
@@ -44,14 +45,16 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { filename, contentType, folder = "uploads" } = body;
+    const validation = uploadRequestSchema.safeParse(body);
 
-    if (!filename) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "Nome do arquivo obrigatorio" },
+        { error: "Dados inválidos", details: validation.error.format() },
         { status: 400 }
       );
     }
+
+    const { filename, contentType, folder = "uploads" } = validation.data;
 
     const fileExtension = filename.split(".").pop();
     const uniqueId = randomUUID();

@@ -13,6 +13,7 @@ import {
 import { Images, DollarSign, Upload, ArrowRight, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import FotografoOnboarding from '@/components/FotografoOnboarding';
+import FinancialSummary from '@/components/dashboard/FinancialSummary';
 
 function StatCard({ icon, title, value, description, actionText, actionHref }) {
   return (
@@ -126,22 +127,13 @@ function DashboardInner() {
                     </div>
                 </Card>
             </Link>
-            <Link href="/dashboard/fotografo/financeiro">
-                <Card className="flex h-full flex-col justify-between p-6 transition-all hover:bg-muted">
-                    <div>
-                        <h3 className="text-xl font-bold">Consultar Financeiro</h3>
-                        <p className="text-muted-foreground">
-                        Acompanhe seu saldo, histórico de vendas e solicite saques.
-                        </p>
-                    </div>
-                    <div className="mt-4 flex items-center font-semibold text-primary">
-                        <span>Ir para Financeiro</span>
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                    </div>
-                </Card>
-            </Link>
         </div>
       </div>
+     
+      <div className="w-full">
+         <FinancialSummary />
+      </div>
+
     </div>
   );
 }

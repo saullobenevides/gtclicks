@@ -1,16 +1,24 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { stackServerApp } from '@/stack/server';
+import { getAuthenticatedUser } from '@/lib/auth';
+import { cartSyncSchema } from '@/lib/validations';
 
 export async function POST(request) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const { items } = await request.json(); // items from local storage
+    const body = await request.json();
+    const validation = cartSyncSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json({ error: 'Invalid data', details: validation.error.format() }, { status: 400 });
+    }
+
+    const { items } = validation.data;
 
     // 1. Get or Create Cart for User
     let cart = await prisma.carrinho.findUnique({

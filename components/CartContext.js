@@ -79,12 +79,9 @@ export function CartProvider({ children }) {
   const clearCart = () => {
     setItems([]);
     if (user) {
-        // We need a clear endpoint or just loop remove? 
-        // Or send empty sync? Empty sync merges... 
-        // Let's rely on individual remove for now or add a clear endpoint?
-        // Simplest: Loop remove is bad. 
-        // Better: Clear endpoint.
-        // For now, I'll just implement the UI clear.
+        fetch('/api/carrinho', {
+            method: 'DELETE',
+        }).catch(console.error);
     }
   };
 

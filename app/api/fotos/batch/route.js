@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { logError } from "@/lib/logger";
 
+import { photoBatchSchema } from "@/lib/validations";
+
 function resolveOrientation(value) {
   if (!value) return OrientacaoFoto.HORIZONTAL;
   const normalized = value.toString().toUpperCase();
@@ -11,19 +13,51 @@ function resolveOrientation(value) {
     : OrientacaoFoto.HORIZONTAL;
 }
 
+import { getAuthenticatedUser } from "@/lib/auth";
+
 export async function POST(request) {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
+  }
+
+  const fotografo = await prisma.fotografo.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (!fotografo) {
+    return NextResponse.json({ error: "Perfil de fotografo nao encontrado" }, { status: 403 });
+  }
+
   try {
+    const body = await request.json();
+    const validation = photoBatchSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Dados inválidos", details: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
     const {
       fotografoId,
       fotos = [],
-      deletedPhotoIds = [] // Read deleted IDs
-    } = await request.json();
+      deletedPhotoIds = []
+    } = validation.data;
 
     if (!fotografoId) {
       return NextResponse.json(
         { error: "Informe o fotografoId." },
         { status: 400 }
       );
+    }
+
+    if (fotografoId !== fotografo.id) {
+        return NextResponse.json(
+            { error: "Voce nao tem permissao para alterar fotos de outro fotografo." },
+            { status: 403 }
+        );
     }
 
     // Delete removed photos
@@ -85,7 +119,7 @@ export async function POST(request) {
         }
         
         // Generate Signed URL for preview
-        const { S3Client, GetObjectCommand } = await import("@aws-sdk/client-s3");
+        const { S3Client, GetObjectCommand, HeadObjectCommand } = await import("@aws-sdk/client-s3");
         const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
         
         const s3Client = new S3Client({
@@ -95,6 +129,18 @@ export async function POST(request) {
             secretAccessKey: process.env.S3_UPLOAD_SECRET_ACCESS_KEY,
           },
         });
+
+        // Anti-Fraud: Verify S3 Object Existence
+        try {
+          await s3Client.send(new HeadObjectCommand({
+            Bucket: process.env.S3_UPLOAD_BUCKET,
+            Key: foto.s3Key,
+          }));
+        } catch (error) {
+          console.error(`Fraud Check Failed: Object not found in S3 (${foto.s3Key})`);
+          // Skip creation for non-existent files
+          continue;
+        }
 
         const command = new GetObjectCommand({
           Bucket: process.env.S3_UPLOAD_BUCKET,

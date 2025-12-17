@@ -2,30 +2,37 @@ import { PedidoStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+import { getAuthenticatedUser } from "@/lib/auth";
+
 export async function POST(request) {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
-    const { clienteId, itens = [], checkoutSessionId, paymentProvider } = body ?? {};
+    const { itens = [], checkoutSessionId, paymentProvider } = body ?? {};
 
-    if (!clienteId || !itens.length) {
+    if (!itens.length) {
       return NextResponse.json(
-        { error: "Informe clienteId e ao menos um item." },
+        { error: "Informe ao menos um item." },
         { status: 400 }
       );
     }
 
     const total = itens.reduce(
-      (acc, item) => acc + Number(item.precoUnitario ?? 0),
+      (acc, item) => acc + Number(item.precoPago ?? 0),
       0
     );
 
     const pedido = await prisma.pedido.create({
       data: {
-        clienteId,
+        userId: user.id,
         total,
         status: PedidoStatus.PENDENTE,
-        checkoutSessionId,
-        paymentProvider,
+        paymentId: checkoutSessionId, // Mapping checkoutSessionId to paymentId as per schema nullable
+        // paymentProvider not in schema, ignoring
         itens: {
           create: itens.map((item) => {
             if (!item.fotoId) {
@@ -34,8 +41,8 @@ export async function POST(request) {
 
             return {
               foto: { connect: { id: item.fotoId } },
-              // licencaId is optional
-              precoUnitario: item.precoUnitario ?? 0,
+              licenca: item.licencaId ? { connect: { id: item.licencaId } } : undefined,
+              precoPago: item.precoPago ?? 0,
             };
           }),
         },
@@ -55,13 +62,19 @@ export async function POST(request) {
 }
 
 export async function GET(request) {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+      return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
-    const clienteId = searchParams.get("clienteId");
+    // const userId = searchParams.get("userId"); // IGNORE CLIENT PARAM, use Secure Auth ID
+    const userId = user.id;
 
     const pedidos = await prisma.pedido.findMany({
       where: {
-        ...(clienteId ? { clienteId } : {}),
+        ...(userId ? { userId } : {}),
       },
       orderBy: { createdAt: "desc" },
       include: {

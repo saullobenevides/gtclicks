@@ -20,13 +20,25 @@ export async function POST(request) {
   try {
     // Create a unique name and slug for the new collection
     const defaultName = "Nova Coleção";
-    let slug = slugify(defaultName);
-    const count = await prisma.colecao.count({ where: { slug: { startsWith: slug } } });
-    if (count > 0) {
-      slug = `${slug}-${count + 1}`;
-    }
-    const finalName = count > 0 ? `${defaultName} ${count + 1}` : defaultName;
+    let baseSlug = slugify(defaultName);
+    let slug = baseSlug;
+    let counter = 1;
+    let finalName = defaultName;
 
+    // Check for uniqueness
+    while (true) {
+      const existing = await prisma.colecao.findUnique({
+        where: { slug },
+      });
+
+      if (!existing) {
+        break; // Slug is free!
+      }
+
+      slug = `${baseSlug}-${counter}`;
+      finalName = `${defaultName} (${counter})`;
+      counter++;
+    }
 
     const colecao = await prisma.colecao.create({
       data: {

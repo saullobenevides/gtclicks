@@ -1,33 +1,41 @@
 "use client";
-
+import Image from "next/image";
 import { useState } from 'react';
+import { cn } from "@/lib/utils";
 
-export default function ImageWithFallback({ src, alt, style, className }) {
-  const [hasError, setHasError] = useState(false);
+export default function ImageWithFallback({ 
+    src, 
+    alt, 
+    className, 
+    sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+    priority = false 
+}) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  if (hasError) {
+  if (error) {
     return (
-      <div style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#666',
-        fontSize: '0.8rem'
-      }}>
+      <div className={cn("flex h-full w-full items-center justify-center bg-secondary text-xs text-muted-foreground", className)}>
         Erro ao carregar
       </div>
     );
   }
 
   return (
-    <img
-      src={src}
-      alt={alt}
-      style={style}
-      className={className}
-      onError={() => setHasError(true)}
-    />
+    <div className={cn("relative overflow-hidden", className)}>
+        <Image
+          src={src}
+          alt={alt || "Imagem"}
+          fill
+          sizes={sizes}
+          priority={priority}
+          className={cn(
+            "object-cover transition-all duration-700 ease-in-out",
+            isLoading ? "scale-110 blur-xl grayscale" : "scale-100 blur-0 grayscale-0"
+          )}
+          onLoad={() => setIsLoading(false)}
+          onError={() => setError(true)}
+        />
+    </div>
   );
 }

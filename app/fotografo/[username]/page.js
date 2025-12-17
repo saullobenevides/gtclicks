@@ -8,6 +8,28 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+export async function generateMetadata({ params }) {
+  const { username } = await params;
+  const decodedUsername = decodeURIComponent(username);
+  const photographer = await getPhotographerByUsername(decodedUsername);
+
+  if (!photographer) {
+    return {
+      title: "Fotógrafo não encontrado | GTClicks",
+    };
+  }
+
+  return {
+    title: `${photographer.name} (@${photographer.username}) | GTClicks`,
+    description: photographer.bio || `Confira o portfólio de ${photographer.name} no GTClicks.`,
+    openGraph: {
+      title: `${photographer.name} - Portfólio`,
+      description: photographer.bio,
+      images: photographer.avatarUrl ? [photographer.avatarUrl] : [],
+    },
+  };
+}
+
 export default async function PhotographerProfilePage(props) {
   try {
     const params = await props.params;
