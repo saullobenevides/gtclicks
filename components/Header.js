@@ -7,13 +7,8 @@ import { Suspense, useState, useEffect } from "react";
 import NavUserActions from "./NavUserActions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { href: "/busca", label: "Explorar" },
-  { href: "/categorias", label: "Categorias" },
-  { href: "/colecoes", label: "Coleções" },
-  { href: "/meus-favoritos", label: "Favoritos" },
-];
+import { siteConfig } from "@/config/site";
+import { Menu, X } from "lucide-react";
 
 export default function Header() {
   const pathname = usePathname();
@@ -47,7 +42,7 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
+            {siteConfig.navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -70,7 +65,7 @@ export default function Header() {
         <div className="flex items-center gap-6">
           <div className="hidden md:flex items-center gap-2">
              <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-white hover:bg-white/5">
-              <Link href="/carrinho">
+              <Link href={siteConfig.links.cart}>
                 Carrinho
               </Link>
             </Button>
@@ -82,7 +77,7 @@ export default function Header() {
             <Suspense
               fallback={
                 <Button asChild variant="default" size="sm" className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5">
-                  <Link href="/cadastro">
+                  <Link href={siteConfig.links.signup}>
                     Seja Fotógrafo
                   </Link>
                 </Button>
@@ -96,13 +91,7 @@ export default function Header() {
               className="md:hidden p-2 text-muted-foreground hover:text-white transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {isMobileMenuOpen ? (
-                  <path d="M18 6 6 18M6 6l12 12" />
-                ) : (
-                  <path d="M4 12h16M4 6h16M4 18h16" />
-                )}
-              </svg>
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -112,7 +101,7 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full border-t border-white/10 bg-black/95 backdrop-blur-xl animate-in slide-in-from-top-5">
           <div className="space-y-1 px-4 pb-6 pt-4">
-            {navItems.map((item) => (
+            {siteConfig.navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -128,7 +117,7 @@ export default function Header() {
               </Link>
             ))}
             <Link
-              href="/carrinho"
+              href={siteConfig.links.cart}
               onClick={() => setIsMobileMenuOpen(false)}
               className="block rounded-lg px-4 py-3 text-base font-medium text-muted-foreground hover:bg-white/5 hover:text-white"
             >

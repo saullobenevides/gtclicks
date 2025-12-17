@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { siteConfig } from "@/config/site";
 
 export default function Footer() {
   return (
@@ -15,7 +16,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-base leading-relaxed text-muted-foreground max-w-xs">
-              O marketplace definitivo para fotógrafos e criadores. Compre e venda fotos exclusivas com segurança e rapidez.
+              {siteConfig.description}
             </p>
           </div>
 
@@ -24,26 +25,13 @@ export default function Footer() {
               Plataforma
             </h4>
             <ul className="flex flex-col gap-3 text-base text-muted-foreground">
-              <li>
-                <Link href="/busca" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Explorar Fotos
-                </Link>
-              </li>
-              <li>
-                <Link href="/colecoes" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Coleções
-                </Link>
-              </li>
-              <li>
-                <Link href="/categorias" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Categorias
-                </Link>
-              </li>
-              <li>
-                <Link href="/meus-favoritos" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Meus Favoritos
-                </Link>
-              </li>
+              {siteConfig.footerParams.platform.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="transition-colors hover:text-white hover:translate-x-1 inline-block">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -52,21 +40,13 @@ export default function Footer() {
               Fotógrafos
             </h4>
             <ul className="flex flex-col gap-3 text-base text-muted-foreground">
-              <li>
-                <Link href="/cadastro" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Começar a Vender
-                </Link>
-              </li>
-              <li>
-                <Link href="/dashboard/fotografo/upload" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Fazer Upload
-                </Link>
-              </li>
-              <li>
-                <Link href="/dashboard/fotografo/financeiro" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Painel Financeiro
-                </Link>
-              </li>
+              {siteConfig.footerParams.photographers.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="transition-colors hover:text-white hover:translate-x-1 inline-block">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -75,36 +55,22 @@ export default function Footer() {
               Suporte
             </h4>
             <ul className="flex flex-col gap-3 text-base text-muted-foreground">
-              <li>
-                <Link href="/faq" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Perguntas Frequentes
-                </Link>
-              </li>
-              <li>
-                <Link href="/termos" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Termos de Uso
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacidade" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Privacidade
-                </Link>
-              </li>
-              <li>
-                <Link href="/contato" className="transition-colors hover:text-white hover:translate-x-1 inline-block">
-                  Fale Conosco
-                </Link>
-              </li>
+              {siteConfig.footerParams.support.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="transition-colors hover:text-white hover:translate-x-1 inline-block">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} GTClicks. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} {siteConfig.name}. Todos os direitos reservados.
           </p>
           <div className="flex items-center gap-6">
-            {/* Social icons could go here */}
             <span className="text-sm text-muted-foreground">Feito com ❤️ para criadores</span>
           </div>
         </div>
