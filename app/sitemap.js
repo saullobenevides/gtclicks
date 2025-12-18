@@ -11,12 +11,12 @@ export default async function sitemap() {
 
   // Dynamic Collections
   const collections = await prisma.colecao.findMany({
-    select: { slug: true, updatedAt: true },
+    select: { slug: true, createdAt: true },
   });
 
   const collectionRoutes = collections.map((col) => ({
     url: `${BASE_URL}/colecoes/${col.slug}`,
-    lastModified: col.updatedAt,
+    lastModified: col.createdAt,
   }));
 
   // Dynamic Photographers

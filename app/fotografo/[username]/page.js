@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MapPin, Camera, Image as ImageIcon, Download, Share2 } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -100,9 +101,11 @@ export default async function PhotographerProfilePage(props) {
                 <Button className="bg-primary hover:bg-primary/90 text-white">
                   Seguir
                 </Button>
-                <Button variant="outline" size="icon" className="glass-panel border-white/10 text-white hover:bg-white/10">
-                  <Share2 className="h-4 w-4" />
-                </Button>
+                <ShareButton 
+                   title={`Portfólio de ${photographer.name}`}
+                   text={`Confira o trabalho de ${photographer.name} no GTClicks!`}
+                   className="glass-panel border-white/10 text-white hover:bg-white/10"
+                />
               </div>
             </div>
           </div>

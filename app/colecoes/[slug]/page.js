@@ -5,7 +5,8 @@ import { getCollectionBySlug } from "@/lib/data/marketplace";
 import { Button } from "@/components/ui/button";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import PhotoCard from "@/components/PhotoCard";
-import { Folder, ArrowLeft } from "lucide-react";
+import { Folder, ArrowLeft, Share2 } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -109,8 +110,8 @@ export default async function CollectionDetail({ params, searchParams }) {
             </div>
         ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {currentLevelPhotos.map((photo) => (
-                <PhotoCard key={photo.id} photo={photo} />
+              {currentLevelPhotos.map((photo, index) => (
+                <PhotoCard key={photo.id} photo={photo} priority={index < 4} />
               ))}
             </div>
         )}

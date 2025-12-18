@@ -20,7 +20,8 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import ImageWithFallback from '@/components/ImageWithFallback';
-import { Heart, Share2, Info, CheckCircle2, ShoppingCart } from 'lucide-react';
+import { Heart, Info, CheckCircle2, ShoppingCart } from 'lucide-react';
+import ShareButton from '@/components/ShareButton';
 import { useUser } from '@stackframe/stack';
 
 export default function PhotoDetailsClient({ photo }) {
@@ -82,9 +83,13 @@ export default function PhotoDetailsClient({ photo }) {
                 <span>{photo.orientacao}</span>
               </div>
               <div className="flex gap-2">
-                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-                  <Share2 className="h-4 w-4" />
-                </Button>
+                <ShareButton 
+                   title={photo.titulo}
+                   text={`Confira esta foto incrível de ${photo.fotografo?.name || 'um fotógrafo'} no GTClicks!`}
+                   className="text-white hover:bg-white/10"
+                   variant="ghost" 
+                   size="icon"
+                />
                 <LikeButton photoId={photo.id} initialLikes={photo.likes || 0} />
               </div>
             </div>

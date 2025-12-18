@@ -27,8 +27,6 @@ export default async function SearchPage(props) {
   const searchParams = await props.searchParams;
   const rawFilters = {
     q: searchParams?.q ?? '',
-    cor: searchParams?.cor ?? '',
-    orientacao: searchParams?.orientacao ?? '',
     categoria: searchParams?.categoria ?? '',
   };
 

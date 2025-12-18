@@ -50,16 +50,13 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-white relative py-1",
+                  "text-sm font-medium transition-all px-4 py-2 rounded-md hover:bg-white/5",
                   pathname === item.href
-                    ? "text-white"
-                    : "text-muted-foreground"
+                    ? "bg-white/10 text-white shadow-inner"
+                    : "text-muted-foreground hover:text-white"
                 )}
               >
                 {item.label}
-                {pathname === item.href && (
-                  <span className="absolute -bottom-1 left-0 h-0.5 w-full bg-primary rounded-full" />
-                )}
               </Link>
             ))}
           </nav>

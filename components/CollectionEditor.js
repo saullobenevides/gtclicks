@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { UploadCloud, Trash2, PlusCircle, Loader2, Save, ArrowLeft, Star } from 'lucide-react';
+import { UploadCloud, Trash2, PlusCircle, Loader2, Save, ArrowLeft, Star, Sparkles } from 'lucide-react';
 import EXIF from 'exif-js';
 import FolderManager from './FolderManager';
 import Breadcrumbs from './Breadcrumbs';
@@ -22,6 +22,7 @@ import { toast } from "sonner";
 const orientationOptions = ['HORIZONTAL', 'VERTICAL', 'PANORAMICA', 'QUADRADO'];
 const blankPhoto = () => ({
   id: null,
+  tempId: Math.random().toString(36).substr(2, 9),
   titulo: '',
   descricao: '',
   previewUrl: '',
@@ -94,7 +95,11 @@ export default function CollectionEditor({ collection: initialCollection }) {
   const [folderPath, setFolderPath] = useState([{ id: null, nome: 'Raiz' }]);
   
   // Photos State (Filtered by current folder)
-  const [allPhotos, setAllPhotos] = useState(initialCollection.fotos || []);
+  // Ensure all photos have a tempId for stable tracking
+  const [allPhotos, setAllPhotos] = useState((initialCollection.fotos || []).map(p => ({
+      ...p,
+      tempId: p.id || Math.random().toString(36).substr(2, 9)
+  })));
   const [currentPhotos, setCurrentPhotos] = useState([]);
 
   const [submitting, setSubmitting] = useState(false);
@@ -148,7 +153,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
     if (photoToRemove.id) {
         setDeletedPhotoIds([...deletedPhotoIds, photoToRemove.id]);
     }
-    setAllPhotos(allPhotos.filter(p => p !== photoToRemove));
+    setAllPhotos(allPhotos.filter(p => p.tempId !== photoToRemove.tempId));
     if (collectionData.capaUrl === photoToRemove.previewUrl) {
       setCollectionData(prev => ({ ...prev, capaUrl: '' }));
     }
@@ -156,7 +161,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
   };
 
   const updatePhoto = (photoToUpdate, field, value) => {
-    setAllPhotos(allPhotos.map(p => p === photoToUpdate ? { ...p, [field]: value } : p));
+    setAllPhotos(allPhotos.map(p => p.tempId === photoToUpdate.tempId ? { ...p, [field]: value } : p));
   };
 
 
@@ -203,7 +208,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
       const processData = await processRes.json();
       if (!processRes.ok) throw new Error(processData?.error || "Erro ao processar foto");
 
-      setAllPhotos((prev) => prev.map(p => p === photoToUpload ? {
+      setAllPhotos((prev) => prev.map(p => p.tempId === photoToUpload.tempId ? {
         ...p,
         id: processData.foto.id,
         s3Key: originalPresign.s3Key,
@@ -235,6 +240,101 @@ export default function CollectionEditor({ collection: initialCollection }) {
     await uploadFromDevice(photo, file);
   };
   
+  const [analyzingId, setAnalyzingId] = useState(null);
+  const [analyzingCollection, setAnalyzingCollection] = useState(false);
+
+  const handleAnalyzeCollection = async () => {
+    if (!collectionData.capaUrl) {
+      toast.error("Defina uma capa para a coleção antes de usar a IA.");
+      return;
+    }
+
+    setAnalyzingCollection(true);
+    toast("IA analisando a capa da coleção...", { icon: <Sparkles className="h-4 w-4 animate-spin text-yellow-500" /> });
+
+    try {
+      const aiRes = await fetch("/api/ai/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          imageUrl: collectionData.capaUrl
+        }),
+      });
+      
+      if (!aiRes.ok) {
+        const errorData = await aiRes.json().catch(() => ({}));
+        throw new Error(errorData.error || "Falha na análise IA");
+      }
+
+      const aiData = await aiRes.json();
+      
+      setCollectionData(prev => ({
+        ...prev,
+        nome: aiData.title || prev.nome,
+        descricao: aiData.description || prev.descricao,
+        // We could also suggest a category based on aiData.tags but that requires mapping to our ENUM
+      }));
+      
+      toast.success("Coleção preenchida com magia IA! ✨");
+
+    } catch (error) {
+       console.error(error);
+       toast.error(error.message || "Erro ao analisar coleção.");
+    } finally {
+      setAnalyzingCollection(false);
+    }
+  };
+
+  const handleAnalyzePhoto = async (photo) => {
+    if (!photo.previewUrl) {
+      toast.error("A foto precisa ter um preview para ser analisada.");
+      return;
+    }
+    
+    setAnalyzingId(photo.tempId);
+    toast("IA analisando a imagem...", { icon: <Sparkles className="h-4 w-4 animate-spin text-yellow-500" /> });
+
+    try {
+      // Send URL to server to avoid CORS issues with client-side fetch
+      const aiRes = await fetch("/api/ai/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          imageUrl: photo.previewUrl
+        }),
+      });
+          
+      if (!aiRes.ok) {
+        const errorData = await aiRes.json().catch(() => ({}));
+        throw new Error(errorData.error || "Falha na análise IA - Verifique o console ou tente novamente.");
+      }
+
+      const aiData = await aiRes.json();
+      
+      // Update photo with AI data
+      setAllPhotos(prev => prev.map(p => {
+         if (p.tempId !== photo.tempId) return p;
+         return {
+           ...p,
+           titulo: aiData.title || p.titulo,
+           descricao: aiData.description || p.descricao,
+           tags: Array.isArray(aiData.tags) ? aiData.tags.join(", ") : (aiData.tags || p.tags),
+           corPredominante: aiData.primaryColor
+         };
+      }));
+      
+      toast.success("Foto preenchida com magia IA! ✨");
+
+    } catch (error) {
+       console.error(error);
+       setAnalyzingId(null);
+       toast.error(error.message || "Erro ao processar imagem para IA.");
+    } finally {
+      setAnalyzingId(null);
+    }
+
+  };
+
   const handleSaveChanges = async () => {
     setSubmitting(true);
 
@@ -343,9 +443,21 @@ export default function CollectionEditor({ collection: initialCollection }) {
     <div className="flex flex-col gap-8">
       {/* Collection Details Form */}
       <Card>
-        <CardHeader>
-          <CardTitle>Detalhes da Coleção</CardTitle>
-          <CardDescription>Edite o título, descrição e categoria da sua coleção.</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Detalhes da Coleção</CardTitle>
+            <CardDescription>Edite o título, descrição e categoria da sua coleção.</CardDescription>
+          </div>
+          <Button 
+            type="button" 
+            variant="outline" 
+            className="text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 border-yellow-500/20 gap-2"
+            onClick={handleAnalyzeCollection}
+            disabled={analyzingCollection}
+          >
+            {analyzingCollection ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Preencher com IA
+          </Button>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
@@ -433,7 +545,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
              ) : (
                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {currentPhotos.map((photo, index) => (
-                    <Card key={index} className={`flex flex-col relative ${collectionData.capaUrl === photo.previewUrl ? 'ring-2 ring-primary' : ''}`}>
+                    <Card key={photo.tempId} className={`flex flex-col relative ${collectionData.capaUrl === photo.previewUrl ? 'ring-2 ring-primary' : ''}`}>
                       <CardHeader className="flex-row items-center justify-between p-4 pb-2">
                         <CardTitle className="text-sm font-medium">Foto #{index + 1}</CardTitle>
                         <div className="flex items-center gap-1">
@@ -471,7 +583,20 @@ export default function CollectionEditor({ collection: initialCollection }) {
                         </div>
                         
                         <div className="space-y-1">
-                          <Label className="text-xs">Título</Label>
+                          <div className="flex items-center justify-between">
+                            <Label className="text-xs">Título</Label>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="xs" 
+                              className="h-5 px-2 text-[10px] text-yellow-500 hover:text-yellow-400 hover:bg-yellow-500/10 gap-1"
+                              onClick={() => handleAnalyzePhoto(photo)}
+                              disabled={analyzingId === photo.tempId}
+                            >
+                              {analyzingId === photo.tempId ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                              Preencher com IA
+                            </Button>
+                          </div>
                           <Input className="h-8 text-sm" placeholder="Título" value={photo.titulo} onChange={(e) => updatePhoto(photo, 'titulo', e.target.value)} />
                         </div>
                         

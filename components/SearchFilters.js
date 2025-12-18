@@ -61,24 +61,6 @@ export default function SearchFilters({ filters }) {
             </div>
 
             <div className="grid w-full items-center gap-2">
-              <Label htmlFor="cor" className="text-gray-400">Cor predominante</Label>
-              <Select name="cor" defaultValue={filters.cor}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/20" suppressHydrationWarning>
-                  <SelectValue placeholder="Todas as cores" />
-                </SelectTrigger>
-                <SelectContent className="bg-black border-white/10 text-white">
-                  <SelectItem value="all">Todas as cores</SelectItem>
-                  <SelectItem value="azul">Azul</SelectItem>
-                  <SelectItem value="verde">Verde</SelectItem>
-                  <SelectItem value="vermelho">Vermelho</SelectItem>
-                  <SelectItem value="amarelo">Amarelo</SelectItem>
-                  <SelectItem value="preto">Preto</SelectItem>
-                  <SelectItem value="branco">Branco</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid w-full items-center gap-2">
               <Label htmlFor="categoria" className="text-gray-400">Categoria</Label>
               <Select name="categoria" defaultValue={filters.categoria}>
                 <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/20" suppressHydrationWarning>
@@ -91,21 +73,6 @@ export default function SearchFilters({ filters }) {
                       {cat}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid w-full items-center gap-2">
-              <Label htmlFor="orientacao" className="text-gray-400">Orientação</Label>
-              <Select name="orientacao" defaultValue={filters.orientacao}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/20" suppressHydrationWarning>
-                  <SelectValue placeholder="Qualquer formato" />
-                </SelectTrigger>
-                <SelectContent className="bg-black border-white/10 text-white">
-                  <SelectItem value="all">Qualquer formato</SelectItem>
-                  <SelectItem value="horizontal">Horizontal</SelectItem>
-                  <SelectItem value="vertical">Vertical</SelectItem>
-                  <SelectItem value="panoramica">Panorâmica</SelectItem>
                 </SelectContent>
               </Select>
             </div>

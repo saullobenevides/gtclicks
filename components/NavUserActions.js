@@ -60,7 +60,7 @@ export default function NavUserActions() {
   if (!user) { // user is null here if not logged in
     return (
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" asChild>
+        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-white hover:bg-white/5" asChild>
           <Link href="/login">Entrar</Link>
         </Button>
         <Button size="sm" className="hidden sm:inline-flex" asChild>
