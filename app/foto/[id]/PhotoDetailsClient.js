@@ -124,11 +124,7 @@ export default function PhotoDetailsClient({ photo }) {
             
             <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">{photo.titulo}</h1>
             
-            {photo.descricao && (
-              <p className="text-lg leading-relaxed text-gray-400">
-                {photo.descricao}
-              </p>
-            )}
+
           </div>
 
           {/* Collection Card */}

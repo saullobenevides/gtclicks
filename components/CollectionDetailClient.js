@@ -82,14 +82,11 @@ export default function CollectionDetailClient({ collection }) {
                           alt={photo.title}
                           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                        
-                        <div className="absolute bottom-0 left-0 w-full p-6 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                          <h3 className="font-bold text-white text-lg mb-1">{photo.title}</h3>
-                          <p className="text-sm text-gray-300">{photo.description}</p>
-                        </div>
                       </CardContent>
                     </Link>
+                    <div className="px-4 pt-4">
+                      <h3 className="font-bold text-white text-base truncate" title={photo.title}>{photo.title}</h3>
+                    </div>
                     <CardFooter className="flex flex-col gap-3 p-4 pt-0">
                       <Button
                         className="w-full bg-primary hover:bg-primary/90 text-white font-semibold"
