@@ -43,7 +43,11 @@ model Fotografo {
   cidade         String?
   estado         String?
   instagram      String?
+  portfolioUrl   String?
   chavePix       String?
+  cpf            String?   @unique
+  especialidades String[]
+  equipamentos   String?
   
   fotos          Foto[]
   colecoes       Colecao[]

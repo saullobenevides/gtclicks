@@ -1,36 +1,25 @@
-'use client';
+import clsx from 'clsx';
+import { getAuthenticatedUser } from '@/lib/auth';
+import prisma from '@/lib/prisma';
+import OnboardingWizard from '@/components/onboarding/OnboardingWizard';
+import { redirect } from 'next/navigation';
 
-import { useState } from 'react';
-import { useUser } from '@stackframe/stack';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import FotografoOnboarding from '@/components/FotografoOnboarding';
+export default async function OnboardingPage() {
+  const user = await getAuthenticatedUser();
+  if (!user) redirect('/login');
 
+  const fotografo = await prisma.fotografo.findUnique({
+    where: { userId: user.id },
+  });
 
-export default function OnboardingPage() {
-  const router = useRouter();
+  if (!fotografo) redirect('/dashboard/fotografo'); // Should be a photographer to be here
+
+  // If already has key info, maybe redirect to dashboard? 
+  // For now let's allow editing by visiting this page manually or via initial flow.
 
   return (
-    <div className="min-h-screen bg-background">
-      <FotografoOnboarding 
-        onSuccess={() => {
-          router.push('/dashboard/fotografo');
-          router.refresh();
-        }} 
-      />
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+       <OnboardingWizard initialData={fotografo} />
     </div>
   );
 }

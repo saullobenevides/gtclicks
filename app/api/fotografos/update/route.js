@@ -72,6 +72,12 @@ export async function PUT(request) {
         estado,
         instagram,
         chavePix,
+        cpf: body.cpf, // Explicitly add new fields
+        portfolioUrl: body.portfolioUrl,
+        equipamentos: body.equipamentos,
+        // especialidades might be array, ensure it is handled if passed
+        // For now, let's assume it might be passed as body.especialidades
+        especialidades: body.especialidades,
       },
     });
 

@@ -27,6 +27,9 @@ export default function PhotographerProfileForm({ photographer }) {
     estado: photographer.estado || "",
     instagram: photographer.instagram || "",
     chavePix: photographer.chavePix || "",
+    cpf: photographer.cpf || "",
+    portfolioUrl: photographer.portfolioUrl || "",
+    equipamentos: photographer.equipamentos || "",
   });
 
   const handleChange = (field, value) => {
@@ -168,16 +171,55 @@ export default function PhotographerProfileForm({ photographer }) {
                 </div>
 
                 <div className="grid gap-2 pt-4 border-t border-border">
-                    <Label htmlFor="chavePix">Chave Pix (Para Recebimento)</Label>
-                    <Input
-                        id="chavePix"
-                        placeholder="CPF, Email ou Aleatória"
-                        value={formData.chavePix}
-                        onChange={(e) => handleChange("chavePix", e.target.value)}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                        Chave usada apenas para transferência dos seus ganhos.
+                    <Label htmlFor="chavePix">Dados Financeiros</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                             <Label htmlFor="cpf">CPF</Label>
+                             <Input
+                                 id="cpf"
+                                 placeholder="000.000.000-00"
+                                 value={formData.cpf || ''}
+                                 onChange={(e) => handleChange("cpf", e.target.value)}
+                             />
+                        </div>
+                        <div className="space-y-2">
+                             <Label htmlFor="chavePix">Chave Pix</Label>
+                             <Input
+                                 id="chavePix"
+                                 placeholder="CPF, Email ou Aleatória"
+                                 value={formData.chavePix}
+                                 onChange={(e) => handleChange("chavePix", e.target.value)}
+                             />
+                        </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Esses dados são criptografados e utilizados apenas para repasses.
                     </p>
+                </div>
+                
+                <div className="grid gap-2 pt-4 border-u border-border">
+                    <Label>Profissional</Label>
+                    <div className="grid grid-cols-1 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="portfolio">Portfólio (Site Externo)</Label>
+                          <Input
+                              id="portfolio"
+                              placeholder="https://..."
+                              value={formData.portfolioUrl || ''}
+                              onChange={(e) => handleChange("portfolioUrl", e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="equipamentos">Equipamentos</Label>
+                          <Textarea
+                              id="equipamentos"
+                              placeholder="Câmeras, Lentes..."
+                              value={formData.equipamentos || ''}
+                              onChange={(e) => handleChange("equipamentos", e.target.value)}
+                              rows={2}
+                          />
+                        </div>
+                    </div>
                 </div>
             </CardContent>
             <CardFooter className="flex justify-end sticky bottom-0 bg-background/95 backdrop-blur py-4 border-t z-10">
