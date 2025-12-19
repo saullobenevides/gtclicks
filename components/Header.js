@@ -7,7 +7,7 @@ import NavUserActions from "./NavUserActions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import { Menu, X, ShoppingCart, Heart } from "lucide-react";
 import { useCart } from "@/components/CartContext";
 
 export default function Header() {
@@ -27,10 +27,10 @@ export default function Header() {
   return (
     <header 
       className={cn(
-        "fixed top-0 z-50 w-full transition-all duration-300 border-b",
+        "fixed top-0 z-50 w-full transition-all duration-300 border-b h-[var(--header-height)] flex items-center",
         scrolled
-          ? "bg-black/80 backdrop-blur-md border-white/5 py-2" // Scrolled state (always glass)
-          : "bg-black border-transparent py-4" // Initial state (solid black for all pages)
+          ? "bg-black/80 backdrop-blur-md border-white/5" // Scrolled state (always glass)
+          : "bg-black border-transparent" // Initial state (solid black for all pages)
       )}
     >
       <div className="container-wide flex h-[var(--header-height)] items-center justify-between">
@@ -45,7 +45,7 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            {siteConfig.navItems.map((item) => (
+            {siteConfig.navItems.filter(item => item.href !== '/meus-favoritos').map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -62,7 +62,19 @@ export default function Header() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-3 md:gap-6">
+        <div className="flex items-center gap-5 md:gap-4 border-l border-white/10 pl-8 md:pl-8 ml-4 md:ml-8">
+          {/* Favorites - Desktop (moved from Nav) */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="hidden md:flex text-muted-foreground hover:text-red-500 hover:bg-white/5"
+            asChild
+          >
+            <Link href="/meus-favoritos">
+              <Heart className="h-5 w-5" />
+              <span className="sr-only">Meus Favoritos</span>
+            </Link>
+          </Button>
           {/* Cart - Visible on Mobile now */}
           <Button 
             variant="ghost" 

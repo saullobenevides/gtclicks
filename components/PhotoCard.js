@@ -16,14 +16,14 @@ export default function PhotoCard({ photo, priority = false }) {
 
     addToCart({
         fotoId: photo.id,
-        titulo: photo.titulo,
+        titulo: photo.title || photo.titulo || "Foto sem título",
         preco: photo.colecao?.precoFoto || 0,
         licenca: 'Uso Padrão',
         previewUrl: photo.previewUrl,
     });
     
     toast.success("Foto adicionada ao carrinho", {
-        description: photo.titulo,
+        description: photo.title || photo.titulo,
         action: {
             label: "Ver Carrinho",
             onClick: () => window.location.href = "/carrinho"
@@ -43,13 +43,13 @@ export default function PhotoCard({ photo, priority = false }) {
         priority={priority}
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80" />
       
       {/* Quick Add Button */}
-      <div className="absolute top-4 right-4 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 z-10">
+      <div className="absolute top-4 right-4 translate-y-0 opacity-100 z-10">
          <Button 
             size="icon" 
-            className="rounded-full h-10 w-10 bg-white text-black hover:bg-primary hover:text-white shadow-lg"
+            className="rounded-full h-10 w-10 bg-white/90 text-black hover:bg-neutral-900 hover:text-white shadow-lg backdrop-blur-sm transition-colors"
             onClick={handleQuickAdd}
             title="Adicionar ao carrinho"
          >
@@ -57,9 +57,9 @@ export default function PhotoCard({ photo, priority = false }) {
          </Button>
       </div>
 
-      <div className="absolute bottom-0 left-0 w-full p-4 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-        <h3 className="font-bold text-white line-clamp-1">{photo.titulo}</h3>
-        <span className="text-xs text-gray-300">ID #{photo.id}</span>
+      <div className="absolute bottom-0 left-0 w-full p-4">
+        <h3 className="font-bold text-white line-clamp-1 text-sm shadow-black/80 drop-shadow-md">{photo.title || photo.titulo || "Sem título"}</h3>
+        <span className="text-xs text-gray-300 font-medium opacity-90">#{photo.id ? photo.id.slice(-4) : '...'}</span>
       </div>
     </Link>
   );

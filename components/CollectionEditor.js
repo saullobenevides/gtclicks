@@ -10,11 +10,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
-import { UploadCloud, Trash2, PlusCircle, Loader2, Save, ArrowLeft, Star, Sparkles } from 'lucide-react';
+import { UploadCloud, Trash2, PlusCircle, Loader2, Save, ArrowLeft, Star, Sparkles, DollarSign, Share2 } from 'lucide-react';
 import EXIF from 'exif-js';
 import FolderManager from './FolderManager';
 import Breadcrumbs from './Breadcrumbs';
+import LocationSelector from './LocationSelector';
+import PlaceSelector from './PlaceSelector';
 import { CATEGORIES } from '@/lib/constants';
 import { toast } from "sonner";
 
@@ -89,6 +92,14 @@ export default function CollectionEditor({ collection: initialCollection }) {
     precoFoto: initialCollection.precoFoto || 0,
     capaUrl: initialCollection.capaUrl || '',
     createdAt: initialCollection.createdAt ? new Date(initialCollection.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    
+    // New Fields
+    cidade: initialCollection.cidade || '',
+    estado: initialCollection.estado || '',
+    local: initialCollection.local || '',
+    dataInicio: initialCollection.dataInicio ? new Date(initialCollection.dataInicio).toISOString().split('T')[0] : (initialCollection.createdAt ? new Date(initialCollection.createdAt).toISOString().split('T')[0] : ''),
+    dataFim: initialCollection.dataFim ? new Date(initialCollection.dataFim).toISOString().split('T')[0] : '', 
+    descontos: initialCollection.descontos || [], // [{min: 5, price: 10}]
   });
   
   // Folder Navigation State
@@ -399,7 +410,10 @@ export default function CollectionEditor({ collection: initialCollection }) {
           let errorMsg = 'Falha ao salvar detalhes da coleção';
           try {
              const json = JSON.parse(text);
-             if (json?.error) errorMsg = json.error;
+             if (json?.error) {
+                 errorMsg = json.error;
+                 if (json.details) errorMsg += `: ${json.details}`;
+             }
           } catch (e) {
              console.warn('Response was not JSON:', text);
           }
@@ -487,245 +501,391 @@ export default function CollectionEditor({ collection: initialCollection }) {
       toast.success("Pasta limpa com sucesso.");
   };
 
+  const addDiscount = () => {
+    setCollectionData(prev => ({
+      ...prev,
+      descontos: [...(prev.descontos || []), { min: 5, price: parseFloat(prev.precoFoto || 0) }]
+    }));
+  };
+
+  const removeDiscount = (index) => {
+    setCollectionData(prev => ({
+      ...prev,
+      descontos: prev.descontos.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateDiscount = (index, field, value) => {
+    setCollectionData(prev => ({
+      ...prev,
+      descontos: prev.descontos.map((d, i) => i === index ? { ...d, [field]: parseFloat(value) } : d)
+    }));
+  };
+
+
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Collection Details Form */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Detalhes da Coleção</CardTitle>
-            <CardDescription>Edite o título, descrição e categoria da sua coleção.</CardDescription>
-          </div>
+      <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">Editar Coleção</h1>
           <div className="flex gap-2">
-            {initialCollection.status === 'PUBLICADA' && (
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="gap-2 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10"
-                onClick={() => {
-                   const link = `${window.location.origin}/colecoes/${initialCollection.slug}`;
-                   navigator.clipboard.writeText(link);
-                   toast.success("Link copiado para a área de transferência!");
-                }}
-              >
-                <Share2 className="h-4 w-4" />
-                Copiar Link
-              </Button>
-            )}
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 border-yellow-500/20 gap-2"
-              onClick={handleAnalyzeCollection}
-              disabled={analyzingCollection}
-            >
-              {analyzingCollection ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              Preencher com IA
+             <Button type="button" variant="outline" onClick={() => router.back()}>
+                <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+             </Button>
+             <Button type="button" onClick={handleSaveChanges} disabled={submitting}>
+                {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Save className="mr-2 h-4 w-4" />
+                Salvar Tudo
             </Button>
           </div>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="collection-name">Título</Label>
-            <Input id="collection-name" value={collectionData.nome} onChange={(e) => handleCollectionDataChange('nome', e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="collection-category">Categoria</Label>
-            <Select value={collectionData.categoria} onValueChange={(value) => handleCollectionDataChange('categoria', value)}>
-              <SelectTrigger id="collection-category">
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="collection-date">Data do Evento</Label>
-            <Input 
-              id="collection-date" 
-              type="date" 
-              value={collectionData.createdAt} 
-              onChange={(e) => handleCollectionDataChange('createdAt', e.target.value)} 
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="collection-status">Status</Label>
-            <Select value={collectionData.status} onValueChange={(value) => handleCollectionDataChange('status', value)}>
-              <SelectTrigger id="collection-status">
-                <SelectValue placeholder="Selecione o status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="RASCUNHO">Rascunho (Oculto)</SelectItem>
-                <SelectItem value="PUBLICADA">Publicada (Visível)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="collection-price">Preço por Foto (R$)</Label>
-            <Input 
-              id="collection-price" 
-              type="number" 
-              min="0" 
-              step="0.01" 
-              placeholder="0.00"
-              value={collectionData.precoFoto} 
-              onChange={(e) => handleCollectionDataChange('precoFoto', e.target.value)} 
-            />
-          </div>
-          <div className="md:col-span-2 space-y-1.5">
-            <Label htmlFor="collection-description">Descrição</Label>
-            <Textarea id="collection-description" value={collectionData.descricao} onChange={(e) => handleCollectionDataChange('descricao', e.target.value)} />
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Folder & Photo Management Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Conteúdo da Coleção</CardTitle>
-          <CardDescription>Gerencie pastas e fotos.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-           {/* Breadcrumbs */}
-           <div className="flex items-center justify-between border-b pb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Você está em:</span>
-                <Breadcrumbs path={folderPath} onNavigate={handleNavigate} />
-              </div>
-           </div>
-
-           {/* Folder Manager */}
-           <FolderManager 
-             collectionId={initialCollection.id} 
-             currentFolder={currentFolder} 
-             onNavigate={(folder) => handleNavigate(folder)}
-           />
-           <div className="border-t pt-6">
-             <div className="flex flex-col gap-4 mb-6">
-                <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium">Fotos ({currentPhotos.length})</h3>
-                    <div className="flex gap-2">
-                         {currentPhotos.length > 0 && (
-                             <Button variant="outline" size="sm" onClick={handleDeleteAllInFolder} className="text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
-                                <Trash2 className="mr-2 h-3 w-3" /> Limpar Pasta
-                             </Button>
-                         )}
-                    </div>
-                </div>
-                
-                {/* Bulk Upload Area */}
-                <div className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl p-8 transition-colors text-center cursor-pointer relative">
-                    <input 
-                        type="file" 
-                        multiple 
-                        accept="image/jpeg,image/png,image/webp"
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        onChange={handleBulkUpload}
-                    />
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-2">
-                            <UploadCloud className="h-6 w-6" />
-                        </div>
-                        <h4 className="font-bold text-lg">Arraste e solte suas fotos aqui</h4>
-                        <p className="text-muted-foreground text-sm">ou clique para selecionar (suporta múltiplos arquivos)</p>
-                    </div>
-                </div>
-             </div>
-
-             {/* Photos Grid */}
-             {currentPhotos.length === 0 ? (
-                <div className="text-center p-8 border-2 border-dashed rounded-lg text-muted-foreground">
-                  <p>Nenhuma foto nesta pasta.</p>
-                  <Button variant="link" onClick={addPhoto}>Adicionar agora</Button>
-                </div>
-             ) : (
-               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {currentPhotos.map((photo, index) => (
-                    <Card key={photo.tempId} className={`flex flex-col relative ${collectionData.capaUrl === photo.previewUrl ? 'ring-2 ring-primary' : ''}`}>
-                      <CardHeader className="flex-row items-center justify-between p-4 pb-2">
-                        <CardTitle className="text-sm font-medium">Foto #{index + 1}</CardTitle>
-                        <div className="flex items-center gap-1">
-                          {photo.previewUrl && (
-                            <Button 
-                              type="button" 
-                              variant="ghost" 
-                              size="icon" 
-                              className={`h-6 w-6 ${collectionData.capaUrl === photo.previewUrl ? 'text-yellow-500 hover:text-yellow-600' : 'text-muted-foreground hover:text-yellow-500'}`}
-                              onClick={() => handleSetCover(photo)}
-                              title={collectionData.capaUrl === photo.previewUrl ? "Capa da coleção" : "Definir como capa"}
-                            >
-                              <Star className={`h-4 w-4 ${collectionData.capaUrl === photo.previewUrl ? 'fill-current' : ''}`} />
-                            </Button>
-                          )}
-                          <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => removePhoto(photo)}><Trash2 className="h-4 w-4" /></Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="flex flex-grow flex-col gap-4 p-4 pt-0">
-                        <div className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed relative overflow-hidden bg-muted/10">
-                          {photo.previewUrl ? (
-                            <img src={photo.previewUrl} alt="Preview" className="h-full w-full object-contain" />
-                          ) : (
-                            <Label htmlFor={`file-upload-${index}`} className="flex cursor-pointer flex-col items-center gap-2 text-center text-muted-foreground w-full h-full justify-center hover:bg-muted/20 transition-colors">
-                              <UploadCloud className="h-8 w-8" />
-                              <input id={`file-upload-${index}`} type="file" accept="image/*" onChange={(e) => handleFileSelect(photo, e.target.files?.[0])} className="hidden" />
-                              {uploadState.photoTempId === photo.tempId ? (
-                                <span className="text-xs">{uploadState.label}</span>
-                              ) : (
-                                <span className="text-xs">Clique para enviar</span>
-                              )}
-                            </Label>
-                          )}
-                          {photo.id && <div className="absolute top-2 right-2 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">Salvo</div>}
-                        </div>
-                        
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <Label className="text-xs">Título</Label>
-                            <Button 
-                              type="button" 
-                              variant="ghost" 
-                              size="xs" 
-                              className="h-5 px-2 text-[10px] text-yellow-500 hover:text-yellow-400 hover:bg-yellow-500/10 gap-1"
-                              onClick={() => handleAnalyzePhoto(photo)}
-                              disabled={analyzingId === photo.tempId}
-                            >
-                              {analyzingId === photo.tempId ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                              Preencher com IA
-                            </Button>
-                          </div>
-                          <Input className="h-8 text-sm" placeholder="Título" value={photo.titulo} onChange={(e) => updatePhoto(photo, 'titulo', e.target.value)} />
-                        </div>
-                        
-                        <div className="space-y-1">
-                          <Label className="text-xs">Tags</Label>
-                          <Input className="h-8 text-sm" placeholder="tags..." value={photo.tags} onChange={(e) => updatePhoto(photo, 'tags', e.target.value)} />
-                        </div>
-
-                      </CardContent>
-                    </Card>
-                  ))}
-               </div>
-             )}
-           </div>
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-between mt-8">
-          <Button type="button" variant="destructive" size="lg" onClick={() => setDeleteOpen(true)}>
-            <Trash2 className="mr-2 h-4 w-4" />
-            Excluir Coleção
-          </Button>
-
-          <Button type="button" size="lg" onClick={handleSaveChanges} disabled={submitting}>
-            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            <Save className="mr-2 h-4 w-4" />
-            Salvar Alterações
-          </Button>
       </div>
+
+      <Tabs defaultValue="detalhes" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[600px] h-auto p-1 bg-zinc-900 rounded-lg border border-zinc-800">
+          <TabsTrigger value="detalhes" className="data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:font-bold py-2 transition-all hover:text-white/80 data-[state=active]:hover:text-black">Detalhes</TabsTrigger>
+          <TabsTrigger value="fotos" className="data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:font-bold py-2 transition-all hover:text-white/80 data-[state=active]:hover:text-black">Fotos ({currentPhotos.length})</TabsTrigger>
+          <TabsTrigger value="precos" className="data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:font-bold py-2 transition-all hover:text-white/80 data-[state=active]:hover:text-black">Preços</TabsTrigger>
+          <TabsTrigger value="publicacao" className="data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:font-bold py-2 transition-all hover:text-white/80 data-[state=active]:hover:text-black">Publicação</TabsTrigger>
+        </TabsList>
+
+        {/* --- TAB 1: DETALHES --- */}
+        <TabsContent value="detalhes" className="space-y-4 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Sobre a Coleção</CardTitle>
+              <CardDescription>Informações básicas para identificar o evento.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="collection-name">Título da Coleção</Label>
+                    <Input id="collection-name" value={collectionData.nome} onChange={(e) => handleCollectionDataChange('nome', e.target.value)} placeholder="Ex: Corrida 5k Santos / Ensaio Fotográfico" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="collection-category">Categoria</Label>
+                    <Select value={collectionData.categoria} onValueChange={(value) => handleCollectionDataChange('categoria', value)}>
+                      <SelectTrigger id="collection-category">
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CATEGORIES.map((cat) => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+              </div>
+
+               <div className="grid md:grid-cols-4 gap-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="collection-date-start">Início do Evento</Label>
+                    <Input id="collection-date-start" type="date" value={collectionData.dataInicio} onChange={(e) => handleCollectionDataChange('dataInicio', e.target.value)} />
+                  </div>
+                   <div className="space-y-1.5">
+                    <Label htmlFor="collection-date-end">Fim do Evento</Label>
+                    <Input id="collection-date-end" type="date" value={collectionData.dataFim} onChange={(e) => handleCollectionDataChange('dataFim', e.target.value)} />
+                  </div>
+                  
+                  {/* Location Selector Component covers City and State */}
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                 <LocationSelector 
+                    selectedState={collectionData.estado}
+                    selectedCity={collectionData.cidade}
+                    onStateChange={(val) => handleCollectionDataChange('estado', val)}
+                    onCityChange={(val) => handleCollectionDataChange('cidade', val)}
+                 />
+              </div>
+              
+              <div className="space-y-1.5">
+                  <PlaceSelector 
+                     value={collectionData.local} 
+                     onChange={(val) => handleCollectionDataChange('local', val)}
+                     onCityStateChange={({ city, state }) => {
+                        // Optional: optimize automatically setting city/state if found
+                        handleCollectionDataChange('cidade', city);
+                        handleCollectionDataChange('estado', state);
+                        toast.info(`Cidade e Estado atualizados para: ${city} - ${state}`);
+                     }}
+                  />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="collection-description">Descrição</Label>
+                <Textarea id="collection-description" value={collectionData.descricao} onChange={(e) => handleCollectionDataChange('descricao', e.target.value)} placeholder="Conte mais sobre como foi o evento..." className="h-24" />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* --- TAB 2: FOTOS --- */}
+        <TabsContent value="fotos" className="space-y-4 mt-6">
+             <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Gerenciamento de Fotos</CardTitle>
+                        <CardDescription>Organize em pastas e faça upload.</CardDescription>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    {/* Breadcrumbs */}
+                    <div className="flex items-center justify-between border-b pb-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-muted-foreground">Pasta atual:</span>
+                            <Breadcrumbs path={folderPath} onNavigate={handleNavigate} />
+                        </div>
+                    </div>
+
+                    {/* Folder Manager */}
+                    <FolderManager 
+                        collectionId={initialCollection.id} 
+                        currentFolder={currentFolder} 
+                        onNavigate={(folder) => handleNavigate(folder)}
+                    />
+
+                    <div className="border-t pt-6">
+                        <div className="flex flex-col gap-4 mb-6">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-lg font-medium">Fotos nesta pasta ({currentPhotos.length})</h3>
+                                <div className="flex gap-2">
+                                     <Button 
+                                       type="button" 
+                                       variant="outline" 
+                                       className="text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 border-yellow-500/20 gap-2"
+                                       onClick={handleAnalyzeCollection}
+                                       disabled={analyzingCollection}
+                                     >
+                                         {analyzingCollection ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                                         IA na Capa
+                                     </Button>
+                                    {currentPhotos.length > 0 && (
+                                        <Button variant="outline" size="sm" onClick={handleDeleteAllInFolder} className="text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
+                                            <Trash2 className="mr-2 h-3 w-3" /> Limpar Pasta
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            {/* Bulk Upload Area */}
+                            <div className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl p-8 transition-colors text-center cursor-pointer relative h-32 flex flex-col items-center justify-center">
+                                <input 
+                                    type="file" 
+                                    multiple 
+                                    accept="image/jpeg,image/png,image/webp"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    onChange={handleBulkUpload}
+                                />
+                                <div className="flex flex-col items-center gap-1">
+                                    <UploadCloud className="h-8 w-8 text-primary mb-1" />
+                                    <h4 className="font-bold text-lg">Solte suas fotos aqui</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Photos Grid */}
+                        {currentPhotos.length === 0 ? (
+                            <div className="text-center p-8 border-2 border-dashed rounded-lg text-muted-foreground">
+                            <p>Nenhuma foto nesta pasta.</p>
+                            </div>
+                        ) : (
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                            {currentPhotos.map((photo, index) => (
+                                <Card key={photo.tempId} className={`flex flex-col relative ${collectionData.capaUrl === photo.previewUrl ? 'ring-2 ring-primary' : ''}`}>
+                                <div className="aspect-square relative group">
+                                    {photo.previewUrl ? (
+                                        <img src={photo.previewUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover rounded-t-lg" />
+                                    ) : (
+                                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                                            {uploadState.photoTempId === photo.tempId ? <Loader2 className="animate-spin" /> : <UploadCloud className="text-muted-foreground" />}
+                                        </div>
+                                    )}
+                                    <div className="absolute top-1 right-1 flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 p-1 rounded">
+                                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-white hover:text-yellow-400" onClick={() => handleSetCover(photo)}>
+                                            <Star className={`h-4 w-4 ${collectionData.capaUrl === photo.previewUrl ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                                        </Button>
+                                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-white hover:text-red-400" onClick={() => removePhoto(photo)}>
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-2">
+                                        <Input 
+                                            className="h-6 text-xs bg-transparent border-none text-white focus-visible:ring-0 placeholder:text-white/50" 
+                                            placeholder="Título..." 
+                                            value={photo.titulo} 
+                                            onChange={(e) => updatePhoto(photo, 'titulo', e.target.value)} 
+                                        />
+                                    </div>
+                                </div>
+                                <div className="p-2 gap-1 flex flex-col">
+                                    <div className="flex items-center gap-1">
+                                         <Input className="h-6 text-xs" placeholder="Tags..." value={Array.isArray(photo.tags) ? photo.tags.join(', ') : photo.tags} onChange={(e) => updatePhoto(photo, 'tags', e.target.value)} />
+                                         <Button 
+                                            type="button" 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="h-6 w-6 text-yellow-500"
+                                            onClick={() => handleAnalyzePhoto(photo)}
+                                            disabled={analyzingId === photo.tempId}
+                                         >
+                                            <Sparkles className="h-3 w-3" />
+                                         </Button>
+                                    </div>
+                                </div>
+                                </Card>
+                            ))}
+                        </div>
+                        )}
+                    </div>
+                </CardContent>
+             </Card>
+        </TabsContent>
+
+        {/* --- TAB 3: PREÇOS --- */}
+        <TabsContent value="precos" className="space-y-4 mt-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Precificação</CardTitle>
+                    <CardDescription>Defina o valor base e descontos progressivos.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                    {/* Main Price Card */}
+                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 flex flex-col items-center justify-center text-center gap-4">
+                        <Label htmlFor="price-base" className="text-lg font-medium text-primary">Preço Unitário da Foto</Label>
+                        <div className="relative max-w-[200px] w-full">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xl">R$</span>
+                            <Input 
+                                id="price-base" 
+                                type="number" 
+                                className="pl-12 h-14 text-2xl font-bold text-center bg-background border-primary/30 focus-visible:ring-primary shadow-sm"
+                                value={collectionData.precoFoto} 
+                                onChange={(e) => handleCollectionDataChange('precoFoto', e.target.value)} 
+                            />
+                        </div>
+                        <p className="text-sm text-muted-foreground">Este é o valor padrão para uma única foto.</p>
+                    </div>
+
+                    <div className="border-t pt-6">
+                        <div className="flex items-center justify-between mb-6">
+                             <div className="space-y-1">
+                                <h3 className="font-semibold text-lg flex items-center gap-2">
+                                    <DollarSign className="h-5 w-5 text-green-500" />
+                                    Pacotes de Desconto
+                                </h3>
+                                <p className="text-sm text-muted-foreground">Incentive a compra de mais fotos oferecendo preços menores.</p>
+                             </div>
+                             <Button type="button" variant="outline" size="sm" onClick={addDiscount} className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
+                                <PlusCircle className="mr-2 h-4 w-4" /> Novo Pacote
+                             </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {(!collectionData.descontos || collectionData.descontos.length === 0) && (
+                                <div className="col-span-full text-center py-8 border-2 border-dashed rounded-lg text-muted-foreground bg-muted/30">
+                                    <p>Nenhuma regra de desconto ativa.</p>
+                                    <p className="text-xs mt-1">Clique em "Novo Pacote" para criar uma.</p>
+                                </div>
+                            )}
+                            
+                            {collectionData.descontos?.map((discount, index) => (
+                                <div key={index} className="relative group border rounded-xl p-4 bg-card shadow-sm hover:shadow-md transition-all flex flex-col gap-3">
+                                    <Button 
+                                        type="button" 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="absolute top-2 right-2 h-6 w-6 text-muted-foreground hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" 
+                                        onClick={() => removeDiscount(index)}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="space-y-1 flex-1">
+                                            <Label className="text-xs text-muted-foreground uppercase tracking-wide">Quantidade Mínima</Label>
+                                            <div className="flex items-center gap-2">
+                                                <Input 
+                                                    type="number" 
+                                                    className="h-9 font-medium" 
+                                                    value={discount.min} 
+                                                    onChange={(e) => updateDiscount(index, 'min', e.target.value)}
+                                                />
+                                                <span className="text-sm font-medium">fotos</span>
+                                            </div>
+                                        </div>
+                                        <ArrowLeft className="h-4 w-4 text-muted-foreground rotate-180" />
+                                        <div className="space-y-1 flex-1 text-right">
+                                            <Label className="text-xs text-muted-foreground uppercase tracking-wide text-green-600">Novo Preço Unitário</Label>
+                                            <div className="relative">
+                                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">R$</span>
+                                                <Input 
+                                                    type="number" 
+                                                    className="h-9 pl-7 font-bold text-green-600 text-right" 
+                                                    value={discount.price} 
+                                                    onChange={(e) => updateDiscount(index, 'price', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="text-xs text-center bg-muted/50 py-1 rounded">
+                                        Cliente paga <span className="font-bold text-green-700">R$ {(discount.price * discount.min).toFixed(2)}</span> por {discount.min} fotos
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </TabsContent>
+
+        {/* --- TAB 4: PUBLICAÇÃO --- */}
+        <TabsContent value="publicacao" className="space-y-4 mt-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Publicar Coleção</CardTitle>
+                    <CardDescription>Revise e coloque sua coleção no ar.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="flex items-center space-x-2">
+                        <Label className="font-medium">Status Atual:</Label>
+                        <Select value={collectionData.status} onValueChange={(value) => handleCollectionDataChange('status', value)}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="RASCUNHO">Rascunho (Privado)</SelectItem>
+                                <SelectItem value="PUBLICADA">✨ Publicada (Visível)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {initialCollection.slug && (
+                        <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+                            <Label>Link Público</Label>
+                            <div className="flex gap-2">
+                                <Input readOnly value={typeof window !== 'undefined' ? `${window.location.origin}/colecoes/${initialCollection.slug}` : ''} className="font-mono text-sm" />
+                                <Button size="icon" variant="outline" onClick={() => {
+                                   if (typeof window !== 'undefined') {
+                                       navigator.clipboard.writeText(`${window.location.origin}/colecoes/${initialCollection.slug}`);
+                                       toast.success("Copiado!");
+                                   }
+                                }}>
+                                    <Share2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className="pt-8 border-t">
+                         <Button type="button" variant="outline" className="text-red-500 border-red-200 hover:bg-red-50" onClick={() => setDeleteOpen(true)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir Coleção Permanentemente
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        </TabsContent>
+
+      </Tabs>
 
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>

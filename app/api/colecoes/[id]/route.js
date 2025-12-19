@@ -4,28 +4,29 @@ import { stackServerApp } from "@/stack/server";
 import { slugify } from "@/lib/slug";
 
 export async function PUT(request, context) {
-  const user = await stackServerApp.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
-  }
-
-  const params = await context.params;
-  const { id: colecaoId } = params;
-  if (!colecaoId) {
-    return NextResponse.json({ error: "ID da coleção é obrigatório" }, { status: 400 });
-  }
-
-  const fotografo = await prisma.fotografo.findUnique({
-    where: { userId: user.id },
-  });
-
-  if (!fotografo) {
-    return NextResponse.json({ error: "Perfil de fotografo nao encontrado" }, { status: 403 });
-  }
-
   try {
+    const user = await stackServerApp.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
+    }
+
+    const params = await context.params;
+    const { id: colecaoId } = params;
+    if (!colecaoId) {
+      return NextResponse.json({ error: "ID da coleção é obrigatório" }, { status: 400 });
+    }
+
+    const fotografo = await prisma.fotografo.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!fotografo) {
+      return NextResponse.json({ error: "Perfil de fotografo nao encontrado" }, { status: 403 });
+    }
+
     const body = await request.json();
-    const { nome, descricao, categoria, status, precoFoto, capaUrl } = body;
+    console.log("API UPDATE Payload:", body);
+    const { nome, descricao, categoria, status, precoFoto, capaUrl, cidade, estado, local, dataInicio, dataFim, descontos } = body;
 
     // Verify ownership
     const colecao = await prisma.colecao.findUnique({
@@ -47,6 +48,19 @@ export async function PUT(request, context) {
         updatedSlug = slug;
     }
 
+    // Validation Helpers
+    const parseDate = (d) => {
+        if (!d) return null;
+        const date = new Date(d);
+        return isNaN(date.getTime()) ? null : date;
+    };
+
+    const parseMoney = (v) => {
+        if (v === undefined || v === null || v === '') return undefined;
+        const floatVal = parseFloat(v);
+        return isNaN(floatVal) ? undefined : floatVal;
+    };
+
     const updatedColecao = await prisma.colecao.update({
       where: { id: colecaoId },
       data: {
@@ -56,13 +70,19 @@ export async function PUT(request, context) {
         capaUrl,
         slug: updatedSlug,
         status: status, // Update status
-        precoFoto: precoFoto ? parseFloat(precoFoto) : undefined,
+        precoFoto: parseMoney(precoFoto),
+        cidade,
+        estado,
+        local,
+        dataInicio: parseDate(dataInicio),
+        dataFim: parseDate(dataFim),
+        descontos,
       },
     });
 
     return NextResponse.json({ data: updatedColecao });
   } catch (error) {
-    console.error(`Erro ao atualizar coleção ${colecaoId}:`, error);
+    console.error(`Erro ao atualizar coleção:`, error);
     return NextResponse.json(
       { error: "Erro ao atualizar coleção", details: error.message },
       { status: 500 }

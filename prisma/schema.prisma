@@ -147,6 +147,15 @@ model Colecao {
   categoria      String?
   status         ColecaoStatus @default(RASCUNHO)
   precoFoto      Decimal   @default(0.0) @db.Decimal(10, 2)
+  descontos      Json?     // Ex: [{"min": 5, "price": 10.0}]
+  
+  // Localização e Data
+  cidade         String?
+  estado         String?
+  local          String?
+  dataInicio     DateTime?
+  dataFim        DateTime?
+
   views          Int       @default(0) // Analytics: Total Views
   vendas         Int       @default(0) // Analytics: Total Sales count
   downloads      Int       @default(0) // Analytics: Total Downloads count
