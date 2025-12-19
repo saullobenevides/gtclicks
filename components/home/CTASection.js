@@ -2,22 +2,22 @@ import Link from 'next/link';
 
 const defaultLinks = [
   {
-    title: 'Coleções',
-    description: 'Descubra álbuns completos',
-    href: '/colecoes',
-    icon: '📚'
-  },
-  {
-    title: 'Buscar coleções',
-    description: 'Filtre por tema, categoria ou cor',
+    title: 'Encontrar Evento',
+    description: 'Busque suas fotos do jogo ou festa',
     href: '/busca',
-    icon: '🔍'
+    icon: '🏃'
   },
   {
-    title: 'Seja Fotógrafo',
-    description: 'Comece a vender suas fotos',
+    title: 'Começar a Vender',
+    description: 'Área exclusiva para fotógrafos',
     href: '/cadastro',
     icon: '📸'
+  },
+  {
+    title: 'Minhas Compras',
+    description: 'Acesse e baixe suas fotos',
+    href: '/meus-downloads',
+    icon: '📥'
   },
 ];
 

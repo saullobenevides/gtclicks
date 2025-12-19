@@ -123,9 +123,14 @@ export default function CartPage() {
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
-              <p className="text-center text-xs text-muted-foreground">
-                Pagamento seguro via Mercado Pago
-              </p>
+              <div className="space-y-2 text-center">
+                 <p className="text-xs text-green-400 font-medium">
+                    ⚡ Entrega automática e download imediato
+                 </p>
+                 <p className="text-xs text-muted-foreground">
+                    Pagamento 100% seguro via Mercado Pago
+                 </p>
+              </div>
             </CardFooter>
           </Card>
         </div>

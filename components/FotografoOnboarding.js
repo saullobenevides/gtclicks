@@ -173,12 +173,12 @@ export default function FotografoOnboarding({ onSuccess }) {
                 </div>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="bio">Bio Curta</Label>
+                <Label htmlFor="bio">Bio Curta (Opcional)</Label>
                 <Textarea 
                   id="bio" 
                   value={formData.bio} 
                   onChange={(e) => handleChange('bio', e.target.value)} 
-                  placeholder="Conte um pouco sobre seu estilo e experiência..."
+                  placeholder="Conte um pouco sobre seu estilo (opcional)..."
                 />
               </div>
             </>

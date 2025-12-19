@@ -20,10 +20,12 @@ export default async function CadastroPage() {
       <section className="py-16">
         <div className="text-center mb-16">
           <Badge>Seja Fotógrafo</Badge>
-          <h1 className="text-6xl font-bold my-4 bg-clip-text text-transparent bg-gradient-to-br from-white to-gray-400">Comece a vender suas fotos</h1>
+          <h1 className="text-5xl md:text-6xl font-bold my-4 bg-clip-text text-transparent bg-gradient-to-br from-white to-gray-400 leading-tight">
+            Transforme a cobertura do seu evento em lucro
+          </h1>
           <p className="text-xl text-body max-w-3xl mx-auto">
-            Junte-se à comunidade de fotógrafos do GTClicks e transforme sua
-            paixão em renda. É rápido, fácil e você define seus próprios preços.
+            Fez a cobertura de um jogo ou festa? Crie uma coleção, envie o link para os participantes 
+            e veja as vendas acontecerem automaticamente.
           </p>
         </div>
 
@@ -51,8 +53,8 @@ export default async function CadastroPage() {
               <div className="max-w-lg mx-auto">
                 <p className="text-lg text-green-500 mb-6">✅ Você já tem um perfil de fotógrafo!</p>
                 <Button asChild>
-                  <Link href="/dashboard/fotografo/upload">
-                    Fazer Upload
+                  <Link href="/dashboard/fotografo/colecoes">
+                    Gerenciar Coleções
                   </Link>
                 </Button>
               </div>
@@ -61,7 +63,7 @@ export default async function CadastroPage() {
                 <h2 className="text-3xl font-bold mb-4 text-heading">Crie seu perfil agora</h2>
                 <p className="text-lg text-body mb-8">Clique abaixo para começar. Vamos criar seu perfil automaticamente.</p>
                 <Button asChild>
-                  <Link href="/dashboard/fotografo/upload">
+                  <Link href="/dashboard/fotografo/colecoes">
                     Criar Meu Perfil de Fotógrafo
                   </Link>
                 </Button>
@@ -71,11 +73,18 @@ export default async function CadastroPage() {
             <div className="max-w-lg mx-auto">
               <h2 className="text-3xl font-bold mb-4 text-heading">Pronto para começar?</h2>
               <p className="text-lg text-body mb-8">Faça login ou crie uma conta para começar a vender suas fotos.</p>
-              <Button asChild>
-                <Link href="/login">
-                  Entrar ou Criar Conta
-                </Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+                  <Link href="/registrar">
+                    Criar Conta Grátis
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link href="/login">
+                    Já tenho conta
+                  </Link>
+                </Button>
+              </div>
             </div>
           )}
         </div>

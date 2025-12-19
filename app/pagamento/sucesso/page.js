@@ -38,9 +38,9 @@ export default function PaymentSuccessPage() {
       <section className="py-24">
         <div className="text-center max-w-2xl mx-auto p-12 bg-card border rounded-lg">
           <div className="w-20 h-20 mx-auto mb-8 rounded-full flex items-center justify-center text-5xl font-bold text-white bg-green-500">✓</div>
-          <h1 className="text-4xl font-bold mb-4 text-heading">Pagamento Aprovado!</h1>
+          <h1 className="text-4xl font-bold mb-4 text-heading">Tudo certo! Suas fotos são suas.</h1>
           <p className="text-xl text-body mb-8">
-            Obrigado pela sua compra. Seu pedido foi processado com sucesso.
+            O pagamento foi confirmado e seus arquivos em alta resolução já estão liberados para download.
           </p>
 
           {loading ? (
@@ -64,9 +64,9 @@ export default function PaymentSuccessPage() {
           )}
 
           <div className="flex flex-col gap-4 mt-8">
-            <Button asChild>
+            <Button asChild size="lg" className="h-12 text-lg">
               <Link href="/meus-downloads">
-                Ver Meus Downloads
+                Baixar Minhas Fotos Agora
               </Link>
             </Button>
             <Button asChild variant="outline">

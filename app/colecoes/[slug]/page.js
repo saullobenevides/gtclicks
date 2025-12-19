@@ -135,13 +135,12 @@ export default async function CollectionDetail({ params, searchParams }) {
         )}
 
         <div className="bg-card border rounded-md p-8 mt-16 max-w-4xl mx-auto">
-          <h3 className="text-2xl font-bold mb-4">Como usar esta coleção</h3>
-          <p className="text-body">
-            Adicione as fotos que quiser ao carrinho, escolha a licença adequada e receba
-            o download imediatamente após o pagamento. Precisa de ajuda para aplicar as
-            imagens no seu projeto? Entre em contato com nosso time e receba sugestões de
-            combinações, cores e formatos.
-          </p>
+          <h3 className="text-2xl font-bold mb-4">Como funciona?</h3>
+          <ol className="list-decimal list-inside space-y-2 text-body text-lg">
+            <li>Escolha seus cliques favoritos e adicione ao carrinho.</li>
+            <li>Finalize a compra com segurança (PIX ou Cartão).</li>
+            <li>Baixe seus arquivos originais em alta resolução <strong>imediatamente</strong>.</li>
+          </ol>
           <div className="flex gap-4 mt-8">
             <Button asChild>
               <Link href="/busca">

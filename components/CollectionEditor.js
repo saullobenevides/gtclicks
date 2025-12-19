@@ -88,6 +88,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
     status: initialCollection.status || 'RASCUNHO',
     precoFoto: initialCollection.precoFoto || 0,
     capaUrl: initialCollection.capaUrl || '',
+    createdAt: initialCollection.createdAt ? new Date(initialCollection.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
   });
   
   // Folder Navigation State
@@ -496,16 +497,33 @@ export default function CollectionEditor({ collection: initialCollection }) {
             <CardTitle>Detalhes da Coleção</CardTitle>
             <CardDescription>Edite o título, descrição e categoria da sua coleção.</CardDescription>
           </div>
-          <Button 
-            type="button" 
-            variant="outline" 
-            className="text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 border-yellow-500/20 gap-2"
-            onClick={handleAnalyzeCollection}
-            disabled={analyzingCollection}
-          >
-            {analyzingCollection ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            Preencher com IA
-          </Button>
+          <div className="flex gap-2">
+            {initialCollection.status === 'PUBLICADA' && (
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="gap-2 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10"
+                onClick={() => {
+                   const link = `${window.location.origin}/colecoes/${initialCollection.slug}`;
+                   navigator.clipboard.writeText(link);
+                   toast.success("Link copiado para a área de transferência!");
+                }}
+              >
+                <Share2 className="h-4 w-4" />
+                Copiar Link
+              </Button>
+            )}
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 border-yellow-500/20 gap-2"
+              onClick={handleAnalyzeCollection}
+              disabled={analyzingCollection}
+            >
+              {analyzingCollection ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              Preencher com IA
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
@@ -524,6 +542,15 @@ export default function CollectionEditor({ collection: initialCollection }) {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="collection-date">Data do Evento</Label>
+            <Input 
+              id="collection-date" 
+              type="date" 
+              value={collectionData.createdAt} 
+              onChange={(e) => handleCollectionDataChange('createdAt', e.target.value)} 
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="collection-status">Status</Label>

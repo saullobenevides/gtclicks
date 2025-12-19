@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@stackframe/stack';
 import {
@@ -28,6 +29,7 @@ import { PlusCircle, ExternalLink, Edit } from 'lucide-react';
 
 function DashboardInner() {
   const user = useUser({ or: 'redirect' });
+  const router = useRouter();
   const [fotografo, setFotografo] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,7 +53,10 @@ function DashboardInner() {
   if (!fotografo) {
     return (
         <FotografoOnboarding 
-            onSuccess={(data) => setFotografo(data)}
+            onSuccess={(data) => {
+                setFotografo(data);
+                router.push('/dashboard/fotografo/colecoes');
+            }}
         />
     );
   }

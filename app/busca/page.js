@@ -59,12 +59,15 @@ export default async function SearchPage(props) {
           {results.length === 0 ? (
             <Card className="col-span-full py-24 px-8 text-center glass-panel border-dashed border-white/10 bg-transparent">
               <CardHeader>
-                <CardTitle className="text-2xl text-white">Nenhuma coleção encontrada</CardTitle>
+                <CardTitle className="text-2xl text-white">Nenhum evento encontrado</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-400 text-lg">
-                  Tente ajustar seus filtros ou buscar por termos mais genéricos.
+                <p className="text-gray-400 text-lg mb-6">
+                  Tente buscar pela <strong>data do jogo</strong>, nome do time ou local do evento.
                 </p>
+                <Button asChild variant="outline">
+                    <Link href="/busca">Ver todos os eventos</Link>
+                </Button>
               </CardContent>
             </Card>
           ) : (
