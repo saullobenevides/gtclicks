@@ -76,6 +76,18 @@ export default function SearchFilters({ filters }) {
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="date" className="text-gray-400">Data do Evento</Label>
+              <Input
+                id="date"
+                name="date"
+                type="date"
+                defaultValue={filters.date}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-primary/50 focus:ring-primary/20 [color-scheme:dark]"
+                suppressHydrationWarning
+              />
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-3 pt-2">
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-semibold" suppressHydrationWarning>

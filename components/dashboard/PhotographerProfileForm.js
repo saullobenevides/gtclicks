@@ -30,6 +30,7 @@ export default function PhotographerProfileForm({ photographer }) {
     cpf: photographer.cpf || "",
     portfolioUrl: photographer.portfolioUrl || "",
     equipamentos: photographer.equipamentos || "",
+    especialidades: photographer.especialidades || [],
   });
 
   const handleChange = (field, value) => {
@@ -197,9 +198,34 @@ export default function PhotographerProfileForm({ photographer }) {
                     </p>
                 </div>
                 
-                <div className="grid gap-2 pt-4 border-u border-border">
+                <div className="grid gap-2 pt-4 border-t border-border">
                     <Label>Profissional</Label>
                     <div className="grid grid-cols-1 gap-4">
+                        <div className="space-y-2">
+                           <Label>Suas Especialidades</Label>
+                           <div className="flex flex-wrap gap-2">
+                              {["Casamentos", "Eventos Corporativos", "Retratos", "Moda", "Produtos", "Gastronomia", "Esportes", "Natureza", "Arquitetura", "Jornalismo", "Ensaios", "Viagens"].map(spec => (
+                                <div 
+                                    key={spec} 
+                                    className={`cursor-pointer border rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                                        (formData.especialidades || []).includes(spec) 
+                                        ? 'bg-primary text-primary-foreground border-primary' 
+                                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                    }`}
+                                    onClick={() => {
+                                        const current = formData.especialidades || [];
+                                        const updated = current.includes(spec) 
+                                            ? current.filter(s => s !== spec) 
+                                            : [...current, spec];
+                                        handleChange("especialidades", updated);
+                                    }}
+                                >
+                                    {spec}
+                                </div>
+                              ))}
+                           </div>
+                        </div>
+
                         <div className="space-y-2">
                           <Label htmlFor="portfolio">Portfólio (Site Externo)</Label>
                           <Input

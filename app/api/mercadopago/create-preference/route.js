@@ -14,20 +14,39 @@ export async function POST(request) {
       );
     }
 
+    // Sanitize and validate items
+    const sanitizedItems = (items || []).map(item => ({
+      ...item,
+      unit_price: Number(item.unit_price),
+      quantity: Number(item.quantity)
+    }));
+
+    // Construct Base URL cleanly (remove trailing slash)
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl.slice(0, -1);
+    }
+
     // Create preference
     const preference = {
-      items: items || [],
+      items: sanitizedItems,
       payer: payer || {},
       back_urls: {
-        success: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pagamento/sucesso?pedidoId=${pedidoId}`,
-        failure: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pagamento/falha?pedidoId=${pedidoId}`,
-        pending: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pagamento/pendente?pedidoId=${pedidoId}`,
+        success: `${baseUrl}/pagamento/sucesso?pedidoId=${pedidoId}`,
+        failure: `${baseUrl}/pagamento/falha?pedidoId=${pedidoId}`,
+        pending: `${baseUrl}/pagamento/pendente?pedidoId=${pedidoId}`,
       },
-      auto_return: "approved",
-      external_reference: pedidoId,
-      notification_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/webhooks/mercadopago`,
+      // Production-ready configuration: Enable auto-return and webhooks ONLY if not on localhost
+      ...(baseUrl.includes('localhost') 
+        ? {} 
+        : { 
+            auto_return: "approved",
+            notification_url: `${baseUrl}/api/webhooks/mercadopago` 
+        }),
       statement_descriptor: "GTClicks",
     };
+
+    console.log("🚀 Payload MP:", JSON.stringify(preference, null, 2));
 
     const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
@@ -40,10 +59,10 @@ export async function POST(request) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Mercado Pago API error:", errorData);
+      console.error("Mercado Pago API error:", JSON.stringify(errorData, null, 2));
       return NextResponse.json(
-        { error: "Erro ao criar preferência de pagamento", details: errorData },
-        { status: response.status }
+        { error: "Erro Mercado Pago: " + (errorData.message || "Dados inválidos"), details: errorData },
+        { status: 400 } 
       );
     }
 

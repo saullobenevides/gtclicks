@@ -560,3 +560,317 @@ Unknown argument `folderId`. Did you mean `folder`? Available options are marked
     at Object.f (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:16170:79)
     at exports.flushSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:82:108)
     at Toaster.Toaster.useEffect (http://localhost:3000/_next/static/chunks/node_modules_fa63bce1._.js:5497:205)
+[2025-12-18T16:17:17.312Z] [ERROR] Client Error at http://localhost:3000/colecoes/test-collection-fix-1764622485852: Error: Invalid src prop (http://example.com/preview.jpg) on `next/image`, hostname "example.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3492:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:1351:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3837:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10224:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:2647:64)
+[2025-12-18T16:17:17.351Z] [ERROR] Client Error at http://localhost:3000/colecoes/test-collection-fix-1764622485852: Error: Invalid src prop (http://example.com/preview.jpg) on `next/image`, hostname "example.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3492:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:1351:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3837:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10224:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:2647:64)
+[2025-12-18T16:40:26.956Z] [ERROR] Client Error at http://localhost:3000/colecoes/test-collection-fix-1764622485852: Error: Invalid src prop (http://example.com/preview.jpg) on `next/image`, hostname "example.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:2763:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:209:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:209:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:622:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:3108:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10224:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:2647:64)
+[2025-12-18T16:40:27.128Z] [ERROR] Client Error at http://localhost:3000/colecoes/test-collection-fix-1764622485852: Error: Invalid src prop (http://example.com/preview.jpg) on `next/image`, hostname "example.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:2763:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:209:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:209:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:622:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_7b4983a8._.js:3108:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10224:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:2647:64)
+[2025-12-18T19:07:59.157Z] [ERROR] Client Error at http://localhost:3000/dashboard/fotografo/colecoes: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\ssr\[root-of-the-server]__ea02af81._.js:416:160
+
+  413         columnNumber: 9
+  414     }, this);
+  415 }
+→ 416 const fotografo = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique(
+The column `Fotografo.portfolioUrl` does not exist in the current database.
+    at  MinhasColecoesPage (about://React/Server/C:%5CUsers%5Csaull%5Cgtclicks%5C.next%5Cdev%5Cserver%5Cchunks%5Cssr%5C%5Broot-of-the-server%5D__ea02af81._.js?45:416:23)
+    at resolveErrorDev (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1882:148)
+    at processFullStringRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2390:29)
+    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2349:9)
+    at processBinaryChunk (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2459:98)
+    at progress (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2628:13)
+[2025-12-18T19:07:59.177Z] [ERROR] Client Error at http://localhost:3000/dashboard/fotografo/colecoes: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\ssr\[root-of-the-server]__ea02af81._.js:416:160
+
+  413         columnNumber: 9
+  414     }, this);
+  415 }
+→ 416 const fotografo = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique(
+The column `Fotografo.portfolioUrl` does not exist in the current database.
+    at  MinhasColecoesPage (about://React/Server/C:%5CUsers%5Csaull%5Cgtclicks%5C.next%5Cdev%5Cserver%5Cchunks%5Cssr%5C%5Broot-of-the-server%5D__ea02af81._.js?45:416:23)
+    at resolveErrorDev (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1882:148)
+    at processFullStringRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2390:29)
+    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2349:9)
+    at processBinaryChunk (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2459:98)
+    at progress (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2628:13)
+[2025-12-18T19:08:36.205Z] [ERROR] Client Error at http://localhost:3000/: Error: Invalid src prop (https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=compress&fit=crop&w=900&q=80) on `next/image`, hostname "images.unsplash.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3492:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:1351:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3837:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10224:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:2647:64)
+[2025-12-18T19:08:36.345Z] [ERROR] Client Error at http://localhost:3000/: Error: Invalid src prop (https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=compress&fit=crop&w=900&q=80) on `next/image`, hostname "images.unsplash.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3492:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:1351:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3837:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10224:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:2647:64)
+[2025-12-18T19:12:16.272Z] [ERROR] Client Error at http://localhost:3000/: Error: Invalid src prop (https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=compress&fit=crop&w=900&q=80) on `next/image`, hostname "images.unsplash.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3492:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:1351:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3837:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performSyncWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10232:9)
+    at flushSyncWorkAcrossRoots_impl (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10148:316)
+    at processRootScheduleInMicrotask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10169:106)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10243:158
+[2025-12-18T19:12:16.412Z] [ERROR] Client Error at http://localhost:3000/: Error: Invalid src prop (https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=compress&fit=crop&w=900&q=80) on `next/image`, hostname "images.unsplash.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3492:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:938:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:1351:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_6b212b89._.js:3837:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performSyncWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10232:9)
+    at flushSyncWorkAcrossRoots_impl (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10148:316)
+    at processRootScheduleInMicrotask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10169:106)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10243:158
+[2025-12-18T19:13:38.961Z] [ERROR] Client Error at http://localhost:3000/: Error: Invalid src prop (https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=compress&fit=crop&w=900&q=80) on `next/image`, hostname "images.unsplash.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:2763:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:209:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:209:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:622:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:3108:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10224:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:2647:64)
+[2025-12-18T19:13:38.989Z] [ERROR] Client Error at http://localhost:3000/: Error: Invalid src prop (https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=compress&fit=crop&w=900&q=80) on `next/image`, hostname "images.unsplash.com" is not configured under images in your `next.config.js`
+See more info: https://nextjs.org/docs/messages/next-image-unconfigured-host
+    at defaultLoader (http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:2763:49)
+    at http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:209:39
+    at Array.map (<anonymous>)
+    at generateImgAttrs (http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:209:24)
+    at getImgProps (http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:622:27)
+    at http://localhost:3000/_next/static/chunks/node_modules_535978c4._.js:3108:82
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:14816:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:4645:24)
+    at updateForwardRef (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:5933:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:6777:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:959:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9556:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9450:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9434:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:9099:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js:10224:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js:2647:64)
+[2025-12-18T19:15:43.321Z] [ERROR] Client Error at http://localhost:3000/cadastro: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\ssr\[root-of-the-server]__47dd8cb6._.js:226:164
+
+  223 const user = await __TURBOPACK__imported__module__$5b$project$5d2f$stack$2f$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["stackServerApp"].getUser();
+  224 let hasProfile = false;
+  225 if (user) {
+→ 226     const fotografo = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique(
+The column `Fotografo.portfolioUrl` does not exist in the current database.
+    at  CadastroPage (about://React/Server/C:%5CUsers%5Csaull%5Cgtclicks%5C.next%5Cdev%5Cserver%5Cchunks%5Cssr%5C%5Broot-of-the-server%5D__47dd8cb6._.js?152:226:27)
+    at resolveErrorDev (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1882:148)
+    at processFullStringRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2390:29)
+    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2349:9)
+    at processBinaryChunk (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2459:98)
+    at progress (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2628:13)
+[2025-12-18T19:15:43.339Z] [ERROR] Client Error at http://localhost:3000/cadastro: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\ssr\[root-of-the-server]__47dd8cb6._.js:226:164
+
+  223 const user = await __TURBOPACK__imported__module__$5b$project$5d2f$stack$2f$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["stackServerApp"].getUser();
+  224 let hasProfile = false;
+  225 if (user) {
+→ 226     const fotografo = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique(
+The column `Fotografo.portfolioUrl` does not exist in the current database.
+    at  CadastroPage (about://React/Server/C:%5CUsers%5Csaull%5Cgtclicks%5C.next%5Cdev%5Cserver%5Cchunks%5Cssr%5C%5Broot-of-the-server%5D__47dd8cb6._.js?152:226:27)
+    at resolveErrorDev (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1882:148)
+    at processFullStringRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2390:29)
+    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2349:9)
+    at processBinaryChunk (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2459:98)
+    at progress (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2628:13)
+[2025-12-18T19:39:19.929Z] [ERROR] Client Error at http://localhost:3000/cadastro: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\ssr\[root-of-the-server]__47dd8cb6._.js:226:164
+
+  223 const user = await __TURBOPACK__imported__module__$5b$project$5d2f$stack$2f$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["stackServerApp"].getUser();
+  224 let hasProfile = false;
+  225 if (user) {
+→ 226     const fotografo = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique(
+The column `Fotografo.portfolioUrl` does not exist in the current database.
+    at  CadastroPage (about://React/Server/C:%5CUsers%5Csaull%5Cgtclicks%5C.next%5Cdev%5Cserver%5Cchunks%5Cssr%5C%5Broot-of-the-server%5D__47dd8cb6._.js?152:226:27)
+    at resolveErrorDev (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1882:148)
+    at processFullStringRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2390:29)
+    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2349:9)
+    at processBinaryChunk (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2459:98)
+    at progress (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2628:13)
+[2025-12-18T19:39:19.978Z] [ERROR] Client Error at http://localhost:3000/cadastro: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\ssr\[root-of-the-server]__47dd8cb6._.js:226:164
+
+  223 const user = await __TURBOPACK__imported__module__$5b$project$5d2f$stack$2f$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["stackServerApp"].getUser();
+  224 let hasProfile = false;
+  225 if (user) {
+→ 226     const fotografo = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique(
+The column `Fotografo.portfolioUrl` does not exist in the current database.
+    at  CadastroPage (about://React/Server/C:%5CUsers%5Csaull%5Cgtclicks%5C.next%5Cdev%5Cserver%5Cchunks%5Cssr%5C%5Broot-of-the-server%5D__47dd8cb6._.js?152:226:27)
+    at resolveErrorDev (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1882:148)
+    at processFullStringRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2390:29)
+    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2349:9)
+    at processBinaryChunk (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2459:98)
+    at progress (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2628:13)
+[2025-12-18T19:39:43.658Z] [ERROR] Client Error at http://localhost:3000/cadastro: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\ssr\[root-of-the-server]__47dd8cb6._.js:226:164
+
+  223 const user = await __TURBOPACK__imported__module__$5b$project$5d2f$stack$2f$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["stackServerApp"].getUser();
+  224 let hasProfile = false;
+  225 if (user) {
+→ 226     const fotografo = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique(
+The column `Fotografo.portfolioUrl` does not exist in the current database.
+    at  CadastroPage (about://React/Server/C:%5CUsers%5Csaull%5Cgtclicks%5C.next%5Cdev%5Cserver%5Cchunks%5Cssr%5C%5Broot-of-the-server%5D__47dd8cb6._.js?152:226:27)
+    at resolveErrorDev (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1882:148)
+    at processFullStringRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2390:29)
+    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2349:9)
+    at processBinaryChunk (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2459:98)
+    at progress (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2628:13)
+[2025-12-18T19:39:43.700Z] [ERROR] Client Error at http://localhost:3000/cadastro: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique()` invocation in
+C:\Users\saull\gtclicks\.next\dev\server\chunks\ssr\[root-of-the-server]__47dd8cb6._.js:226:164
+
+  223 const user = await __TURBOPACK__imported__module__$5b$project$5d2f$stack$2f$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["stackServerApp"].getUser();
+  224 let hasProfile = false;
+  225 if (user) {
+→ 226     const fotografo = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].fotografo.findUnique(
+The column `Fotografo.portfolioUrl` does not exist in the current database.
+    at  CadastroPage (about://React/Server/C:%5CUsers%5Csaull%5Cgtclicks%5C.next%5Cdev%5Cserver%5Cchunks%5Cssr%5C%5Broot-of-the-server%5D__47dd8cb6._.js?152:226:27)
+    at resolveErrorDev (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:1882:148)
+    at processFullStringRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2390:29)
+    at processFullBinaryRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2349:9)
+    at processBinaryChunk (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2459:98)
+    at progress (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2628:13)

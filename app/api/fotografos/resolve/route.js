@@ -40,6 +40,22 @@ export async function GET(request) {
             email: true,
           },
         },
+        saldo: true,
+        colecoes: {
+            take: 5,
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                nome: true,
+                status: true,
+                views: true,
+                vendas: true,
+                downloads: true,
+                carrinhoCount: true,
+                createdAt: true,
+                capaUrl: true,
+            }
+        },
         _count: {
           select: {
             colecoes: true,
@@ -63,6 +79,8 @@ export async function GET(request) {
         username: fotografo.username,
         nome: fotografo.user?.name ?? null,
         email: fotografo.user?.email ?? null,
+        saldo: fotografo.saldo,
+        colecoes: fotografo.colecoes,
         _count: fotografo._count,
       },
     });

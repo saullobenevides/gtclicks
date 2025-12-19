@@ -7,6 +7,8 @@ import ImageWithFallback from "@/components/ImageWithFallback";
 import PhotoCard from "@/components/PhotoCard";
 import { Folder, ArrowLeft, Share2 } from "lucide-react";
 import ShareButton from "@/components/ShareButton";
+import ViewTracker from "@/components/analytics/ViewTracker";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -54,14 +56,30 @@ export default async function CollectionDetail({ params, searchParams }) {
 
   return (
     <section className="py-16">
+      <ViewTracker entityId={collection.id} type="colecao" />
       <div className="container-wide">
         <div className="text-center mb-16">
-          <Badge>Coleção</Badge>
+          <div className="flex items-center justify-center gap-2 mb-4">
+              <Badge>Coleção</Badge>
+              <ShareButton 
+                title={collection.title} 
+                text={`Veja a coleção ${collection.title} no GTClicks`} 
+                variant="ghost" 
+                size="icon" 
+                className="hover:bg-muted"
+              />
+          </div>
           <h1 className="text-4xl xs:text-5xl font-bold my-4 leading-tight">{collection.title}</h1>
           <p className="text-xl text-body">{collection.description}</p>
-          <p className="text-body">
+          <p className="text-body mb-4">
             por <strong>{collection.photographer}</strong>
           </p>
+          {Number(collection.precoFoto) > 0 && (
+            <div className="flex items-center justify-center gap-2 text-2xl font-bold text-primary mb-8">
+                <span className="text-lg text-muted-foreground">Preço por foto:</span>
+                <span>R$ {Number(collection.precoFoto).toFixed(2).replace('.', ',')}</span>
+            </div>
+          )}
         </div>
 
         {/* Folder Navigation Header */}

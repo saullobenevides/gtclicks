@@ -176,7 +176,7 @@ export default function FinanceiroPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold">Financeiro</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Financeiro</h1>
         <p className="text-muted-foreground">Gerencie seus ganhos e saques.</p>
       </div>
 
@@ -189,7 +189,7 @@ export default function FinanceiroPage() {
       )}
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <Card>
+        <Card className="bg-black/20 border-white/10">
           <CardHeader>
             <CardTitle>Saldo Disponível</CardTitle>
           </CardHeader>
@@ -205,7 +205,7 @@ export default function FinanceiroPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-black/20 border-white/10">
           <CardHeader>
             <CardTitle>Chave PIX</CardTitle>
           </CardHeader>
@@ -227,7 +227,7 @@ export default function FinanceiroPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <p className="break-all rounded-md border bg-muted p-3 text-sm">
+                <p className="break-all rounded-md border border-white/10 bg-black/40 p-3 text-sm">
                   {chavePix || 'Não cadastrada'}
                 </p>
                 <Button onClick={() => setEditingPix(true)} variant="outline">
@@ -239,7 +239,7 @@ export default function FinanceiroPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-black/20 border-white/10">
         <CardHeader>
           <CardTitle>Solicitar Saque</CardTitle>
           <CardDescription>
@@ -255,7 +255,7 @@ export default function FinanceiroPage() {
               placeholder="Valor do saque"
               min="50"
               step="0.01"
-              className="flex-1"
+              className="flex-1 bg-black/40 border-white/10"
             />
             <Button
               onClick={handleSolicitarSaque}
@@ -268,14 +268,14 @@ export default function FinanceiroPage() {
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="bg-black/20 border-white/10">
         <CardHeader>
           <CardTitle>Histórico de Transações</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="border-white/10 hover:bg-transparent">
                 <TableHead>Descrição</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead className="text-right">Valor</TableHead>
@@ -283,14 +283,14 @@ export default function FinanceiroPage() {
             </TableHeader>
             <TableBody>
               {transacoes.length === 0 ? (
-                <TableRow>
+                <TableRow className="border-white/10 hover:bg-white/5">
                   <TableCell colSpan={3} className="h-24 text-center">
                     Nenhuma transação ainda.
                   </TableCell>
                 </TableRow>
               ) : (
                 transacoes.map((t) => (
-                  <TableRow key={t.id}>
+                  <TableRow key={t.id} className="border-white/10 hover:bg-white/5">
                     <TableCell>{t.descricao || t.tipo}</TableCell>
                     <TableCell>
                       {new Date(t.createdAt).toLocaleDateString('pt-BR')}

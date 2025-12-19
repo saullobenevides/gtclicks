@@ -118,7 +118,6 @@ export default async function PhotographerProfilePage(props) {
             <div className="grid grid-cols-3 gap-4 lg:hidden">
               <StatsCard label="Coleções" value={collections.length || 0} icon={<ImageIcon className="h-4 w-4" />} />
               <StatsCard label="Fotos" value={totalPhotos} icon={<Camera className="h-4 w-4" />} />
-              <StatsCard label="Downloads" value={photographer.downloads || 0} icon={<Download className="h-4 w-4" />} />
             </div>
 
             {/* Bio */}
@@ -186,7 +185,6 @@ export default async function PhotographerProfilePage(props) {
               <div className="space-y-6">
                 <SidebarStat label="Coleções Publicadas" value={collections.length || 0} icon={<ImageIcon className="h-5 w-5 text-primary" />} />
                 <SidebarStat label="Total de Fotos" value={totalPhotos} icon={<Camera className="h-5 w-5 text-primary" />} />
-                <SidebarStat label="Total de Downloads" value={photographer.downloads || 0} icon={<Download className="h-5 w-5 text-primary" />} />
               </div>
             </Card>
           </div>

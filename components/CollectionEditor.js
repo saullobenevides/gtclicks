@@ -1,7 +1,7 @@
 'use client';
 
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -100,21 +100,18 @@ export default function CollectionEditor({ collection: initialCollection }) {
       ...p,
       tempId: p.id || Math.random().toString(36).substr(2, 9)
   })));
-  const [currentPhotos, setCurrentPhotos] = useState([]);
-
   const [submitting, setSubmitting] = useState(false);
-  const [uploadState, setUploadState] = useState({ index: null, label: '' });
+  const [uploadState, setUploadState] = useState({ photoTempId: null, label: '' });
   const [deletedPhotoIds, setDeletedPhotoIds] = useState([]);
 
   // Filter photos when folder changes or photos update
-  useEffect(() => {
-    const filtered = allPhotos.filter(p => {
+  const currentPhotos = useMemo(() => {
+    return allPhotos.filter(p => {
       if (currentFolder === null) {
         return !p.folderId; // Root photos have no folderId
       }
       return p.folderId === currentFolder.id;
     });
-    setCurrentPhotos(filtered);
   }, [allPhotos, currentFolder]);
 
   const handleCollectionDataChange = (field, value) => {
@@ -146,14 +143,14 @@ export default function CollectionEditor({ collection: initialCollection }) {
   // Photo management functions
   const addPhoto = () => {
     const newPhoto = { ...blankPhoto(), folderId: currentFolder?.id || null };
-    setAllPhotos([...allPhotos, newPhoto]);
+    setAllPhotos(prev => [...prev, newPhoto]);
   };
 
   const removePhoto = (photoToRemove) => {
     if (photoToRemove.id) {
-        setDeletedPhotoIds([...deletedPhotoIds, photoToRemove.id]);
+        setDeletedPhotoIds(prev => [...prev, photoToRemove.id]);
     }
-    setAllPhotos(allPhotos.filter(p => p.tempId !== photoToRemove.tempId));
+    setAllPhotos(prev => prev.filter(p => p.tempId !== photoToRemove.tempId));
     if (collectionData.capaUrl === photoToRemove.previewUrl) {
       setCollectionData(prev => ({ ...prev, capaUrl: '' }));
     }
@@ -161,20 +158,19 @@ export default function CollectionEditor({ collection: initialCollection }) {
   };
 
   const updatePhoto = (photoToUpdate, field, value) => {
-    setAllPhotos(allPhotos.map(p => p.tempId === photoToUpdate.tempId ? { ...p, [field]: value } : p));
+    setAllPhotos(prev => prev.map(p => p.tempId === photoToUpdate.tempId ? { ...p, [field]: value } : p));
   };
 
 
   const uploadFromDevice = async (photoToUpload, file) => {
     if (!file) return;
-    const index = currentPhotos.indexOf(photoToUpload); // Index for UI feedback only
-    setUploadState({ index, label: `Extraindo metadados...` });
+    setUploadState({ photoTempId: photoToUpload.tempId, label: `Extraindo metadados...` });
 
     try {
       const metadata = await extractMetadata(file);
       const previewBlob = await generatePreview(file);
       
-      setUploadState({ index, label: `Enviando arquivos...` });
+      setUploadState({ photoTempId: photoToUpload.tempId, label: `Enviando arquivos...` });
       const [originalPresign, previewPresign] = await Promise.all([
         fetch("/api/upload", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: file.name, contentType: file.type, folder: "originals" }) }).then(r => r.json()),
         fetch("/api/upload", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: `preview_${file.name}`, contentType: "image/jpeg", folder: "previews" }) }).then(r => r.json()),
@@ -219,11 +215,11 @@ export default function CollectionEditor({ collection: initialCollection }) {
         folderId: currentFolder?.id || null
       } : p));
 
-      setUploadState({ index: null, label: '' });
+      setUploadState({ photoTempId: null, label: '' });
       toast.success('Upload concluído! Preencha os detalhes e publique.');
     } catch (error) {
       console.error(error);
-      setUploadState({ index: null, label: '' });
+      setUploadState({ photoTempId: null, label: '' });
       toast.error(error.message);
     }
   };
@@ -231,13 +227,54 @@ export default function CollectionEditor({ collection: initialCollection }) {
   const handleFileSelect = async (photo, file) => {
     if (!file) return;
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type)) { toast.error('Formato inválido. Use apenas JPG, PNG ou WebP.'); return; }
-    const maxSize = 50 * 1024 * 1024;
-    if (file.size > maxSize) { toast.error('Arquivo muito grande. Tamanho máximo: 50MB'); return; }
+    if (!validTypes.includes(file.type)) { toast.error(`Formato inválido: ${file.name}`); return; }
+    
+    // Update local state first
     const img = new Image();
-    img.onload = () => { const orientation = img.width > img.height ? 'HORIZONTAL' : 'VERTICAL'; updatePhoto(photo, 'orientacao', orientation); };
+    img.onload = () => { 
+        const orientation = img.width > img.height ? 'HORIZONTAL' : 'VERTICAL'; 
+        updatePhoto(photo, 'orientacao', orientation); 
+    };
     img.src = URL.createObjectURL(file);
+    
     await uploadFromDevice(photo, file);
+  };
+
+  const handleBulkUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    toast.info(`Iniciando upload de ${files.length} fotos...`);
+
+    // 1. Create placeholders for all files immediately
+    const newPhotos = files.map(file => ({
+        ...blankPhoto(),
+        titulo: file.name.split('.')[0], // Auto-title from filename
+        folderId: currentFolder?.id || null
+    }));
+
+    // Add to state so user sees them immediately
+    setAllPhotos(prev => [...prev, ...newPhotos]);
+
+    // 2. Process uploads sequentially (or focused parallel) to avoid browser freeze
+    // We match the newPhoto tempId to the file index
+    let completed = 0;
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const photoPlaceholder = newPhotos[i];
+        
+        try {
+            await handleFileSelect(photoPlaceholder, file);
+            completed++;
+            if (completed % 5 === 0) toast.success(`${completed}/${files.length} enviados...`);
+        } catch (err) {
+            console.error(`Erro ao enviar ${file.name}`, err);
+            toast.error(`Falha no envio de ${file.name}`);
+        }
+    }
+    
+    toast.success("Upload em massa concluído!");
   };
   
   const [analyzingId, setAnalyzingId] = useState(null);
@@ -377,7 +414,6 @@ export default function CollectionEditor({ collection: initialCollection }) {
           descricao: p.descricao,
           tags: typeof p.tags === 'string' ? p.tags.split(',').map(tag => tag.trim()).filter(Boolean) : (p.tags || []),
           orientacao: p.orientacao,
-          orientacao: p.orientacao,
           folderId: p.folderId, // Ensure folderId is sent
         })),
         deletedPhotoIds, // Send deleted IDs
@@ -436,6 +472,18 @@ export default function CollectionEditor({ collection: initialCollection }) {
     } finally {
       setDeleting(false);
     }
+  };
+
+  const handleDeleteAllInFolder = () => {
+      if (!confirm("Tem certeza? Isso removerá todas as fotos VISÍVEIS nesta pasta.")) return;
+      
+      const idsToRemove = currentPhotos.map(p => p.id).filter(Boolean);
+      setDeletedPhotoIds(prev => [...prev, ...idsToRemove]);
+      
+      const tempIdsToRemove = currentPhotos.map(p => p.tempId);
+      setAllPhotos(prev => prev.filter(p => !tempIdsToRemove.includes(p.tempId)));
+      
+      toast.success("Pasta limpa com sucesso.");
   };
 
 
@@ -529,11 +577,36 @@ export default function CollectionEditor({ collection: initialCollection }) {
              currentFolder={currentFolder} 
              onNavigate={(folder) => handleNavigate(folder)}
            />
-           
            <div className="border-t pt-6">
-             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium">Fotos ({currentPhotos.length})</h3>
-                <Button type="button" variant="ghost" onClick={addPhoto}><PlusCircle className="mr-2 h-4 w-4" />Adicionar foto</Button>
+             <div className="flex flex-col gap-4 mb-6">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-medium">Fotos ({currentPhotos.length})</h3>
+                    <div className="flex gap-2">
+                         {currentPhotos.length > 0 && (
+                             <Button variant="outline" size="sm" onClick={handleDeleteAllInFolder} className="text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
+                                <Trash2 className="mr-2 h-3 w-3" /> Limpar Pasta
+                             </Button>
+                         )}
+                    </div>
+                </div>
+                
+                {/* Bulk Upload Area */}
+                <div className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl p-8 transition-colors text-center cursor-pointer relative">
+                    <input 
+                        type="file" 
+                        multiple 
+                        accept="image/jpeg,image/png,image/webp"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        onChange={handleBulkUpload}
+                    />
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-2">
+                            <UploadCloud className="h-6 w-6" />
+                        </div>
+                        <h4 className="font-bold text-lg">Arraste e solte suas fotos aqui</h4>
+                        <p className="text-muted-foreground text-sm">ou clique para selecionar (suporta múltiplos arquivos)</p>
+                    </div>
+                </div>
              </div>
 
              {/* Photos Grid */}
@@ -572,7 +645,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
                             <Label htmlFor={`file-upload-${index}`} className="flex cursor-pointer flex-col items-center gap-2 text-center text-muted-foreground w-full h-full justify-center hover:bg-muted/20 transition-colors">
                               <UploadCloud className="h-8 w-8" />
                               <input id={`file-upload-${index}`} type="file" accept="image/*" onChange={(e) => handleFileSelect(photo, e.target.files?.[0])} className="hidden" />
-                              {uploadState.index === currentPhotos.indexOf(photo) ? (
+                              {uploadState.photoTempId === photo.tempId ? (
                                 <span className="text-xs">{uploadState.label}</span>
                               ) : (
                                 <span className="text-xs">Clique para enviar</span>

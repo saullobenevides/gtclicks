@@ -14,29 +14,20 @@ import { Images, DollarSign, Upload, ArrowRight, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import FotografoOnboarding from '@/components/FotografoOnboarding';
 import FinancialSummary from '@/components/dashboard/FinancialSummary';
-
-function StatCard({ icon, title, value, description, actionText, actionHref }) {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {icon}
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </CardContent>
-      <CardFooter>
-        <Button asChild className="w-full">
-          <Link href={actionHref}>{actionText}</Link>
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-}
+import AnalyticsOverview from '@/components/dashboard/AnalyticsOverview';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { PlusCircle, ExternalLink, Edit } from 'lucide-react';
 
 function DashboardInner() {
-  const user = useUser({ or: 'redirect' }); // Redirects to login if not authenticated
+  const user = useUser({ or: 'redirect' });
   const [fotografo, setFotografo] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -57,80 +48,125 @@ function DashboardInner() {
     return <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin" /></div>;
   }
 
-  // Se não achou fotógrafo no banco, mostra o Onboarding
   if (!fotografo) {
     return (
         <FotografoOnboarding 
-            onSuccess={(data) => {
-                setFotografo(data); // Atualiza estado local para exibir dashboard
-            }}
+            onSuccess={(data) => setFotografo(data)}
         />
     );
   }
 
+  // Aggregate stats from ALL collections (if available) or use the summary from backend
+  // For now, we use the collections returned (top 5) + generic counts to simulate totals if needed
+  // In a real scenario, the backend should return 'totalSales', 'totalViews' separately.
+  // We will sum the top 5 for now as a proxy or use the 'carrinhoCount' we added.
+  
+  // Let's assume the backend returned aggregating logic or we sum what we have.
+  // Ideally, 'fotografo.colecoes' are just the recent ones.
+  // We will rely on what we have:
   const stats = {
-    colecoes: fotografo._count?.colecoes || 0,
-    fotos: fotografo._count?.fotos || 0,
-    saldo: fotografo.saldo?.disponivel || '0,00',
+    views: (fotografo.colecoes || []).reduce((acc, col) => acc + (col.views || 0), 0), 
+    sales: (fotografo.colecoes || []).reduce((acc, col) => acc + (col.vendas || 0), 0),
+    downloads: (fotografo.colecoes || []).reduce((acc, col) => acc + (col.downloads || 0), 0),
+    cartAdds: (fotografo.colecoes || []).reduce((acc, col) => acc + (col.carrinhoCount || 0), 0),
   };
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="mb-4">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Bem-vindo de volta, {fotografo.username}!
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <StatCard
-          title="Minhas Coleções"
-          value={stats.colecoes}
-          description={`${stats.fotos} fotos em ${stats.colecoes} coleções`}
-          icon={<Images className="h-4 w-4 text-muted-foreground" />}
-          actionText="Gerenciar Coleções"
-          actionHref="/dashboard/fotografo/colecoes"
-        />
-        <StatCard
-          title="Saldo Disponível"
-          value={`R$ ${stats.saldo}`}
-          description="Valor disponível para saque"
-          icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
-          actionText="Ver Financeiro"
-          actionHref="/dashboard/fotografo/financeiro"
-        />
-        <StatCard
-          title="Nova Coleção"
-          value="Criar Coleção"
-          description="Crie uma coleção e faça upload de fotos"
-          icon={<Upload className="h-4 w-4 text-muted-foreground" />}
-          actionText="Criar Agora"
-          actionHref="/dashboard/fotografo/colecoes"
-        />
-      </div>
-
-      <div>
-        <h2 className="mb-4 text-2xl font-bold">Ações Rápidas</h2>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      {/* Header & Main Action */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight">Visão Geral</h1>
+            <p className="text-muted-foreground">
+            Acompanhe o desempenho das suas coleções e vendas.
+            </p>
+        </div>
+        <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">
             <Link href="/dashboard/fotografo/colecoes">
-                <Card className="flex h-full flex-col justify-between p-6 transition-all hover:bg-muted">
-                    <div>
-                        <h3 className="text-xl font-bold">Gerenciar Coleções</h3>
-                        <p className="text-muted-foreground">
-                        Visualize, edite e organize suas coleções.
-                        </p>
-                    </div>
-                    <div className="mt-4 flex items-center font-semibold text-primary">
-                        <span>Ir para Coleções</span>
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                    </div>
-                </Card>
+                <PlusCircle className="mr-2 h-5 w-5" />
+                Nova Coleção
+            </Link>
+        </Button>
+      </div>
+
+      {/* Analytics Section */}
+      <AnalyticsOverview stats={stats} />
+
+      {/* Recent Events Table */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Coleções Recentes</h2>
+            <Link href="/dashboard/fotografo/colecoes" className="text-sm text-primary hover:underline">
+                Ver todas
             </Link>
         </div>
+        
+        <Card className="overflow-hidden border-white/10 bg-black/20">
+            <Table>
+                <TableHeader>
+                    <TableRow className="hover:bg-transparent border-white/10">
+                        <TableHead className="w-[300px]">Coleção</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Visualizações</TableHead>
+                        <TableHead className="text-right">No Carrinho</TableHead>
+                        <TableHead className="text-right">Vendas</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {(fotografo.colecoes || []).length === 0 ? (
+                        <TableRow>
+                            <TableCell colspan={6} className="h-24 text-center text-muted-foreground">
+                                Nenhuma coleção encontrada. Crie a sua primeira!
+                            </TableCell>
+                        </TableRow>
+                    ) : (
+                        fotografo.colecoes.map((col) => (
+                            <TableRow key={col.id} className="border-white/10 hover:bg-white/5">
+                                <TableCell className="font-medium">
+                                    <div className="flex flex-col">
+                                        <span className="text-base text-white">{col.nome}</span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {new Date(col.createdAt).toLocaleDateString('pt-BR')}
+                                        </span>
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <Badge variant={col.status === 'PUBLICADA' ? 'default' : 'secondary'} className={col.status === 'PUBLICADA' ? 'bg-green-500/10 text-green-500 hover:bg-green-500/20' : ''}>
+                                        {col.status === 'PUBLICADA' ? 'Ativo' : 'Rascunho'}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell className="text-right">{col.views}</TableCell>
+                                <TableCell className="text-right">{col.carrinhoCount}</TableCell>
+                                <TableCell className="text-right font-bold text-green-400">
+                                    {col.vendas}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    <div className="flex justify-end gap-2">
+                                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white">
+                                            <Link href={`/dashboard/fotografo/colecoes/${col.id}/editar`} title="Editar">
+                                                <Edit className="h-4 w-4" />
+                                            </Link>
+                                        </Button>
+                                        {col.status === 'PUBLICADA' && (
+                                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white">
+                                                <Link href={`/colecoes/${col.slug}`} target="_blank" title="Ver Página">
+                                                    <ExternalLink className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+                                        )}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    )}
+                </TableBody>
+            </Table>
+        </Card>
       </div>
-     
-      <div className="w-full">
+
+      {/* Financials */}
+      <div className="mt-4">
          <FinancialSummary />
       </div>
 

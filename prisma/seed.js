@@ -36,6 +36,101 @@ async function main() {
     }
   }
 
+  // Create or Update Main Photographer User
+  const photographerEmail = 'teste@gtclicks.com';
+  let user = await prisma.user.findUnique({ where: { email: photographerEmail } });
+  
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email: photographerEmail,
+        name: 'Fotógrafo Teste',
+        image: 'https://github.com/shadcn.png',
+        role: 'FOTOGRAFO',
+      }
+    });
+    console.log('✓ Created Test User');
+  } else {
+    // Ensure role is FOTOGRAFO
+    if (user.role !== 'FOTOGRAFO') {
+       await prisma.user.update({ where: { id: user.id }, data: { role: 'FOTOGRAFO' } });
+       console.log('✓ Updated Test User role');
+    }
+  }
+
+  // Create Photographer Profile
+  let photographer = await prisma.fotografo.findUnique({ where: { userId: user.id } });
+  if (!photographer) {
+    photographer = await prisma.fotografo.create({
+      data: {
+        userId: user.id,
+        username: 'fotografoteste',
+        bio: 'Fotógrafo profissional especializado em tecnologia e eventos.',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        instagram: 'fotografoteste',
+        chavePix: 'teste@pix.com.br',
+        cpf: '123.456.789-00',
+        especialidades: ['Eventos Corporativos', 'Retratos', 'Tecnologia'],
+        equipamentos: 'Sony A7III, 24-70mm GM',
+        portfolioUrl: 'https://gtclicks.com'
+      }
+    });
+    console.log('✓ Created Photographer Profile');
+  }
+
+  // Create Sample Collection
+  const collectionSlug = 'tech-event-2025';
+  let collection = await prisma.colecao.findUnique({ where: { slug: collectionSlug } });
+  
+  if (!collection) {
+    collection = await prisma.colecao.create({
+      data: {
+        nome: 'Tech Summit 2025',
+        slug: collectionSlug,
+        descricao: 'Fotos exclusivas do maior evento de tecnologia do ano.',
+        categoria: 'CORPORATIVO',
+        status: 'PUBLICADA',
+        precoFoto: 25.00,
+        capaUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80',
+        fotografoId: photographer.id,
+        fotos: {
+            create: [
+                {
+                    titulo: 'Keynote Speaker',
+                    descricao: 'Palestrante principal apresentando novas tendências de IA.',
+                    s3Key: 'seeds/speaker.jpg',
+                    previewUrl: 'https://images.unsplash.com/photo-1475721027767-pja438964d85?auto=format&fit=crop&q=80',
+                    width: 1920,
+                    height: 1080,
+                    formato: 'jpg',
+                    tamanhoBytes: 2500000,
+                    orientacao: 'HORIZONTAL',
+                    tags: ['palestra', 'ia', 'tecnologia', 'palco'],
+                    status: 'PUBLICADA',
+                    fotografoId: photographer.id
+                },
+                {
+                    titulo: 'Networking Area',
+                    descricao: 'Área de convivência com profissionais trocando experiências.',
+                    s3Key: 'seeds/networking.jpg',
+                    previewUrl: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80',
+                    width: 1920,
+                    height: 1080,
+                    formato: 'jpg',
+                    tamanhoBytes: 2200000,
+                    orientacao: 'HORIZONTAL',
+                    tags: ['networking', 'coffee', 'pessoas', 'negócios'],
+                    status: 'PUBLICADA',
+                    fotografoId: photographer.id
+                }
+            ]
+        }
+      }
+    });
+    console.log('✓ Created Sample Collection');
+  }
+
   console.log('✅ Seed completed!');
 }
 

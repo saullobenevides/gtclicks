@@ -130,7 +130,7 @@ export default function DownloadsPage() {
                 <p className="font-semibold text-primary">{item.licenca?.nome}</p>
                 <p className="text-sm text-muted-foreground">
                   Comprada em{' '}
-                  {new Date(item.createdAt).toLocaleDateString('pt-BR')}
+                  {new Date(item.pedido?.createdAt || item.createdAt || Date.now()).toLocaleDateString('pt-BR')}
                 </p>
               </div>
               {item.downloadToken ? (

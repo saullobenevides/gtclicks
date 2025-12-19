@@ -22,9 +22,11 @@ import { Label } from '@/components/ui/label';
 import ImageWithFallback from '@/components/ImageWithFallback';
 import { Heart, Info, CheckCircle2, ShoppingCart } from 'lucide-react';
 import ShareButton from '@/components/ShareButton';
+import ViewTracker from "@/components/analytics/ViewTracker";
+import { formatCurrency } from "@/lib/utils";
 import { useUser } from '@stackframe/stack';
 
-export default function PhotoDetailsClient({ photo }) {
+export default function PhotoDetailsClient({ photo, relatedPhotos }) {
   const { addToCart, setIsCartOpen } = useCart();
   const [addedToCart, setAddedToCart] = useState(false);
   

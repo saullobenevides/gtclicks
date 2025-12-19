@@ -63,6 +63,9 @@ export default function CheckoutPage() {
       const pedidoId = orderData.data.id;
 
       // Create Mercado Pago preference
+      const payerEmail = user.email || user.primaryEmail || "cliente@gtclicks.com";
+      console.log("Preparing MP Preference for:", payerEmail);
+      
       const mpResponse = await fetch('/api/mercadopago/create-preference', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -71,12 +74,13 @@ export default function CheckoutPage() {
           items: items.map((item) => ({
             title: item.titulo,
             quantity: 1,
-            unit_price: item.preco,
+            unit_price: Number(item.preco),
             currency_id: 'BRL',
           })),
           payer: {
-            email: user.email,
-            name: user.name,
+            email: payerEmail,
+            name: (user.name || "Cliente GTClicks").split(" ")[0],
+            surname: (user.name || "").split(" ").slice(1).join(" ") || "Teste",
           },
         }),
       });

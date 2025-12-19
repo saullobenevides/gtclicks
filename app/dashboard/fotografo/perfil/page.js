@@ -24,7 +24,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Meu Perfil</h1>
         <p className="text-muted-foreground">

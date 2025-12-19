@@ -80,6 +80,12 @@ model Foto {
   tags           String[]
   orientacao     OrientacaoFoto
   likes          Int       @default(0)
+  views          Int       @default(0) // Analytics: Detail Views
+  vendas         Int       @default(0) // Analytics: Total Sales count
+  downloads      Int       @default(0) // Analytics: Total Downloads count
+  carrinhoCount  Int       @default(0) // Analytics: Added to Cart count
+  numeroSequencial Int?    // Busca: "Foto 231"
+  categoriaFoto  String?   // Busca: "Individual", "Grupo"
   
   // Técnico (Crítico para S3 e Next/Image)
   s3Key          String    @unique // Caminho privado no S3
@@ -141,6 +147,10 @@ model Colecao {
   categoria      String?
   status         ColecaoStatus @default(RASCUNHO)
   precoFoto      Decimal   @default(0.0) @db.Decimal(10, 2)
+  views          Int       @default(0) // Analytics: Total Views
+  vendas         Int       @default(0) // Analytics: Total Sales count
+  downloads      Int       @default(0) // Analytics: Total Downloads count
+  carrinhoCount  Int       @default(0) // Analytics: Added to Cart count
   
   fotografoId    String
   fotografo      Fotografo @relation(fields: [fotografoId], references: [id])
