@@ -1,97 +1,56 @@
+
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { stackServerApp } from "@/stack/server";
-import { logError } from "@/lib/logger";
-// import sharp from "sharp"; // Sharp might be too heavy for some environments, using basic metadata if possible or just saving dimensions from client if needed. 
-// For this MVP, we will try to read metadata. If sharp is not available, we might need another way or rely on client sending dimensions.
-// The spec mentions "Lib Sharp / Exif-Parser". I'll assume I can use a lightweight exif parser or just mock the extraction if dependencies are missing.
-// Let's try to use 'exif-parser' if available, or just basic logic.
-// Actually, I'll check package.json first.
-
-// Checking package.json... I don't see sharp or exif-parser in the previous view_file of package.json.
-// I should probably install 'exif-parser' or 'sharp'.
-// For now, I will implement the route assuming I can add the dependency or use a placeholder.
-// I'll use a placeholder for EXIF extraction to avoid breaking the build if the package is missing, 
-// but I'll add a TODO to install it.
-
-const bucket = process.env.S3_UPLOAD_BUCKET;
-const region = process.env.S3_UPLOAD_REGION;
-const accessKeyId = process.env.S3_UPLOAD_ACCESS_KEY_ID;
-const secretAccessKey = process.env.S3_UPLOAD_SECRET_ACCESS_KEY;
-
-const s3Client = new S3Client({
-  region,
-  credentials: { accessKeyId, secretAccessKey },
-});
+import { getAuthenticatedUser } from "@/lib/auth";
+import { processUploadedImage } from "@/lib/processing";
 
 export async function POST(request) {
-  const user = await stackServerApp.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
-  }
-
-
   try {
-    console.log("Invoked /api/photos/process"); // Debug: Force rebuild
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
 
     const body = await request.json();
     const { 
       s3Key, 
-      previewS3Key, 
-      titulo, 
-      descricao, 
-      tags, 
-      orientacao, 
-      width, 
+      colecaoId, 
+      folderId,
+      titulo,
+      width,
       height,
       camera,
       lens,
       focalLength,
       iso,
       shutterSpeed,
-      aperture,
-      colecaoId, // Added
-      folderId   // Added
+      aperture
     } = body;
 
-    if (!s3Key) {
-      return NextResponse.json({ error: "Dados incompletos" }, { status: 400 });
+    if (!s3Key || !colecaoId) {
+        return NextResponse.json({ error: "Dados incompletos (s3Key e colecaoId obrigatórios)" }, { status: 400 });
     }
 
-    // Find photographer using the authenticated user's ID
     const fotografo = await prisma.fotografo.findUnique({
       where: { userId: user.id },
     });
 
     if (!fotografo) {
-      return NextResponse.json({ error: "Fotografo nao encontrado" }, { status: 404 });
+      return NextResponse.json({ error: "Fotógrafo não encontrado" }, { status: 403 });
     }
 
-    // Generate Signed URL for preview (using the preview key if available, otherwise original)
-    const command = new GetObjectCommand({
-      Bucket: bucket,
-      Key: previewS3Key || s3Key,
-    });
-    
-    // Generate a signed URL valid for 7 days
-    const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
-    const previewUrl = await getSignedUrl(s3Client, command, { expiresIn: 604800 });
-    
-    // Build creating data
-    const photoData = {
-        titulo: titulo || "Sem titulo",
-        descricao,
-        tags: tags || [],
-        orientacao: orientacao || "HORIZONTAL",
+    // 1. Create Initial Record (Pending)
+    // We create it first to get the ID for Rekognition
+    const foto = await prisma.foto.create({
+      data: {
+        titulo: titulo || "Sem título",
         s3Key,
         width: width || 0,
         height: height || 0,
-        formato: "jpg", // Mock
-        tamanhoBytes: 0, // Mock
-        previewUrl: previewUrl,
+        formato: "jpg", // Default, will be validated if needed.
+        tamanhoBytes: 0, // We could get this from S3 head object but optional for now
+        previewUrl: "", // Placeholder until processed
         
-        // Metadata
         camera,
         lens,
         focalLength,
@@ -99,32 +58,52 @@ export async function POST(request) {
         shutterSpeed,
         aperture,
 
+        orientacao: (width && height && width > height) ? "HORIZONTAL" : "VERTICAL",
 
-
-        fotografo: {
-            connect: { id: fotografo.id }
-        },
-        status: "PUBLICADA", // Auto-publish for MVP
-    };
-
-    if (colecaoId) {
-        photoData.colecao = {
-            connect: { id: colecaoId }
-        };
-    }
-    
-    if (folderId) {
-        photoData.folder = { connect: { id: folderId } };
-    }
-
-    const foto = await prisma.foto.create({
-      data: photoData
+        colecaoId,
+        folderId,
+        fotografoId: fotografo.id,
+        status: "PENDENTE",
+        indexingStatus: "PENDENTE"
+      }
     });
 
-    return NextResponse.json({ success: true, foto });
+    console.log(`[Process API] Created photo ${foto.id}, starting processing...`);
+
+    // 2. Trigger async processing
+    // Note: Vercel serverless has timeout limits (10s-60s). Processing might take 2-5s, so it should be fine.
+    // For production with large files, we might want to decouple this (background job), but for MVP sync is okay.
+    
+    let processResult;
+    try {
+        processResult = await processUploadedImage(s3Key, foto.id);
+    } catch (procError) {
+        console.error("Processing failed, rolling back photo creation", procError);
+        // Optional: Delete the phantom record or mark as error
+        await prisma.foto.delete({ where: { id: foto.id } });
+        return NextResponse.json({ error: "Erro no processamento da imagem", details: procError.message }, { status: 500 });
+    }
+
+    // 3. Update Record with Processed Data
+    const updatedFoto = await prisma.foto.update({
+        where: { id: foto.id },
+        data: {
+            previewUrl: processResult.previewUrl,
+            indexingStatus: processResult.indexingStatus,
+            status: "PUBLICADA" // Or PENDENTE if you want manual approval
+        }
+    });
+
+    return NextResponse.json({
+      message: "Processamento concluído",
+      foto: updatedFoto
+    });
+
   } catch (error) {
-    console.error("Error processing photo:", error);
-    logError(error, "Photo Process API"); // Use logger
-    return NextResponse.json({ error: "Erro ao processar foto: " + error.message }, { status: 500 });
+    console.error("Critical error in process route:", error);
+    return NextResponse.json(
+      { error: "Erro interno no servidor", details: error.message },
+      { status: 500 }
+    );
   }
 }

@@ -69,12 +69,21 @@ function DashboardInner() {
   // Let's assume the backend returned aggregating logic or we sum what we have.
   // Ideally, 'fotografo.colecoes' are just the recent ones.
   // We will rely on what we have:
+  // Use aggregated stats from backend (or fallback to empty)
+  const backendStats = fotografo.stats || {};
+  
   const stats = {
-    views: (fotografo.colecoes || []).reduce((acc, col) => acc + (col.views || 0), 0), 
-    sales: (fotografo.colecoes || []).reduce((acc, col) => acc + (col.vendas || 0), 0),
-    downloads: (fotografo.colecoes || []).reduce((acc, col) => acc + (col.downloads || 0), 0),
-    cartAdds: (fotografo.colecoes || []).reduce((acc, col) => acc + (col.carrinhoCount || 0), 0),
+    views: backendStats.views || 0,
+    sales: backendStats.sales || 0,
+    downloads: backendStats.downloads || 0,
+    cartAdds: (fotografo.colecoes || []).reduce((acc, col) => acc + (col.carrinhoCount || 0), 0), // Cart count is still per collection for now
+    revenue: backendStats.revenue || 0,
+    ordersCount: backendStats.orders || 0,
   };
+
+  // Derived KPIs
+  const conversionRate = stats.views > 0 ? ((stats.sales / stats.views) * 100).toFixed(1) : "0.0";
+  const avgTicket = stats.ordersCount > 0 ? (stats.revenue / stats.ordersCount).toFixed(2) : "0.00";
 
   return (
     <div className="flex flex-col gap-8">
@@ -95,7 +104,7 @@ function DashboardInner() {
       </div>
 
       {/* Analytics Section */}
-      <AnalyticsOverview stats={stats} />
+      <AnalyticsOverview stats={{...stats, avgTicket, conversionRate}} />
 
       {/* Recent Events Table */}
       <div className="space-y-4">

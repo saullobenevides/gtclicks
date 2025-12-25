@@ -71,6 +71,12 @@ enum FotoStatus {
   REJEITADA
 }
 
+enum FaceIndexingStatus {
+  PENDENTE
+  INDEXED
+  FAILED
+}
+
 model Foto {
   id             String    @id @default(cuid())
   
@@ -104,6 +110,7 @@ model Foto {
   aperture       String?   // Ex: f/2.8
   
   status         FotoStatus @default(PENDENTE)
+  indexingStatus FaceIndexingStatus @default(PENDENTE)
   
   fotografoId    String
   fotografo      Fotografo @relation(fields: [fotografoId], references: [id])

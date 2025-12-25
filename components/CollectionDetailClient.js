@@ -12,6 +12,7 @@ import { useCart } from '@/components/CartContext'; // Assuming CartContext prov
 
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import FaceSearchModal from '@/components/FaceSearchModal';
 
 export default function CollectionDetailClient({ collection }) {
   const { addToCart } = useCart();
@@ -83,8 +84,8 @@ export default function CollectionDetailClient({ collection }) {
         </p>
       </div>
 
-      <div className="max-w-md mx-auto mb-8 relative">
-        <div className="relative">
+      <div className="max-w-md mx-auto mb-8 relative flex gap-2">
+        <div className="relative flex-1">
              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
              <Input 
                placeholder="Buscar nesta coleção (Ex: número 123, largada, pódio...)" 
@@ -93,6 +94,7 @@ export default function CollectionDetailClient({ collection }) {
                onChange={(e) => setSearchQuery(e.target.value)}
              />
         </div>
+        <FaceSearchModal collectionId={collection.id} />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

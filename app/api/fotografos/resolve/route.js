@@ -72,6 +72,57 @@ export async function GET(request) {
       );
     }
 
+    // Calcular estatísticas agregadas reais
+    const [revenueData, salesCount, viewsData, downloadsData, ordersCount] = await prisma.$transaction([
+        // Receita Total (Soma dos itens vendidos deste fotógrafo)
+        prisma.itemPedido.aggregate({
+            _sum: { precoPago: true },
+            where: {
+                foto: { fotografoId: fotografo.id },
+                pedido: { status: 'PAGO' }
+            }
+        }),
+        // Total de Itens Vendidos
+        prisma.itemPedido.count({
+            where: {
+                foto: { fotografoId: fotografo.id },
+                pedido: { status: 'PAGO' }
+            }
+        }),
+        // Total de Visualizações (Soma das views de todas as fotos)
+        prisma.foto.aggregate({
+            _sum: { views: true },
+            where: { fotografoId: fotografo.id }
+        }),
+        // Total de Downloads
+        prisma.foto.aggregate({
+            _sum: { downloads: true },
+            where: { fotografoId: fotografo.id }
+        }),
+        // Total de Pedidos Únicos (Para Ticket Médio)
+        prisma.pedido.count({
+            where: {
+                status: 'PAGO',
+                itens: { some: { foto: { fotografoId: fotografo.id } } }
+            }
+        })
+    ]);
+
+    const stats = {
+        revenue: Number(revenueData._sum.precoPago || 0),
+        sales: salesCount,
+        views: viewsData._sum.views || 0,
+        downloads: downloadsData._sum.downloads || 0,
+        orders: ordersCount
+    };
+
+    if (!fotografo) {
+      return NextResponse.json(
+        { error: "Fotografo nao encontrado para este usuario." },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({
       data: {
         id: fotografo.id,
@@ -82,6 +133,7 @@ export async function GET(request) {
         saldo: fotografo.saldo,
         colecoes: fotografo.colecoes,
         _count: fotografo._count,
+        stats, // Estatísticas agregadas
       },
     });
   } catch (error) {

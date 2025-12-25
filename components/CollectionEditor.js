@@ -180,21 +180,28 @@ export default function CollectionEditor({ collection: initialCollection }) {
 
     try {
       const metadata = await extractMetadata(file);
-      const previewBlob = await generatePreview(file);
       
-      setUploadState({ photoTempId: photoToUpload.tempId, label: `Enviando arquivos...` });
-      const [originalPresign, previewPresign] = await Promise.all([
-        fetch("/api/upload", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: file.name, contentType: file.type, folder: "originals" }) }).then(r => r.json()),
-        fetch("/api/upload", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: `preview_${file.name}`, contentType: "image/jpeg", folder: "previews" }) }).then(r => r.json()),
-      ]);
+      setUploadState({ photoTempId: photoToUpload.tempId, label: `Enviando arquivo original...` });
+      
+      // 1. Get Presigned URL for ORIGINAL only
+      const originalPresign = await fetch("/api/upload", { 
+          method: "POST", 
+          headers: { "Content-Type": "application/json" }, 
+          body: JSON.stringify({ filename: file.name, contentType: file.type, folder: "originals" }) 
+      }).then(r => r.json());
 
-      if (originalPresign.error || previewPresign.error) throw new Error("Falha ao gerar URLs de upload");
+      if (originalPresign.error) throw new Error("Falha ao gerar URL de upload");
 
-      await Promise.all([
-        fetch(originalPresign.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type || "application/octet-stream" }, body: file }),
-        fetch(previewPresign.uploadUrl, { method: "PUT", headers: { "Content-Type": "image/jpeg" }, body: previewBlob }),
-      ]);
+      // 2. Upload to S3
+      await fetch(originalPresign.uploadUrl, { 
+          method: "PUT", 
+          headers: { "Content-Type": file.type || "application/octet-stream" }, 
+          body: file 
+      });
 
+      // 3. Process & Create Record (Backend generates Watermark & Indexes Face)
+      setUploadState({ photoTempId: photoToUpload.tempId, label: `Processando (Marca d'água + IA)...` });
+      
       const img = new Image();
       img.src = URL.createObjectURL(file);
       await new Promise((resolve) => { img.onload = resolve; });
@@ -204,31 +211,30 @@ export default function CollectionEditor({ collection: initialCollection }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           s3Key: originalPresign.s3Key,
-          previewS3Key: previewPresign.s3Key,
           width: img.width, height: img.height,
           titulo: file.name.split('.')[0],
           ...metadata,
           colecaoId: initialCollection.id,
-          folderId: currentFolder?.id || null, // Use folderId instead of string path
+          folderId: currentFolder?.id || null, 
         }),
       });
 
       const processData = await processRes.json();
       if (!processRes.ok) throw new Error(processData?.error || "Erro ao processar foto");
 
+      // 4. Update UI with Backend Data
       setAllPhotos((prev) => prev.map(p => p.tempId === photoToUpload.tempId ? {
         ...p,
-        id: processData.foto.id,
+        id: processData.foto.id, // Real ID from DB
         s3Key: originalPresign.s3Key,
-        previewS3Key: previewPresign.s3Key,
-        previewUrl: processData.foto.previewUrl,
+        previewUrl: processData.foto.previewUrl, // NOW COMES FROM BACKEND WITH WATERMARK
         titulo: processData.foto.titulo,
         ...metadata,
         folderId: currentFolder?.id || null
       } : p));
 
       setUploadState({ photoTempId: null, label: '' });
-      toast.success('Upload concluído! Preencha os detalhes e publique.');
+      toast.success('Upload e processamento concluídos!');
     } catch (error) {
       console.error(error);
       setUploadState({ photoTempId: null, label: '' });

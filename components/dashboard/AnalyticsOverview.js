@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
-import { ArrowUpRight, Eye, ShoppingCart, Download, TrendingUp, ShoppingBag } from 'lucide-react';
+import { ArrowUpRight, Eye, ShoppingCart, Download, TrendingUp, ShoppingBag, Activity, DollarSign, Images } from 'lucide-react';
 
 export default function AnalyticsOverview({ stats }) {
   // Dados simulados para o gráfico (enquanto não temos histórico diário no backend)
@@ -24,67 +24,58 @@ export default function AnalyticsOverview({ stats }) {
       <h2 className="text-2xl font-bold">Desempenho</h2>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Visualizações Totais</CardTitle>
-            <Eye className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.views || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Acessos às suas fotos
-            </p>
-          </CardContent>
-        </Card>
-
+        {/* Vendas Totais */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Vendas Totais</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            <Images className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.sales || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Fotos vendidas
+              fotos vendidas
             </p>
           </CardContent>
         </Card>
 
+        {/* Receita Total */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Downloads</CardTitle>
-            <Download className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
+            <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.downloads || 0}</div>
+            <div className="text-2xl font-bold text-green-500">R$ {Number(stats.revenue || 0).toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              Downloads realizados
+              valor bruto acumulado
             </p>
           </CardContent>
         </Card>
 
+        {/* Ticket Médio */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">No Carrinho</CardTitle>
-            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Ticket Médio</CardTitle>
+            <TrendingUp className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.cartAdds || 0}</div>
+            <div className="text-2xl font-bold text-blue-500">R$ {stats.avgTicket || "0.00"}</div>
             <p className="text-xs text-muted-foreground">
-              Adições ao carrinho
+              por pedido
             </p>
           </CardContent>
         </Card>
 
+        {/* Conversão */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversão</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
+            <Activity className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{conversionRate}%</div>
+            <div className="text-2xl font-bold text-purple-500">{stats.conversionRate || 0}%</div>
             <p className="text-xs text-muted-foreground">
-              Vendas por visualização
+              vendas / visualizações
             </p>
           </CardContent>
         </Card>
