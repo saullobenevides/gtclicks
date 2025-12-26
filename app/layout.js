@@ -8,7 +8,11 @@ import BottomNav from "@/components/mobile/BottomNav";
 
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: 'swap', // Prevents FOIT (Flash of Invisible Text)
+  variable: '--font-inter',
+});
 
 export const metadata = {
   title: {

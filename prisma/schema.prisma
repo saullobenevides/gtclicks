@@ -132,6 +132,11 @@ model Foto {
   likesList      Like[]
   
   createdAt      DateTime  @default(now())
+  
+  @@index([colecaoId])
+  @@index([fotografoId])
+  @@index([status, createdAt])
+  @@index([indexingStatus])
 }
 
 model Like {
@@ -179,6 +184,11 @@ model Colecao {
   fotos          Foto[]
   folders        Folder[]
   createdAt      DateTime  @default(now())
+  
+  @@index([fotografoId])
+  @@index([status, createdAt])
+  @@index([slug])
+  @@index([categoria, status])
 }
 
 model Folder {
@@ -265,6 +275,10 @@ model Pedido {
   
   itens           ItemPedido[]
   createdAt       DateTime     @default(now())
+  
+  @@index([userId, status])
+  @@index([createdAt])
+  @@index([status])
 }
 
 model ItemPedido {

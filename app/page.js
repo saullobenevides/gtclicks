@@ -5,8 +5,8 @@ import PhotographerSpotlight from '@/components/home/PhotographerSpotlight';
 import FeaturesGrid from '@/components/home/FeaturesGrid';
 import CTASection from '@/components/home/CTASection';
 
-// Revalidate this page every 60 seconds
-export const revalidate = 60;
+// Revalidate this page every hour
+export const revalidate = 3600;
 
 export default async function Home() {
   const { collections = [], photographers = [], highlights = [] } =

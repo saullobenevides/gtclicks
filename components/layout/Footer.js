@@ -22,7 +22,7 @@ export default function Footer() {
             
             {/* Social Icons */}
             <div className="flex items-center gap-4 mt-2">
-              <a href="https://instagram.com/gtclicks" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="https://instagram.com/gt.clicks" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
               <a href="https://youtube.com/@gtclicks" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">

@@ -1,16 +1,21 @@
-
 "use client";
 
 import dynamic from 'next/dynamic';
 
-const SlideCart = dynamic(() => import("@/features/cart/components/SlideCart"), { ssr: false });
-const Toaster = dynamic(() => import("@/components/ui/sonner").then(mod => mod.Toaster), { ssr: false });
+// Lazy load heavy components
+const ToastProvider = dynamic(() => import('./ToastProvider'), {
+  ssr: false,
+});
+
+const BottomNav = dynamic(() => import('../mobile/BottomNav'), {
+  ssr: false,
+});
 
 export default function LazyClientComponents() {
   return (
     <>
-      <SlideCart />
-      <Toaster />
+      <ToastProvider />
+      <BottomNav />
     </>
   );
 }

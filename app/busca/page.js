@@ -23,6 +23,9 @@ import {
 
 import SearchFilters from '@/features/collections/components/SearchFilters';
 
+// Revalidate every 10 minutes
+export const revalidate = 600;
+
 export default async function SearchPage(props) {
   const searchParams = await props.searchParams;
   const rawFilters = {

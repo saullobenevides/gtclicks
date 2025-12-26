@@ -2,6 +2,9 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { getCollections } from "@/lib/data/marketplace";
 
+// Revalidate every 30 minutes
+export const revalidate = 1800;
+
 export default async function CollectionsPage() {
   const collections = await getCollections();
 

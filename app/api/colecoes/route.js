@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
 
+// GET with optional fotografoId filter
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const fotografoId = searchParams.get("fotografoId");
@@ -12,7 +13,11 @@ export async function GET(request) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ data: colecoes });
+    return NextResponse.json({ data: colecoes }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600',
+      },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: "Nao foi possivel carregar as colecoes.", details: error.message },
