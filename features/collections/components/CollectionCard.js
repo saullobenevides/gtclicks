@@ -19,7 +19,7 @@ export default function CollectionCard({ collection, className }) {
     <Link
       href={`/colecoes/${collection.slug}`}
       className={cn(
-        "group relative block overflow-hidden rounded-xl bg-muted aspect-[4/3] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10",
+        "group relative block overflow-hidden rounded-xl bg-muted aspect-square transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10",
         className
       )}
     >

@@ -11,6 +11,7 @@ import ViewTracker from "@/components/analytics/ViewTracker";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CollectionSearchClient from "@/features/collections/components/CollectionSearchClient";
 import { formatDateLong } from "@/lib/utils/formatters";
+import ExpandableDescription from "@/components/shared/ExpandableDescription";
 
 
 export async function generateMetadata({ params }) {
@@ -93,45 +94,49 @@ export default async function CollectionDetail({ params, searchParams }) {
                      {collection.title}
                    </h1>
                    
-                   {collection.description && (
-                      <p className="text-base md:text-lg text-gray-200/80 max-w-2xl mx-auto leading-relaxed drop-shadow-sm">
-                        {collection.description}
-                      </p>
-                   )}
+                   
+                   <ExpandableDescription description={collection.description} maxLength={200} />
   
                    {/* Metadata Row */}
                    <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-medium text-white/80 pt-2">
-                       {collection.photographerUsername ? (
-                           <Link 
-                                href={`/fotografo/${collection.photographerUsername}`}
-                                className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors"
-                           >
-                                <Avatar className="h-6 w-6 border border-white/20">
-                                    <AvatarImage src={collection.capaUrl} className="object-cover" /> 
-                                    <AvatarFallback>FT</AvatarFallback>
-                                </Avatar>
-                                <span>{collection.photographer}</span>
-                           </Link>
-                       ) : (
-                           <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
-                                <Avatar className="h-6 w-6 border border-white/20">
-                                    <AvatarImage src={collection.capaUrl} className="object-cover" /> 
-                                    <AvatarFallback>FT</AvatarFallback>
-                                </Avatar>
-                                <span>{collection.photographer}</span>
-                           </div>
-                       )}
-                      
+                      {/* Photographer with Avatar */}
+                      {collection.photographerUsername ? (
+                        <Link 
+                           href={`/fotografo/${collection.photographerUsername}`}
+                           className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors"
+                        >
+                           <Avatar className="h-6 w-6 border border-white/20">
+                              <AvatarImage src={collection.photographerAvatar} alt={collection.photographer} className="object-cover" />
+                              <AvatarFallback className="text-xs bg-white/10">
+                                {collection.photographer?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'FT'}
+                              </AvatarFallback>
+                           </Avatar>
+                           <span>{collection.photographer}</span>
+                        </Link>
+                      ) : (
                         <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
-                           <Calendar className="w-4 h-4" />
-                           <span>
-                             {formatDateLong(collection.createdAt)}
-                           </span>
-                       </div>
-  
-                       <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
-                          <Folder className="w-4 h-4" />
-                          <span>{collection.photos?.length || 0} fotos</span>
+                           <Avatar className="h-6 w-6 border border-white/20">
+                              <AvatarImage src={collection.photographerAvatar} alt={collection.photographer} className="object-cover" />
+                              <AvatarFallback className="text-xs bg-white/10">
+                                {collection.photographer?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'FT'}
+                              </AvatarFallback>
+                           </Avatar>
+                           <span>{collection.photographer}</span>
+                        </div>
+                      )}
+                      
+                      {/* Date - only show if available */}
+                      {collection.eventDate && (
+                        <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
+                           <Calendar className="h-4 w-4" />
+                           <span>{formatDateLong(collection.eventDate)}</span>
+                        </div>
+                      )}
+                      
+                      {/* Photo Count */}
+                      <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
+                         <Folder className="h-4 w-4" />
+                         <span>{collection.photos?.length || 0} fotos</span>
                       </div>
                    </div>
                </div>

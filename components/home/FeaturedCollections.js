@@ -25,7 +25,7 @@ export default function FeaturedCollections({ collections = [] }) {
               <Link
                 key={collection.slug ?? index}
                 href={`/colecoes/${collection.slug}`}
-                className="group relative bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg aspect-video block"
+                className="group relative bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg aspect-square block"
               >
                 {/* Background Image */}
                 {isUrl ? (

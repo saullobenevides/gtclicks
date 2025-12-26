@@ -86,15 +86,15 @@ export default async function SearchPage(props) {
                   <Link
                     key={collection.id ?? index}
                     href={`/colecoes/${collection.slug}`}
-                    className="group bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg h-[400px] block"
+                    className="group bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg aspect-square block"
                     style={{ ...backgroundStyle, backgroundSize: 'cover', backgroundPosition: 'center' }}
                   >
-                     <div className="p-6 bg-black/50 h-full flex flex-col justify-end">
-                      <h3 className="text-xl font-bold mb-2 text-white">{collection.name}</h3>
-                      <p className="text-white/80 text-sm mb-4 line-clamp-2">{collection.description}</p>
-                      <div className="flex justify-between text-xs text-white/70">
-                        <span>{collection.totalPhotos || 0} fotos</span>
-                        <span>Por {collection.photographerName || 'GT Clicks'}</span>
+                     <div className="p-6 bg-black/50 h-full flex flex-col justify-end gap-1">
+                      <h3 className="text-xl font-bold text-white">{collection.name}</h3>
+                      <p className="text-sm text-white/70">Por {collection.photographerName || 'GT Clicks'}</p>
+                      <p className="text-sm text-white/70">{collection.totalPhotos || 0} fotos</p>
+                      <div className="text-lg font-bold text-primary mt-1">
+                        R$ {(collection.precoFoto || 0).toFixed(2)}
                       </div>
                     </div>
                   </Link>

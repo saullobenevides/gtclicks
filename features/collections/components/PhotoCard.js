@@ -50,7 +50,7 @@ export default function PhotoCard({ photo, priority = false }) {
         <Link
         href={`/foto/${photo.id}`}
         className={cn(
-            "block relative aspect-[4/5] overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10",
+            "block relative aspect-square overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10",
             isSelected ? "ring-4 ring-primary translate-y-[-4px] shadow-xl" : ""
         )}
         >
@@ -59,7 +59,7 @@ export default function PhotoCard({ photo, priority = false }) {
             alt={photo.titulo}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             priority={priority}
-            className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className={cn(
             "absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent",

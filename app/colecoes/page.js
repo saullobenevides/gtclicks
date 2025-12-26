@@ -28,7 +28,7 @@ export default async function CollectionsPage() {
               <Link
                 key={collection.slug ?? index}
                 href={`/colecoes/${collection.slug}`}
-                className="group bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg"
+                className="group bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg aspect-square block"
                 style={{ ...backgroundStyle, backgroundSize: 'cover', backgroundPosition: 'center' }}
               >
                 <div className="p-6 bg-black/50 h-full flex flex-col justify-end">
