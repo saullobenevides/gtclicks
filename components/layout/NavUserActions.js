@@ -111,6 +111,11 @@ export default function NavUserActions() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5 focus:bg-white/10 focus:text-white">
+              <Link href="/pedidos" className="flex items-center gap-3">
+                <span className="text-sm font-medium">Meus Pedidos</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="cursor-pointer rounded-md px-3 py-2.5 focus:bg-white/10 focus:text-white">
               <Link href="/meus-downloads" className="flex items-center gap-3">
                 <span className="text-sm font-medium">Meus Downloads</span>
               </Link>
