@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { getAuthenticatedUser } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import OnboardingWizard from '@/components/onboarding/OnboardingWizard';
+import OnboardingWizard from '@/features/photographer/components/FotografoOnboarding';
 import { redirect } from 'next/navigation';
 
 export default async function OnboardingPage() {

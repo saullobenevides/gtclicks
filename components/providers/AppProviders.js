@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { StackProvider, StackTheme } from "@stackframe/stack";
 import { stackClientApp } from "@/stack/client";
-import { CartProvider } from "@/components/CartContext";
+import { CartProvider } from "@/features/cart/context/CartContext";
 import UserSync from "@/components/UserSync";
 
 export default function AppProviders({ children }) {

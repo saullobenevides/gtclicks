@@ -1,9 +1,10 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Inter } from "next/font/google";
 import AppProviders from "@/components/providers/AppProviders";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import LazyClientComponents from "@/components/providers/LazyClientComponents";
+import BottomNav from "@/components/mobile/BottomNav";
 
 import "./globals.css";
 
@@ -20,6 +21,7 @@ export const metadata = {
   creator: "GTClicks",
   publisher: "GTClicks",
   metadataBase: new URL("https://www.gtclicks.com"),
+  manifest: "/manifest.json",
   alternates: {
     canonical: "./",
   },
@@ -51,6 +53,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: "#ef233c",
 };
 
 export default function RootLayout({ children }) {
@@ -62,6 +65,7 @@ export default function RootLayout({ children }) {
             <main className="flex-1 w-full pt-20">{children}</main>
             <Footer />
             <LazyClientComponents />
+            <BottomNav />
         </AppProviders>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import ImageWithFallback from '@/components/ImageWithFallback';
+import ImageWithFallback from '@/components/shared/ImageWithFallback';
 import { searchCollections } from '@/lib/data/marketplace';
 import { CATEGORIES } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import SearchFilters from '@/components/SearchFilters';
+import SearchFilters from '@/features/collections/components/SearchFilters';
 
 export default async function SearchPage(props) {
   const searchParams = await props.searchParams;

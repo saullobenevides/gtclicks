@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCollectionByIdForEdit } from "@/lib/data/marketplace";
-import CollectionEditor from "@/components/CollectionEditor";
+import CollectionEditor from "@/features/collections/components/CollectionEditor";
 
 export default async function EditCollectionPage(props) {
   const params = await props.params;

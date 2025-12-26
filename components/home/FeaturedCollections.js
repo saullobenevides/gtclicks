@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import ImageWithFallback from '@/components/ImageWithFallback';
+import ImageWithFallback from '@/components/shared/ImageWithFallback';
 
 export default function FeaturedCollections({ collections = [] }) {
   if (!collections || collections.length === 0) return null;

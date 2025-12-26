@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { Menu, X, ShoppingCart, Heart } from "lucide-react";
-import { useCart } from "@/components/CartContext";
+import { useCart } from "@/features/cart/context/CartContext";
 
 export default function Header() {
   const pathname = usePathname();
@@ -34,7 +34,7 @@ export default function Header() {
       )}
     >
       <div className="container-wide flex h-[var(--header-height)] items-center justify-between">
-        <div className="flex items-center gap-12">
+        <div className="flex items-center gap-12 lg:gap-14">
           <Link href="/" className="group flex items-center gap-3">
             <div className="relative flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20 transition-transform group-hover:scale-105 group-hover:shadow-primary/40">
               <span className="text-lg md:text-xl font-black">GT</span>
@@ -44,15 +44,15 @@ export default function Header() {
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-8">
             {siteConfig.navItems.filter(item => item.href !== '/meus-favoritos').map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "text-sm font-medium transition-all px-4 py-2 rounded-md hover:bg-white/5",
+                  "text-sm font-semibold transition-all px-4 py-2.5 rounded-lg hover:bg-white/5 relative group",
                   pathname === item.href
-                    ? "bg-white/10 text-white shadow-inner"
+                    ? "bg-white/10 text-white"
                     : "text-muted-foreground hover:text-white"
                 )}
               >
@@ -62,7 +62,7 @@ export default function Header() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-5 md:gap-4 border-l border-white/10 pl-8 md:pl-8 ml-4 md:ml-8">
+        <div className="flex items-center gap-3 lg:gap-4 border-l border-white/10 pl-8 lg:pl-10 ml-8 lg:ml-12">
           {/* Favorites - Desktop (moved from Nav) */}
           <Button 
             variant="ghost" 
@@ -96,7 +96,7 @@ export default function Header() {
           <div className="flex items-center gap-3 md:gap-4">
             <Suspense
               fallback={
-                <Button asChild variant="default" size="sm" className="hidden md:flex bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5">
+                <Button asChild variant="default" size="default" className="hidden lg:flex bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5 hover:scale-105">
                   <Link href={siteConfig.links.signup}>
                     Seja Fotógrafo
                   </Link>

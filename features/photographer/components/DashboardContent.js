@@ -13,9 +13,9 @@ import {
 } from '@/components/ui/card';
 import { Images, DollarSign, Upload, ArrowRight, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import FotografoOnboarding from '@/components/FotografoOnboarding';
-import FinancialSummary from '@/components/dashboard/FinancialSummary';
-import AnalyticsOverview from '@/components/dashboard/AnalyticsOverview';
+import FotografoOnboarding from '@/features/photographer/components/FotografoOnboarding';
+import FinancialSummary from './FinancialSummary';
+import AnalyticsOverview from './AnalyticsOverview';
 import {
   Table,
   TableBody,
@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { PlusCircle, ExternalLink, Edit } from 'lucide-react';
+import { formatCurrency, formatDate } from '@/lib/utils/formatters';
 
 function DashboardInner() {
   const user = useUser({ or: 'redirect' });
@@ -83,7 +84,7 @@ function DashboardInner() {
 
   // Derived KPIs
   const conversionRate = stats.views > 0 ? ((stats.sales / stats.views) * 100).toFixed(1) : "0.0";
-  const avgTicket = stats.ordersCount > 0 ? (stats.revenue / stats.ordersCount).toFixed(2) : "0.00";
+  const avgTicket = stats.ordersCount > 0 ? formatCurrency(stats.revenue / stats.ordersCount) : formatCurrency(0);
 
   return (
     <div className="flex flex-col gap-8">
@@ -141,7 +142,7 @@ function DashboardInner() {
                                     <div className="flex flex-col">
                                         <span className="text-base text-white">{col.nome}</span>
                                         <span className="text-xs text-muted-foreground">
-                                            {new Date(col.createdAt).toLocaleDateString('pt-BR')}
+                                            {formatDate(col.createdAt)}
                                         </span>
                                     </div>
                                 </TableCell>

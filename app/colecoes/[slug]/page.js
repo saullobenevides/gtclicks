@@ -3,13 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { notFound } from "next/navigation";
 import { getCollectionBySlug } from "@/lib/data/marketplace";
 import { Button } from "@/components/ui/button";
-import ImageWithFallback from "@/components/ImageWithFallback";
-import PhotoCard from "@/components/PhotoCard";
+import ImageWithFallback from "@/components/shared/ImageWithFallback";
+import PhotoCard from "@/features/collections/components/PhotoCard";
 import { Folder, ArrowLeft, Share2, InfoIcon, Calendar } from "lucide-react";
 import ShareButton from "@/components/ShareButton";
 import ViewTracker from "@/components/analytics/ViewTracker";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import CollectionSearchClient from "@/components/CollectionSearchClient";
+import CollectionSearchClient from "@/features/collections/components/CollectionSearchClient";
+import { formatDateLong } from "@/lib/utils/formatters";
 
 
 export async function generateMetadata({ params }) {
@@ -100,22 +101,31 @@ export default async function CollectionDetail({ params, searchParams }) {
   
                    {/* Metadata Row */}
                    <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-medium text-white/80 pt-2">
-                      <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
-                          <Avatar className="h-6 w-6 border border-white/20">
-                              <AvatarImage src={collection.capaUrl} className="object-cover" /> 
-                              {/* Using capaUrl as fallback avatar if photographer has none, ideally we fetch photographer avatar */}
-                              <AvatarFallback>FT</AvatarFallback>
-                          </Avatar>
-                          <span>{collection.photographer}</span>
-                      </div>
+                       {collection.photographerUsername ? (
+                           <Link 
+                                href={`/fotografo/${collection.photographerUsername}`}
+                                className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors"
+                           >
+                                <Avatar className="h-6 w-6 border border-white/20">
+                                    <AvatarImage src={collection.capaUrl} className="object-cover" /> 
+                                    <AvatarFallback>FT</AvatarFallback>
+                                </Avatar>
+                                <span>{collection.photographer}</span>
+                           </Link>
+                       ) : (
+                           <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
+                                <Avatar className="h-6 w-6 border border-white/20">
+                                    <AvatarImage src={collection.capaUrl} className="object-cover" /> 
+                                    <AvatarFallback>FT</AvatarFallback>
+                                </Avatar>
+                                <span>{collection.photographer}</span>
+                           </div>
+                       )}
                       
                         <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
                            <Calendar className="w-4 h-4" />
                            <span>
-                             {collection.createdAt 
-                               ? new Date(collection.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
-                               : 'Data não informada'
-                             }
+                             {formatDateLong(collection.createdAt)}
                            </span>
                        </div>
   

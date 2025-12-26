@@ -85,8 +85,54 @@ export function CartProvider({ children }) {
     }
   };
 
+  const getItemsByCollection = () => {
+    const groups = {};
+    items.forEach(item => {
+      const colId = item.colecaoId || 'unknown';
+      if (!groups[colId]) groups[colId] = [];
+      groups[colId].push(item);
+    });
+    return groups;
+  };
+
+  const getItemPrice = (item) => {
+    if (!item.colecaoId || !item.descontos || item.descontos.length === 0) {
+      return Number(item.precoBase || item.preco || 0);
+    }
+
+    const collectionItems = items.filter(i => i.colecaoId === item.colecaoId);
+    const count = collectionItems.length;
+
+    // Find applicable discounts and pick the one with the highest 'min' that is <= count
+    const applicableDiscounts = item.descontos
+      .filter(d => count >= d.min)
+      .sort((a, b) => b.min - a.min);
+
+    if (applicableDiscounts.length > 0) {
+      return Number(applicableDiscounts[0].price);
+    }
+
+    return Number(item.precoBase || item.preco || 0);
+  };
+
   const getTotalPrice = () => {
-    return items.reduce((sum, item) => sum + Number(item.preco), 0);
+    const groups = getItemsByCollection();
+    let total = 0;
+
+    Object.values(groups).forEach(groupItems => {
+      if (groupItems.length === 0) return;
+      
+      const firstItem = groupItems[0];
+      const unitPrice = getItemPrice(firstItem);
+      total += unitPrice * groupItems.length;
+    });
+
+    return total;
+  };
+
+  const getSavings = () => {
+    const originalTotal = items.reduce((sum, item) => sum + Number(item.precoBase || item.preco || 0), 0);
+    return originalTotal - getTotalPrice();
   };
 
   return (
@@ -97,6 +143,8 @@ export function CartProvider({ children }) {
         removeFromCart,
         clearCart,
         getTotalPrice,
+        getItemPrice,
+        getSavings,
         itemCount: items.length,
         isCartOpen,
         setIsCartOpen,

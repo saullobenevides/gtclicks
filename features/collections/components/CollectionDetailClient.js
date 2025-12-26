@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCart } from '@/components/CartContext'; // Assuming CartContext provides useCart
+import { useCart } from '@/features/cart/context/CartContext'; // Assuming CartContext provides useCart
 
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';

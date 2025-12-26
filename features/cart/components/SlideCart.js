@@ -1,6 +1,6 @@
 "use client";
 
-import { useCart } from "@/components/CartContext";
+import { useCart } from "@/features/cart/context/CartContext";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Trash2, ShoppingCart } from "lucide-react";
 import Link from "next/link";
-import ImageWithFallback from "@/components/ImageWithFallback";
+import ImageWithFallback from "@/components/shared/ImageWithFallback";
 
 export default function SlideCart() {
   const { items, removeFromCart, getTotalPrice, isCartOpen, setIsCartOpen } = useCart();

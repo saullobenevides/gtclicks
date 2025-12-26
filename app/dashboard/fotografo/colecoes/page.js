@@ -13,7 +13,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Images, PlusCircle, Edit, ExternalLink } from 'lucide-react';
-import CreateCollectionButton from '@/components/CreateCollectionButton';
+import CreateCollectionButton from '@/features/collections/components/CreateCollectionButton';
 
 const formatDate = (date) => {
   return new Intl.DateTimeFormat('pt-BR', {

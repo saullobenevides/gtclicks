@@ -8,6 +8,7 @@ import ShareButton from "@/components/ShareButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import CollectionCard from "@/features/collections/components/CollectionCard";
 
 export async function generateMetadata({ params }) {
   const { username } = await params;
@@ -145,34 +146,9 @@ export default async function PhotographerProfilePage(props) {
                 </Card>
               ) : (
                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2">
-                  {collections.map((collection, index) => {
-                     const isUrl = collection.cover?.startsWith("http");
-                     const isGradient = collection.cover?.startsWith("linear-gradient");
-                     
-                     const backgroundStyle = isUrl
-                        ? { backgroundImage: `url(${collection.cover})` }
-                        : isGradient
-                        ? { backgroundImage: collection.cover }
-                        : { backgroundColor: collection.cover };
-                    
-                    return (
-                      <Link
-                        key={collection.id ?? index}
-                        href={`/colecoes/${collection.slug}`}
-                        className="group bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg h-[400px] block"
-                        style={{ ...backgroundStyle, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                      >
-                         <div className="p-6 bg-black/50 h-full flex flex-col justify-end">
-                          <h3 className="text-xl font-bold mb-2 text-white">{collection.name}</h3>
-                          <p className="text-white/80 text-sm mb-4 line-clamp-2">{collection.description}</p>
-                          <div className="flex justify-between text-xs text-white/70">
-                            <span>{collection.totalPhotos || 0} fotos</span>
-                            <span>Por {collection.photographerName || 'GT Clicks'}</span>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                  {collections.map((collection, index) => (
+                      <CollectionCard key={collection.id ?? index} collection={collection} />
+                  ))}
                 </div>
               )}
             </div>

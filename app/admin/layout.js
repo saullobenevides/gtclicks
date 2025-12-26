@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useUser } from '@stackframe/stack';
 import { useRouter } from 'next/navigation';
-import { DashboardLayout } from '../../components/DashboardLayout';
+import { DashboardLayout } from '../../components/layout/DashboardLayout';
 
 export default function AdminLayout({ children }) {
   const user = useUser();

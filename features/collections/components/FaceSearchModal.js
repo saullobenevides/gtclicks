@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Camera, Loader2, ScanFace, RefreshCw, X, ShieldCheck } from "lucide-react";
-import PhotoCard from "@/components/PhotoCard";
+import PhotoCard from './PhotoCard';
 import { toast } from "sonner";
 import Webcam from "react-webcam";
 

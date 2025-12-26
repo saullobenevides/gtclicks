@@ -5,11 +5,11 @@ import { createPortal } from 'react-dom';
 import { Search, X, CheckSquare, ShoppingCart, PlusCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import FaceSearchModal from '@/components/FaceSearchModal';
-import { useCart } from '@/components/CartContext';
+import FaceSearchModal from './FaceSearchModal';
+import { useCart } from '@/features/cart/context/CartContext';
 import { toast } from 'sonner';
-import { SelectionContext } from '@/components/SelectionContext';
-import PhotoCard from '@/components/PhotoCard';
+import { SelectionContext } from '../context/SelectionContext';
+import PhotoCard from './PhotoCard';
 
 
 export default function CollectionSearchClient({ allPhotos = [], collectionId, children }) {
@@ -35,8 +35,11 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
             if (selectedIds.has(photo.id)) {
                  addToCart({
                     fotoId: photo.id,
+                    colecaoId: collectionId,
                     titulo: photo.title || photo.titulo || "Foto sem título",
-                    preco: photo.colecao?.precoFoto || 0,
+                    preco: photo.colecao?.precoFoto || photo.preco || 0,
+                    precoBase: photo.colecao?.precoFoto || photo.preco || 0,
+                    descontos: photo.colecao?.descontos || [],
                     licenca: 'Uso Padrão',
                     previewUrl: photo.previewUrl,
                 });
@@ -59,6 +62,9 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
         
         return allPhotos.filter(photo => {
             const titleMatch = (photo.title || photo.titulo) && (photo.title || photo.titulo).toLowerCase().includes(lowerQuery);
+            const bibMatch = photo.numeroSequencial && photo.numeroSequencial.toString() === lowerQuery;
+            const bibMatchPartial = photo.numeroSequencial && photo.numeroSequencial.toString().includes(lowerQuery);
+            
             let tagsMatch = false;
             if (Array.isArray(photo.tags)) {
                 tagsMatch = photo.tags.some(t => t.toLowerCase().includes(lowerQuery));
@@ -66,7 +72,7 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
                 tagsMatch = photo.tags.toLowerCase().includes(lowerQuery);
             }
 
-            return titleMatch || tagsMatch;
+            return titleMatch || tagsMatch || bibMatch || bibMatchPartial;
         });
     }, [allPhotos, query]);
 
@@ -77,7 +83,7 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input 
-                            placeholder="Buscar pelo número de peito ou nome..." 
+                            placeholder="Buscar pelo número de peito..." 
                             className="pl-10 pr-10 bg-secondary/50 border-border focus:bg-background transition-colors h-12 text-lg"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}

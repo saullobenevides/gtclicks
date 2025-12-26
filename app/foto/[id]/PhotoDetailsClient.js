@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/components/CartContext';
+import { useCart } from '@/features/cart/context/CartContext';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/avatar';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import ImageWithFallback from '@/components/ImageWithFallback';
+import ImageWithFallback from '@/components/shared/ImageWithFallback';
 import { Heart, Info, CheckCircle2, ShoppingCart } from 'lucide-react';
 import ShareButton from '@/components/ShareButton';
 import ViewTracker from "@/components/analytics/ViewTracker";

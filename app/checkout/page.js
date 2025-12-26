@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@stackframe/stack';
-import { useCart } from '@/components/CartContext';
+import { useCart } from '@/features/cart/context/CartContext';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,7 +19,7 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 export default function CheckoutPage() {
   const router = useRouter();
   const user = useUser();
-  const { items, getTotalPrice, clearCart } = useCart();
+  const { items, getTotalPrice, getItemPrice, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -48,7 +48,7 @@ export default function CheckoutPage() {
           itens: items.map((item) => ({
             fotoId: item.fotoId,
             licencaId: item.licencaId,
-            precoUnitario: item.preco,
+            precoUnitario: getItemPrice(item),
           })),
           total: getTotalPrice(),
         }),
@@ -74,7 +74,7 @@ export default function CheckoutPage() {
           items: items.map((item) => ({
             title: item.titulo,
             quantity: 1,
-            unit_price: Number(item.preco),
+            unit_price: Number(getItemPrice(item)),
             currency_id: 'BRL',
           })),
           payer: {
@@ -132,7 +132,7 @@ export default function CheckoutPage() {
                   </p>
                 </div>
                 <div className="font-medium">
-                  R$ {Number(item.preco).toFixed(2)}
+                  R$ {Number(getItemPrice(item)).toFixed(2)}
                 </div>
               </div>
             ))}

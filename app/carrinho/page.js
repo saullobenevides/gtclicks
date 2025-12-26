@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/components/CartContext';
+import { useCart } from '@/features/cart/context/CartContext';
 import {
   Card,
   CardContent,
@@ -10,11 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import ImageWithFallback from '@/components/ImageWithFallback';
+import ImageWithFallback from '@/components/shared/ImageWithFallback';
 import { Trash2, ShoppingCart, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function CartPage() {
-  const { items, removeFromCart, clearCart, getTotalPrice } = useCart();
+  const { items, removeFromCart, clearCart, getTotalPrice, getItemPrice, getSavings } = useCart();
+  const savings = getSavings();
 
   if (items.length === 0) {
     return (
@@ -70,9 +71,21 @@ export default function CartPage() {
                 </div>
                 
                 <div className="flex items-center justify-between gap-6 sm:justify-end">
-                  <span className="text-xl font-bold text-white">
-                    R$ {Number(item.preco).toFixed(2)}
-                  </span>
+                  <div className="flex flex-col items-end gap-1">
+                    {Number(item.precoBase) > getItemPrice(item) && (
+                      <span className="text-xs text-muted-foreground line-through">
+                        R$ {Number(item.precoBase).toFixed(2)}
+                      </span>
+                    )}
+                    <span className="text-xl font-bold text-white">
+                      R$ {getItemPrice(item).toFixed(2)}
+                    </span>
+                    {Number(item.precoBase) > getItemPrice(item) && (
+                      <span className="text-[10px] font-bold bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded uppercase tracking-tighter">
+                        Desconto Aplicado
+                      </span>
+                    )}
+                  </div>
                   
                   <Button
                     variant="ghost"
@@ -108,8 +121,55 @@ export default function CartPage() {
             <CardContent className="space-y-4">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal ({items.length} itens)</span>
-                <span>R$ {getTotalPrice().toFixed(2)}</span>
+                <span>R$ {items.reduce((sum, i) => sum + Number(i.precoBase || i.preco), 0).toFixed(2)}</span>
               </div>
+              {savings > 0 && (
+                <div className="flex justify-between text-green-400">
+                    <span>Economia Progressiva</span>
+                    <span>- R$ {savings.toFixed(2)}</span>
+                </div>
+              )}
+              
+              {/* Progressive Discount Upsell */}
+              {(() => {
+                // Get items from first collection to check next discount tier
+                const collectionItems = items.filter(i => i.colecaoId === items[0]?.colecaoId);
+                const count = collectionItems.length;
+                const firstItem = collectionItems[0];
+                
+                if (firstItem?.descontos && firstItem.descontos.length > 0) {
+                  // Find next applicable discount
+                  const nextDiscount = firstItem.descontos
+                    .filter(d => d.min > count)
+                    .sort((a, b) => a.min - b.min)[0];
+                  
+                  if (nextDiscount) {
+                    const photosNeeded = nextDiscount.min - count;
+                    const currentPrice = getItemPrice(firstItem);
+                    const savingsPerPhoto = currentPrice - nextDiscount.price;
+                    const totalSavings = savingsPerPhoto * count;
+                    
+                    return (
+                      <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 animate-slide-up">
+                        <p className="text-sm font-medium text-white mb-1">
+                          🎉 Faltam {photosNeeded} {photosNeeded === 1 ? 'foto' : 'fotos'} para economizar mais!
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Adicione mais {photosNeeded} e economize R$ {totalSavings.toFixed(2)}
+                        </p>
+                        <div className="mt-2 h-2 bg-white/10 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary transition-all duration-500"
+                            style={{ width: `${(count / nextDiscount.min) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+                }
+                return null;
+              })()}
+              
               <div className="my-4 h-px bg-white/10" />
               <div className="flex justify-between text-2xl font-bold text-white">
                 <span>Total</span>
@@ -119,7 +179,7 @@ export default function CartPage() {
             <CardFooter className="flex flex-col gap-3">
               <Button asChild className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-12 text-lg" size="lg">
                 <Link href="/checkout" className="flex items-center justify-center gap-2">
-                  Finalizar Compra
+                  Ir para Pagamento
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>

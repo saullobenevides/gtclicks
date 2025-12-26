@@ -1,9 +1,11 @@
 "use client";
 
-import { Share2, Link as LinkIcon, Check } from "lucide-react";
+import { Share2, Link as LinkIcon, Check, QrCode, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function ShareButton({ 
   title, 
@@ -14,7 +16,9 @@ export default function ShareButton({
   size = "icon",
   children
 }) {
+  const [showQr, setShowQr] = useState(false);
   const [copied, setCopied] = useState(false);
+
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -44,17 +48,56 @@ export default function ShareButton({
     });
   };
 
+  const shareToWhatsApp = () => {
+    const encodedText = encodeURIComponent(`${text}\n\n${url}`);
+    window.open(`https://wa.me/?text=${encodedText}`, "_blank");
+  };
+
   return (
-    <Button 
-      variant={variant} 
-      size={size} 
-      className={className} 
-      onClick={handleShare}
-      title="Compartilhar"
-    >
-      {children ? children : (
-        copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />
-      )}
-    </Button>
+    <div className="flex items-center gap-2">
+      <Dialog open={showQr} onOpenChange={setShowQr}>
+        <DialogTrigger asChild>
+          <Button variant={variant} size={size} className={className} title="Ver QR Code">
+             <QrCode className="h-4 w-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white">
+          <DialogHeader>
+            <DialogTitle>Compartilhar Coleção</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Escaneie o QR Code ou escolha uma opção abaixo.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center p-6 gap-6">
+            <div className="bg-white p-4 rounded-xl">
+               <QRCodeSVG value={url} size={200} />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 w-full">
+               <Button onClick={shareToWhatsApp} variant="outline" className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800 gap-2">
+                  <MessageCircle className="h-4 w-4 text-green-500" />
+                  WhatsApp
+               </Button>
+               <Button onClick={copyToClipboard} variant="outline" className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800 gap-2">
+                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <LinkIcon className="h-4 w-4" />}
+                  {copied ? "Copiado" : "Copiar Link"}
+               </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Button 
+        variant={variant} 
+        size={size} 
+        className={className} 
+        onClick={handleShare}
+        title="Compartilhar"
+      >
+        {children ? children : (
+          copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />
+        )}
+      </Button>
+    </div>
   );
 }

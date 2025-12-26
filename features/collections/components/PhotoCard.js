@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import ImageWithFallback from "@/components/ImageWithFallback";
+import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { ShoppingCart, Check } from "lucide-react";
-import { useCart } from "@/components/CartContext";
-import { useSelection } from "@/components/SelectionContext";
+import { useCart } from "@/features/cart/context/CartContext";
+import { useSelection } from "../context/SelectionContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -21,8 +21,11 @@ export default function PhotoCard({ photo, priority = false }) {
 
     addToCart({
         fotoId: photo.id,
+        colecaoId: photo.colecaoId,
         titulo: photo.title || photo.titulo || "Foto sem título",
-        preco: photo.colecao?.precoFoto || 0,
+        preco: photo.colecao?.precoFoto || photo.preco || 0,
+        precoBase: photo.colecao?.precoFoto || photo.preco || 0,
+        descontos: photo.colecao?.descontos || [],
         licenca: 'Uso Padrão',
         previewUrl: photo.previewUrl,
     });

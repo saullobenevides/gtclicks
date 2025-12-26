@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import ImageWithFallback from '@/components/ImageWithFallback';
+import ImageWithFallback from '@/components/shared/ImageWithFallback';
 import { Eye, Heart, Download, PlusCircle } from 'lucide-react';
 
 function PhotoCardSkeleton() {

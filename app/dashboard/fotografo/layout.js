@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@stackframe/stack';
 import { useRouter, usePathname } from 'next/navigation';
-import { DashboardLayout } from '../../../components/DashboardLayout';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function PhotographerLayout({ children }) {
   const user = useUser();
