@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
-import { Instagram, Youtube, Twitter } from "lucide-react";
+import { Instagram, Youtube, Twitter, MessageCircle } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -30,6 +30,9 @@ export default function Footer() {
               </a>
               <a href="https://twitter.com/gtclicks" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                 <Twitter className="h-5 w-5" />
+              </a>
+              <a href="https://tiktok.com/@gtclicks" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+                <MessageCircle className="h-5 w-5" />
               </a>
             </div>
           </div>

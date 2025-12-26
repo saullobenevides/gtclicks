@@ -58,7 +58,7 @@ export default async function SearchPage(props) {
       <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[300px_1fr]">
         <SearchFilters filters={rawFilters} />
 
-        <main>
+        <div className="min-w-0">
           {results.length === 0 ? (
             <Card className="col-span-full py-24 px-8 text-center glass-panel border-dashed border-white/10 bg-transparent">
               <CardHeader>
@@ -105,7 +105,7 @@ export default async function SearchPage(props) {
               })}
             </div>
           )}
-        </main>
+        </div>
       </div>
     </div>
   );

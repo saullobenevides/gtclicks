@@ -7,15 +7,12 @@ const ToastProvider = dynamic(() => import('./ToastProvider'), {
   ssr: false,
 });
 
-const BottomNav = dynamic(() => import('../mobile/BottomNav'), {
-  ssr: false,
-});
+
 
 export default function LazyClientComponents() {
   return (
     <>
       <ToastProvider />
-      <BottomNav />
     </>
   );
 }
