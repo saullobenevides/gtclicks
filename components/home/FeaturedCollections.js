@@ -1,22 +1,24 @@
 import Link from 'next/link';
 import ImageWithFallback from '@/components/shared/ImageWithFallback';
 
-export default function FeaturedCollections({ collections = [] }) {
+export default function FeaturedCollections({ collections = [], title = "Coleções em Destaque", subtitle = "Séries autorais selecionadas para inspirar sua próxima criação" }) {
   if (!collections || collections.length === 0) return null;
 
   return (
-    <section className="">
+    <section className="py-16">
       <div className="container-wide">
-        <div className="mb-16 flex flex-col items-center text-center gap-4">
-          <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Coleções em Destaque
+        <div className="mb-16 flex flex-col items-center text-center gap-3">
+          <h2 className="heading-section font-display text-4xl font-black text-white sm:text-5xl lg:text-6xl">
+            {title}
           </h2>
-          <p className="max-w-2xl text-lg text-gray-400">
-            Séries autorais selecionadas para inspirar sua próxima criação.
-          </p>
+          {subtitle && (
+            <p className="max-w-2xl text-base text-gray-400 font-medium">
+              {subtitle}
+            </p>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {collections.map((collection, index) => {
             const isUrl = collection.cover?.startsWith("http");
             const isGradient = collection.cover?.startsWith("linear-gradient");
@@ -25,7 +27,7 @@ export default function FeaturedCollections({ collections = [] }) {
               <Link
                 key={collection.slug ?? index}
                 href={`/colecoes/${collection.slug}`}
-                className="group relative bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg aspect-square block"
+                className="group relative rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-primary/20 hover:scale-[1.02] aspect-[3/4] block border border-white/5"
               >
                 {/* Background Image */}
                 {isUrl ? (
@@ -44,12 +46,11 @@ export default function FeaturedCollections({ collections = [] }) {
                 )}
 
                 {/* Content Overlay */}
-                <div className="absolute inset-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end z-10">
-                  <h3 className="text-xl font-bold mb-2 text-white">{collection.name}</h3>
-                  <p className="text-white/80 text-sm mb-4 line-clamp-2">{collection.description}</p>
-                  <div className="flex justify-between text-xs text-white/70">
+                <div className="absolute inset-0 p-8 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end z-10 transition-all duration-500 group-hover:from-black/90">
+                  <h3 className="text-2xl font-black mb-3 text-white leading-tight uppercase tracking-wide">{collection.name}</h3>
+                  <p className="text-gray-300 text-sm mb-5 line-clamp-3 leading-relaxed">{collection.description}</p>
+                  <div className="flex justify-between text-xs text-gray-400 font-bold uppercase tracking-widest">
                     <span>{collection.totalPhotos || 0} fotos</span>
-                    <span>Por {collection.photographerName || 'GT Clicks'}</span>
                   </div>
                 </div>
               </Link>

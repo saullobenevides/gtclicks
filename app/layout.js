@@ -1,5 +1,5 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { Inter } from "next/font/google";
+import { Inter, Syne } from "next/font/google"; // [NEW] Added Syne
 import AppProviders from "@/components/providers/AppProviders";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -10,8 +10,14 @@ import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
-  display: 'swap', // Prevents FOIT (Flash of Invisible Text)
+  display: 'swap',
   variable: '--font-inter',
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-syne',
 });
 
 export const metadata = {
@@ -62,7 +68,7 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning className="dark">
-      <body className={`${inter.className} font-sans antialiased min-h-screen flex flex-col bg-black text-foreground selection:bg-primary selection:text-white`}>
+      <body className={`${inter.className} ${syne.variable} font-sans antialiased min-h-screen flex flex-col bg-black text-foreground selection:bg-primary selection:text-white`}>
         <AppProviders>
             <Header />
             <main className="flex-1 w-full pt-20">{children}</main>

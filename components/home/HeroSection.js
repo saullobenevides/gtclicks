@@ -1,37 +1,42 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export default function HeroSection() {
   return (
-    <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-6 text-center">
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 -z-20 bg-black" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/20 via-black/50 to-black" />
-      <div className="absolute inset-0 -z-10 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+    <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
+      <div className="absolute inset-0 -z-20">
+        <Image
+          src="/hero-gtclicks.png"
+          alt="Background"
+          fill
+          className="object-cover object-top"
+          priority
+        />
+      </div>
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/60 to-black" />
 
-      <div className="z-10 flex max-w-5xl flex-col items-center gap-8 animate-in fade-in zoom-in duration-700">
-        <Badge variant="outline" className="border-primary/50 text-primary bg-primary/10 px-6 py-2 text-sm uppercase tracking-[0.2em] backdrop-blur-sm">
-          FOTOGRAFIA ESPORTIVA & EVENTOS
-        </Badge>
+      <div className="z-10 flex max-w-5xl flex-col items-center gap-8 animate-in fade-in zoom-in duration-700 pt-96">
         
-        <h1 className="text-4xl xs:text-5xl font-black tracking-tighter text-white sm:text-7xl md:text-8xl lg:text-9xl leading-[0.9]">
-          VOCÊ <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">VIVEU</span>
+        <h1 className="heading-display font-display text-5xl xs:text-6xl font-black text-white sm:text-7xl md:text-8xl lg:text-8xl">
+          CAPTURE MOMENTOS,
           <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-600">A GENTE ETERNIZA</span>
+          <span style={{ color: '#FF0000' }}>VENDA ARTE!</span>
         </h1>
         
-        <p className="max-w-2xl text-xl text-gray-400 md:text-2xl leading-relaxed font-light">
-          A plataforma oficial dos seus melhores momentos esportivos e sociais. 
-          Encontre sua foto em segundos ou monetize a cobertura do seu evento.
+        <p className="max-w-2xl text-lg text-gray-300 md:text-xl leading-relaxed font-medium drop-shadow-md">
+          O marketplace definitivo para fotógrafos e criadores.
+          <br className="hidden sm:block" />
+          Compre e venda fotos exclusivas com segurança e rapidez.
         </p>
         
-        <div className="mt-10 flex flex-col w-full sm:w-auto sm:flex-row gap-6">
-          <Button asChild size="lg" className="h-14 px-10 text-lg bg-primary hover:bg-primary/90 text-white shadow-[0_0_30px_rgba(239,35,60,0.3)] hover:shadow-[0_0_50px_rgba(239,35,60,0.5)] transition-all hover:-translate-y-1">
-            <Link href="/busca">Encontrar Minha Foto</Link>
+        <div className="mt-8 flex flex-col w-full sm:w-auto sm:flex-row gap-5">
+          <Button asChild size="lg" className="h-14 px-10 text-base font-bold bg-transparent text-white hover:text-white transition-all duration-300 uppercase tracking-wider" style={{ borderWidth: '2px', borderColor: '#FF0000' }}>
+            <Link href="/busca" className="hover:!bg-[#FF0000]">Comprar fotos</Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="h-14 px-10 text-lg border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/20 backdrop-blur-sm transition-all hover:-translate-y-1">
-            <Link href="/dashboard/fotografo">Sou Fotógrafo</Link>
+          <Button asChild variant="secondary" size="lg" className="h-14 px-10 text-base font-bold bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 hover:border-white/50 transition-all duration-300 backdrop-blur-sm uppercase tracking-wider">
+            <Link href="/dashboard/fotografo">Vender fotos</Link>
           </Button>
         </div>
       </div>

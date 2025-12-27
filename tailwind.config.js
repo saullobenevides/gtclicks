@@ -19,8 +19,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-geist-sans)'],
+        sans: ['var(--font-geist-sans)'], // Note: 'inter' variable is unused in this config but used in layout? keeping original
         mono: ['var(--font-geist-mono)'],
+        display: ['var(--font-syne)', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border) / <alpha-value>)",
