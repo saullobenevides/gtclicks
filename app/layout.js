@@ -1,4 +1,5 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Inter, Syne } from "next/font/google"; // [NEW] Added Syne
 import AppProviders from "@/components/providers/AppProviders";
 import Header from "@/components/layout/Header";
@@ -77,6 +78,7 @@ export default function RootLayout({ children }) {
             <BottomNav />
         </AppProviders>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
+        <SpeedInsights />
       </body>
     </html>
   );
