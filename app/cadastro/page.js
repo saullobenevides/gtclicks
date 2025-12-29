@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { stackServerApp } from "@/stack/server";
 import prisma from "@/lib/prisma";
+import { PageSection, SectionHeader } from "@/components/shared/layout";
+import { FeatureCard } from "@/components/shared/cards";
 
 export default async function CadastroPage() {
   const user = await stackServerApp.getUser();
@@ -17,34 +18,32 @@ export default async function CadastroPage() {
 
   return (
     <div className="container">
-      <section className="py-16">
-        <div className="text-center mb-16">
-          <Badge>Seja Fotógrafo</Badge>
-          <h1 className="text-5xl md:text-6xl font-bold my-4 bg-clip-text text-transparent bg-gradient-to-br from-white to-gray-400 leading-tight">
-            Transforme a cobertura do seu evento em lucro
-          </h1>
-          <p className="text-xl text-body max-w-3xl mx-auto">
-            Fez a cobertura de um jogo ou festa? Crie uma coleção, envie o link para os participantes 
-            e veja as vendas acontecerem automaticamente.
-          </p>
-        </div>
+      <PageSection variant="default">
+        <SectionHeader
+          badge="Seja Fotógrafo"
+          title="Transforme a cobertura do seu evento em lucro"
+          description="Fez a cobertura de um jogo ou festa? Crie uma coleção, envie o link para os participantes e veja as vendas acontecerem automaticamente."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <div className="text-center p-8 bg-card border rounded-md transition hover:-translate-y-1 hover:shadow-lg">
-            <div className="text-5xl mb-4">📸</div>
-            <h3 className="text-xl font-bold my-4 text-heading">Você no controle</h3>
-            <p className="text-body leading-relaxed">Defina seus próprios preços e mantenha 80% de cada venda</p>
-          </div>
-          <div className="text-center p-8 bg-card border rounded-md transition hover:-translate-y-1 hover:shadow-lg">
-            <div className="text-5xl mb-4">💰</div>
-            <h3 className="text-xl font-bold my-4 text-heading">Pagamentos rápidos</h3>
-            <p className="text-body leading-relaxed">Receba via Pix ou transferência bancária com saque mínimo de R$ 50</p>
-          </div>
-          <div className="text-center p-8 bg-card border rounded-md transition hover:-translate-y-1 hover:shadow-lg">
-            <div className="text-5xl mb-4">🛡️</div>
-            <h3 className="text-xl font-bold my-4 text-heading">Proteção automática</h3>
-            <p className="text-body leading-relaxed">Suas fotos são protegidas com marca d&apos;água e anti-cópia</p>
-          </div>
+          <FeatureCard
+            icon="📸"
+            title="Você no controle"
+            description="Defina seus próprios preços e mantenha 80% de cada venda"
+            variant="outlined"
+          />
+          <FeatureCard
+            icon="💰"
+            title="Pagamentos rápidos"
+            description="Receba via Pix ou transferência bancária com saque mínimo de R$ 50"
+            variant="outlined"
+          />
+          <FeatureCard
+            icon="🛡️"
+            title="Proteção automática"
+            description="Suas fotos são protegidas com marca d'água e anti-cópia"
+            variant="outlined"
+          />
         </div>
 
         <div className="text-center p-12 rounded-lg my-16 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
@@ -89,8 +88,10 @@ export default async function CadastroPage() {
           )}
         </div>
 
-        <div className="my-16 text-center">
-          <h2 className="text-4xl font-bold mb-12 text-heading">Como funciona</h2>
+        <div className="my-16">
+          <SectionHeader
+            title="Como funciona"
+          />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="relative p-8">
               <div className="w-16 h-16 bg-accent text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">1</div>
@@ -129,7 +130,7 @@ export default async function CadastroPage() {
             <p className="text-body leading-relaxed mt-4">Absolutamente! Você tem total controle sobre os preços de cada licença das suas fotos.</p>
           </details>
         </div>
-      </section>
+      </PageSection>
     </div>
   );
 }

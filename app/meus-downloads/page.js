@@ -12,9 +12,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import ImageWithFallback from '@/components/shared/ImageWithFallback';
+import { PageSection, SectionHeader, ResponsiveGrid } from '@/components/shared/layout';
+import { EmptyState, LoadingState } from '@/components/shared/states';
 
 function DownloadCardSkeleton() {
   return (
@@ -42,10 +43,9 @@ export default function DownloadsPage() {
 
   useEffect(() => {
     if (isUserLoading) {
-      return; // Wait for user status to be determined
+      return;
     }
     if (!user) {
-      // No need to setLoading(false) here, as initial state handles it
       return;
     }
 
@@ -65,11 +65,11 @@ export default function DownloadsPage() {
   const renderContent = () => {
     if (isUserLoading || loading) {
       return (
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ResponsiveGrid cols={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8}>
           {[...Array(4)].map((_, i) => (
             <DownloadCardSkeleton key={i} />
           ))}
-        </div>
+        </ResponsiveGrid>
       );
     }
 
@@ -95,26 +95,19 @@ export default function DownloadsPage() {
 
     if (purchases.length === 0) {
       return (
-        <div className="flex h-[50vh] items-center justify-center">
-          <Card className="w-full max-w-md text-center">
-            <CardHeader>
-              <CardTitle>Nenhuma Compra Encontrada</CardTitle>
-              <CardDescription>
-                Você ainda não comprou nenhuma foto.
-              </CardDescription>
-            </CardHeader>
-            <CardFooter className="justify-center">
-              <Button asChild>
-                <Link href="/busca">Explorar Fotos</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+        <EmptyState
+          title="Nenhuma Compra Encontrada"
+          description="Você ainda não comprou nenhuma foto."
+          action={{
+            label: "Explorar Fotos",
+            href: "/busca"
+          }}
+        />
       );
     }
 
     return (
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <ResponsiveGrid cols={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8}>
         {purchases.map((item) => (
           <Card key={item.id} className="overflow-hidden">
             <CardContent className="aspect-[4/3] w-full p-0">
@@ -147,17 +140,18 @@ export default function DownloadsPage() {
             </CardFooter>
           </Card>
         ))}
-      </div>
+      </ResponsiveGrid>
     );
   };
 
   return (
-    <div className="container mx-auto py-16">
-      <div className="mb-12 flex flex-col items-center text-center">
-        <Badge>Minha Conta</Badge>
-        <h1 className="mt-2 text-4xl font-bold">Meus Downloads</h1>
-      </div>
+    <PageSection variant="default">
+      <SectionHeader 
+        badge="Minha Conta"
+        title="Meus Downloads"
+        align="center"
+      />
       {renderContent()}
-    </div>
+    </PageSection>
   );
 }

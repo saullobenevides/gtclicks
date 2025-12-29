@@ -36,12 +36,15 @@ export default function Header() {
       <div className="container-wide flex h-[var(--header-height)] items-center justify-between">
         <div className="flex items-center gap-12 lg:gap-14">
           <Link href="/" className="group flex items-center gap-3">
-            <div className="relative flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20 transition-transform group-hover:scale-105 group-hover:shadow-primary/40">
-              <span className="text-lg md:text-xl font-black">GT</span>
-            </div>
-            <span className="text-xl md:text-2xl font-black tracking-tighter text-white">
-              CLICKS
-            </span>
+            {/* Logo Replaced */}
+             <div className="relative h-10 w-auto aspect-[3/1] md:h-12">
+               <img 
+                 src="/logo.png" 
+                 alt="GTClicks Logo" 
+                 className="h-full w-full object-contain"
+               />
+             </div>
+             {/* End Logo Replaced */}
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8">

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { IconCard } from '@/components/shared/cards';
 
 const defaultLinks = [
   {
@@ -34,15 +34,13 @@ export default function CTASection({ links = defaultLinks }) {
           
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 max-w-4xl mx-auto mt-12">
             {links.map((link) => (
-              <Link key={link.href} href={link.href} className="group block">
-                <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/5 bg-black/50 p-8 transition-all hover:border-primary/50 hover:bg-white/5 hover:-translate-y-1">
-                  <span className="text-4xl mb-2 grayscale group-hover:grayscale-0 transition-all">{link.icon}</span>
-                  <div className="space-y-2">
-                    <h3 className="font-bold text-white text-lg">{link.title}</h3>
-                    <p className="text-sm text-gray-400">{link.description}</p>
-                  </div>
-                </div>
-              </Link>
+              <IconCard
+                key={link.href}
+                icon={link.icon}
+                title={link.title}
+                description={link.description}
+                href={link.href}
+              />
             ))}
           </div>
         </div>
@@ -50,3 +48,4 @@ export default function CTASection({ links = defaultLinks }) {
     </section>
   );
 }
+

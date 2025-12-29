@@ -16,7 +16,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import ImageWithFallback from '@/components/shared/ImageWithFallback';
-import { Eye, Heart, Download, PlusCircle } from 'lucide-react';
+import { ResponsiveGrid } from '@/components/shared/layout';
+import { EmptyState } from '@/components/shared/states';
+import { Eye, Heart, Download, PlusCircle, ImageIcon } from 'lucide-react';
 
 function PhotoCardSkeleton() {
   return (
@@ -73,30 +75,30 @@ export default function MinhasFotosPage() {
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ResponsiveGrid cols={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8}>
           {[...Array(8)].map((_, i) => (
             <PhotoCardSkeleton key={i} />
           ))}
-        </div>
+        </ResponsiveGrid>
       );
     }
+
     if (fotos.length === 0) {
       return (
-        <div className="flex items-center justify-center rounded-lg border-2 border-dashed py-24">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold">Nenhuma foto ainda</h2>
-            <p className="mb-6 text-muted-foreground">
-              Comece fazendo upload das suas primeiras fotos!
-            </p>
-            <Button asChild>
-              <Link href="/dashboard/fotografo/upload">Fazer Upload</Link>
-            </Button>
-          </div>
-        </div>
+        <EmptyState
+          icon={ImageIcon}
+          title="Nenhuma foto ainda"
+          description="Comece fazendo upload das suas primeiras fotos!"
+          action={{
+            label: "Fazer Upload",
+            href: "/dashboard/fotografo/upload"
+          }}
+        />
       );
     }
+
     return (
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <ResponsiveGrid cols={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8}>
         {fotos.map((foto) => (
           <Card key={foto.id} className="overflow-hidden">
             <CardContent className="aspect-[4/3] w-full p-0">
@@ -125,7 +127,7 @@ export default function MinhasFotosPage() {
             </div>
           </Card>
         ))}
-      </div>
+      </ResponsiveGrid>
     );
   };
 

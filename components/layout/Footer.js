@@ -9,12 +9,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-20 mb-16">
           <div className="flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
-                <span className="text-xl font-black">GT</span>
+              <div className="relative h-10 w-auto aspect-[3/1]">
+                 <img 
+                   src="/logo.png" 
+                   alt="GTClicks Logo" 
+                   className="h-full w-full object-contain"
+                 />
               </div>
-              <span className="text-2xl font-black tracking-tighter text-white">
-                CLICKS
-              </span>
             </Link>
             <p className="text-sm leading-relaxed text-muted-foreground max-w-xs">
               {siteConfig.description}

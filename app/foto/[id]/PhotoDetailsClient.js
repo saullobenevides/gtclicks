@@ -25,6 +25,8 @@ import ShareButton from '@/components/ShareButton';
 import ViewTracker from "@/components/analytics/ViewTracker";
 import { formatCurrency } from "@/lib/utils";
 import { useUser } from '@stackframe/stack';
+import PageContainer from "@/components/shared/layout/PageContainer";
+import PageHeader from "@/components/shared/layout/PageHeader";
 
 export default function PhotoDetailsClient({ photo, relatedPhotos }) {
   const { addToCart, setIsCartOpen } = useCart();
@@ -42,21 +44,21 @@ export default function PhotoDetailsClient({ photo, relatedPhotos }) {
     });
 
     setAddedToCart(true);
-    // Remove auto-close timeout as we are opening the cart
-    // setTimeout(() => setAddedToCart(false), 3000); 
-    
     setIsCartOpen(true);
   };
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Background Blur Effect */}
-      <div className="fixed inset-0 z-0 opacity-20 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/90 to-black" />
-        <img src={photo.previewUrl} alt="" className="h-full w-full object-cover blur-3xl" />
-      </div>
-
-      <div className="container-wide relative z-10 grid grid-cols-1 gap-12 py-12 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
+    <div className="min-h-screen pb-20 bg-background">
+      <PageHeader 
+        backgroundImage={photo.previewUrl} 
+        title={photo.titulo}
+        className="min-h-[50vh] blur-sm opacity-50 contrast-125 saturate-50"
+        overlayOpacity="heavy"
+      >
+        <div className="sr-only">Background Cover</div>
+      </PageHeader>
+      
+      <PageContainer className="grid grid-cols-1 gap-12 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
         {/* Left Column - Image */}
         <div className="flex flex-col gap-6">
           <div className="sticky top-24 overflow-hidden rounded-2xl border border-white/10 bg-black/50 shadow-2xl backdrop-blur-sm">
@@ -214,7 +216,7 @@ export default function PhotoDetailsClient({ photo, relatedPhotos }) {
             )}
           </div>
         </div>
-      </div>
+      </PageContainer>
     </div>
   );
 }

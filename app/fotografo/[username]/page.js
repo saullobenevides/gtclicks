@@ -8,7 +8,9 @@ import ShareButton from "@/components/ShareButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import CollectionCard from "@/features/collections/components/CollectionCard";
+import { CollectionCard } from "@/components/shared/cards";
+import PageHeader from "@/components/shared/layout/PageHeader";
+import PageContainer from "@/components/shared/layout/PageContainer";
 
 export async function generateMetadata({ params }) {
   const { username } = await params;
@@ -50,20 +52,18 @@ export default async function PhotographerProfilePage(props) {
     const totalPhotos = collections.reduce((acc, col) => acc + (col.totalPhotos || 0), 0);
 
     return (
-      <div className="min-h-screen pb-20">
-        {/* Immersive Header */}
-        <div className="relative min-h-[450px] w-full overflow-hidden md:h-[400px]">
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-black/60 to-black z-10" />
-          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-20 z-0" />
-          
-          {/* Optional Cover Image - using a gradient fallback for now */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800" />
-          
-          <div className="container-wide relative z-20 flex h-full flex-col justify-end pb-8 pt-20 md:pb-12">
+      <div className="min-h-screen pb-20 bg-background">
+        {/* Immersive Encapsulated Header */}
+        <PageHeader 
+          backgroundImage={null} // Or utilize a cover photo if available
+          variant="profile"
+          overlayOpacity="light"
+          title={photographer.name}
+        >
             <div className="flex flex-col items-start gap-4 md:flex-row md:items-end md:gap-6">
               <div className="relative">
                 <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-orange-500 opacity-75 blur-sm" />
-                <Avatar className="h-32 w-32 border-4 border-black md:h-40 md:w-40">
+                <Avatar className="h-32 w-32 border-4 border-black md:h-40 md:w-40 relative z-10">
                   <AvatarImage src={photographer.avatarUrl} alt={photographer.name} className="object-cover" />
                   <AvatarFallback className="bg-muted text-4xl font-bold">
                     {photographer.name?.charAt(0) || photographer.username?.charAt(1)}
@@ -109,62 +109,61 @@ export default async function PhotographerProfilePage(props) {
                 />
               </div>
             </div>
-          </div>
-        </div>
+        </PageHeader>
 
-        <div className="container-wide mt-6 grid grid-cols-1 gap-12 lg:mt-12 lg:grid-cols-[1fr_300px]">
-          {/* Main Content */}
-          <div className="space-y-12">
-            {/* Stats Grid - Mobile Only (Hidden on Desktop, moved to sidebar) */}
-            <div className="grid grid-cols-3 gap-4 lg:hidden">
-              <StatsCard label="Coleções" value={collections.length || 0} icon={<ImageIcon className="h-4 w-4" />} />
-              <StatsCard label="Fotos" value={totalPhotos} icon={<Camera className="h-4 w-4" />} />
-            </div>
-
-            {/* Bio */}
-            {photographer.bio && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-white">Sobre</h2>
-                <p className="text-lg leading-relaxed text-muted-foreground">{photographer.bio}</p>
-              </div>
-            )}
-
-            {/* Collections Grid */}
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Coleções</h2>
-                <div className="text-sm text-muted-foreground">{collections.length} coleções publicadas</div>
+        <PageContainer floating={false}>
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_300px]">
+            {/* Main Content */}
+            <div className="space-y-12">
+              {/* Stats Grid - Mobile Only */}
+              <div className="grid grid-cols-3 gap-4 lg:hidden">
+                <StatsCard label="Coleções" value={collections.length || 0} icon={<ImageIcon className="h-4 w-4" />} />
+                <StatsCard label="Fotos" value={totalPhotos} icon={<Camera className="h-4 w-4" />} />
               </div>
 
-              {collections.length === 0 ? (
-                <Card className="glass-panel border-dashed border-white/10 bg-transparent py-12 text-center">
-                  <CardContent>
-                    <ImageIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
-                    <p className="text-lg font-medium text-white">Nenhuma coleção publicada</p>
-                    <p className="text-muted-foreground">Este fotógrafo ainda não publicou nenhuma coleção.</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2">
-                  {collections.map((collection, index) => (
-                      <CollectionCard key={collection.id ?? index} collection={collection} />
-                  ))}
+              {/* Bio */}
+              {photographer.bio && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold text-white">Sobre</h2>
+                  <p className="text-lg leading-relaxed text-muted-foreground">{photographer.bio}</p>
                 </div>
               )}
+
+              {/* Collections Grid */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-white">Coleções</h2>
+                  <div className="text-sm text-muted-foreground">{collections.length} coleções publicadas</div>
+                </div>
+
+                {collections.length === 0 ? (
+                  <div className="glass-panel border-dashed border-white/10 bg-transparent py-12 text-center rounded-xl">
+                      <ImageIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+                      <p className="text-lg font-medium text-white">Nenhuma coleção publicada</p>
+                      <p className="text-muted-foreground">Este fotógrafo ainda não publicou nenhuma coleção.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2">
+                    {collections.map((collection, index) => (
+                        <CollectionCard key={collection.id ?? index} collection={collection} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Sidebar - Desktop Only */}
+            <div className="hidden space-y-8 lg:block">
+              <div className="glass-panel border border-white/10 bg-black/40 p-6 rounded-xl">
+                <h3 className="mb-6 text-lg font-bold text-white">Estatísticas</h3>
+                <div className="space-y-6">
+                  <SidebarStat label="Coleções Publicadas" value={collections.length || 0} icon={<ImageIcon className="h-5 w-5 text-primary" />} />
+                  <SidebarStat label="Total de Fotos" value={totalPhotos} icon={<Camera className="h-5 w-5 text-primary" />} />
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* Sidebar - Desktop Only */}
-          <div className="hidden space-y-8 lg:block">
-            <Card className="glass-panel border-white/10 bg-black/40 p-6">
-              <h3 className="mb-6 text-lg font-bold text-white">Estatísticas</h3>
-              <div className="space-y-6">
-                <SidebarStat label="Coleções Publicadas" value={collections.length || 0} icon={<ImageIcon className="h-5 w-5 text-primary" />} />
-                <SidebarStat label="Total de Fotos" value={totalPhotos} icon={<Camera className="h-5 w-5 text-primary" />} />
-              </div>
-            </Card>
-          </div>
-        </div>
+        </PageContainer>
       </div>
     );
   } catch (error) {

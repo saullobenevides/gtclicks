@@ -1,22 +1,29 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SectionHeader } from '@/components/shared/layout';
+import { FeatureCard } from '@/components/shared/cards';
 
-export default function FeaturesGrid({ highlights = [] }) {
+export default function FeaturesGrid({ title, description, highlights = [] }) {
   if (!highlights || highlights.length === 0) return null;
 
   return (
-    <section className="container-wide">
+    <section className="container-wide py-16">
+      {(title || description) && (
+        <SectionHeader 
+          title={title}
+          description={description}
+        />
+      )}
+
       <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
         {highlights.map((item, index) => (
-          <Card key={index} className="glass-panel p-8 transition-all hover:bg-white/5">
-            <CardHeader className="p-0 mb-4">
-              <CardTitle className="text-2xl font-bold text-white">{item.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <p className="text-gray-400 leading-relaxed">{item.body}</p>
-            </CardContent>
-          </Card>
+          <FeatureCard
+            key={index}
+            title={item.title}
+            description={item.body}
+            variant="default"
+          />
         ))}
       </div>
     </section>
   );
 }
+

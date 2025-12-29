@@ -1,25 +1,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import ImageWithFallback from '@/components/shared/ImageWithFallback';
 import { searchCollections } from '@/lib/data/marketplace';
-import { CATEGORIES } from '@/lib/constants';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { CollectionCard } from '@/components/shared/cards';
 
 import SearchFilters from '@/features/collections/components/SearchFilters';
 
@@ -60,49 +43,27 @@ export default async function SearchPage(props) {
 
         <div className="min-w-0">
           {results.length === 0 ? (
-            <Card className="col-span-full py-24 px-8 text-center glass-panel border-dashed border-white/10 bg-transparent">
-              <CardHeader>
-                <CardTitle className="text-2xl text-white">Nenhum evento encontrado</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-400 text-lg mb-6">
-                  Tente buscar pela <strong>data do jogo</strong>, nome do time ou local do evento.
-                </p>
-                <Button asChild variant="outline">
-                    <Link href="/busca">Ver todos os eventos</Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="col-span-full py-24 px-8 text-center glass-panel border-dashed border-white/10 bg-transparent rounded-xl">
+              <h2 className="text-2xl font-bold text-white mb-4">Nenhum evento encontrado</h2>
+              <p className="text-gray-400 text-lg mb-6">
+                Tente buscar pela <strong>data do jogo</strong>, nome do time ou local do evento.
+              </p>
+              <Button asChild variant="outline">
+                <Link href="/busca">Ver todos os eventos</Link>
+              </Button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {results.map((collection, index) => {
-                 const isUrl = collection.cover?.startsWith("http");
-                 const isGradient = collection.cover?.startsWith("linear-gradient");
-                 
-                 const backgroundStyle = isUrl
-                    ? { backgroundImage: `url(${collection.cover})` }
-                    : isGradient
-                    ? { backgroundImage: collection.cover }
-                    : { backgroundColor: collection.cover };
-                
-                return (
-                  <Link
-                    key={collection.id ?? index}
-                    href={`/colecoes/${collection.slug}`}
-                    className="group bg-card border rounded-lg overflow-hidden transition cursor-pointer hover:-translate-y-1 hover:shadow-lg aspect-square block"
-                    style={{ ...backgroundStyle, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                  >
-                     <div className="p-6 bg-black/50 h-full flex flex-col justify-end gap-1">
-                      <h3 className="text-xl font-bold text-white">{collection.name}</h3>
-                      <p className="text-sm text-white/70">Por {collection.photographerName || 'GT Clicks'}</p>
-                      <p className="text-sm text-white/70">{collection.totalPhotos || 0} fotos</p>
-                      <div className="text-lg font-bold text-primary mt-1">
-                        R$ {(collection.precoFoto || 0).toFixed(2)}
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+              {results.map((collection, index) => (
+                <CollectionCard
+                  key={collection.id ?? index}
+                  collection={collection}
+                  variant="default"
+                  showDescription={false}
+                  showDate={false}
+                  showPrice={true}
+                />
+              ))}
             </div>
           )}
         </div>
