@@ -72,7 +72,7 @@ export default function PhotoCard({
     openPhoto(photo, contextList);
   };
 
-  const aspectClass = "aspect-square"; // Sempre 1:1
+  const aspectClass = "aspect-[2/3]";
   const textSize =
     variant === "compact"
       ? "text-xs"
@@ -89,7 +89,7 @@ export default function PhotoCard({
     >
       <Card
         className={cn(
-          "relative overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10 border-0",
+          "relative overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10 border border-[#480000]",
           aspectClass,
           isSelected ? "ring-4 ring-primary translate-y-[-4px] shadow-xl" : ""
         )}
@@ -119,33 +119,44 @@ export default function PhotoCard({
           <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 scale-90 group-hover:scale-100">
             <Button
               size="icon"
-              className="h-10 w-10 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white hover:text-black text-white transition-all"
+              className="h-12 w-12 rounded-lg bg-white/10 backdrop-blur-md border border-[#480000]/20 hover:bg-white hover:text-black text-white transition-all duration-200 shadow-lg"
               onClick={handleOpenModal}
               title="Ver detalhes"
             >
-              <Eye className="h-5 w-5" />
+              <Eye className="h-6 w-6" />
             </Button>
-            {onAddToCart && (
+
+            {/* Selection Button (Styled as Cart) */}
+            {showSelection && (
               <Button
                 size="icon"
-                className="h-10 w-10 rounded-lg bg-primary/90 backdrop-blur-md border border-primary/20 hover:bg-primary hover:text-white text-white transition-all shadow-lg shadow-primary/20"
-                onClick={handleQuickAdd}
-                title="Adicionar ao carrinho"
+                className={cn(
+                  "h-12 w-12 rounded-lg backdrop-blur-md border transition-all duration-200 shadow-lg",
+                  isSelected
+                    ? "bg-[#480000] border-[#480000] text-white shadow-[#480000]/30 scale-105"
+                    : "bg-white/10 border-[#480000]/20 text-white hover:bg-white hover:text-black"
+                )}
+                onClick={handleSelection}
+                title={
+                  isSelected ? "Remover da seleção" : "Selecionar para comprar"
+                }
               >
-                <ShoppingCart className="h-5 w-5" />
+                {isSelected ? (
+                  <Check className="h-6 w-6 stroke-[3]" />
+                ) : (
+                  <ShoppingCart className="h-6 w-6" />
+                )}
               </Button>
             )}
           </div>
         )}
 
-        {/* Selection Checkbox */}
-        {showSelection && (
+        {/* Selection Checkbox (Only for non-centered-hover) */}
+        {showSelection && variant !== "centered-hover" && (
           <div
             className={cn(
               "absolute top-4 left-4 z-30 transition-all duration-200",
-              variant === "centered-hover" && !isSelected
-                ? "opacity-0 group-hover:opacity-100"
-                : "opacity-100"
+              !isSelected ? "opacity-100" : "opacity-100"
             )}
           >
             <button

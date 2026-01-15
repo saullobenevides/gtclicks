@@ -243,9 +243,3 @@ html {
     }
   }
 }
-
-/* Global Text Selection */
-::selection {
-  background-color: hsl(var(--primary));
-  color: #ffffff;
-}

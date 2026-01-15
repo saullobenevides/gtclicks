@@ -89,8 +89,7 @@ export async function POST(request) {
         where: { id: foto.id },
         data: {
             previewUrl: processResult.previewUrl,
-            indexingStatus: processResult.indexingStatus,
-            status: "PUBLICADA" // Or PENDENTE if you want manual approval
+            status: "PUBLICADA"
         }
     });
 

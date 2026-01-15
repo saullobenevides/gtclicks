@@ -1,4 +1,4 @@
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Inter, Syne } from "next/font/google"; // [NEW] Added Syne
 import AppProviders from "@/components/providers/AppProviders";
 import Header from "@/components/layout/Header";
@@ -10,23 +10,31 @@ import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
-  display: 'swap',
-  variable: '--font-inter',
+  display: "swap",
+  variable: "--font-inter",
 });
 
 const syne = Syne({
   subsets: ["latin"],
-  display: 'swap',
-  variable: '--font-syne',
+  display: "swap",
+  variable: "--font-syne",
 });
 
 export const metadata = {
   title: {
     default: "GTClicks | Marketplace de Fotos",
-    template: "%s | GTClicks"
+    template: "%s | GTClicks",
   },
-  description: "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
-  keywords: ["fotografia", "marketplace", "fotos", "venda de fotos", "coleções", "fotógrafos"],
+  description:
+    "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
+  keywords: [
+    "fotografia",
+    "marketplace",
+    "fotos",
+    "venda de fotos",
+    "coleções",
+    "fotógrafos",
+  ],
   authors: [{ name: "GTClicks" }],
   creator: "GTClicks",
   publisher: "GTClicks",
@@ -40,7 +48,8 @@ export const metadata = {
     locale: "pt_BR",
     url: "https://www.gtclicks.com",
     title: "GTClicks | Marketplace de Fotos",
-    description: "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
+    description:
+      "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
     siteName: "GTClicks",
     images: [
       {
@@ -54,7 +63,8 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "GTClicks | Marketplace de Fotos",
-    description: "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
+    description:
+      "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
     creator: "@gtclicks",
   },
 };
@@ -68,19 +78,18 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning className="dark">
-      <body className={`${inter.className} ${syne.variable} font-sans antialiased min-h-screen flex flex-col bg-black text-foreground selection:bg-primary selection:text-white`}>
+      <body
+        className={`${inter.className} ${syne.variable} font-sans antialiased min-h-screen flex flex-col bg-black text-foreground`}
+      >
         <AppProviders>
-            <Header />
-            <main className="flex-1 w-full pt-20">
-              {children}
-            </main>
-            <Footer />
-            <LazyClientComponents />
-            <BottomNav />
+          <Header />
+          <main className="flex-1 w-full pt-20">{children}</main>
+          <Footer />
+          <LazyClientComponents />
+          <BottomNav />
         </AppProviders>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>
   );
 }
-

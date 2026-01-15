@@ -92,6 +92,7 @@ export default async function CollectionDetail({ params, searchParams }) {
           <CollectionSearchClient
             allPhotos={collection.photos || []}
             collectionId={collection.id}
+            initialDisplayPhotos={currentLevelPhotos}
           >
             {/* Folder Navigation Header */}
             {(folderId || currentLevelFolders.length > 0) && (
@@ -146,28 +147,6 @@ export default async function CollectionDetail({ params, searchParams }) {
                       </div>
                     </div>
                   </Link>
-                ))}
-              </div>
-            )}
-
-            {/* Photos Grid */}
-            {currentLevelPhotos.length === 0 &&
-            currentLevelFolders.length === 0 ? (
-              <div className="text-center py-24 border-2 border-dashed border-white/5 rounded-xl bg-secondary/5">
-                <p className="text-muted-foreground">
-                  Nenhuma foto encontrada nesta pasta.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-                {currentLevelPhotos.map((photo, index) => (
-                  <PhotoCard
-                    key={photo.id}
-                    photo={photo}
-                    priority={index < 4}
-                    contextList={currentLevelPhotos}
-                    variant="centered-hover"
-                  />
                 ))}
               </div>
             )}
