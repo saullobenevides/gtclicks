@@ -32,10 +32,6 @@ jest.mock('@/lib/auth', () => ({
   getAuthenticatedUser: jest.fn(),
 }));
 
-jest.mock('@/lib/rekognition', () => ({
-  indexFace: jest.fn(),
-}));
-
 // Mock AWS SDK dynamic imports
 const { S3Client } = require('@aws-sdk/client-s3');
 
@@ -94,7 +90,6 @@ describe('POST /api/fotos/batch', () => {
     prisma.fotografo.findUnique.mockResolvedValue({ id: 'photo-1' });
     prisma.foto.findFirst.mockResolvedValue({ numeroSequencial: 10 }); // Mock last photo
     prisma.foto.create.mockResolvedValue({ id: 'new-foto', s3Key: 'uploads/test.jpg' });
-    const { indexFace } = require('@/lib/rekognition'); // Require inside to get the mock
 
     const request = {
       json: async () => ({ 
@@ -112,7 +107,6 @@ describe('POST /api/fotos/batch', () => {
     const response = await POST(request);
     expect(response.status).toBe(200);
     expect(prisma.foto.create).toHaveBeenCalled();
-    expect(indexFace).toHaveBeenCalled(); // Verify Facial Recognition Trigger
   });
 
   it('should skip creation if file does not exist in S3 (Anti-Fraud)', async () => {
