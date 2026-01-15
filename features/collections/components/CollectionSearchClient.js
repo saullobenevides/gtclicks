@@ -182,23 +182,23 @@ export default function CollectionSearchClient({
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-4 mt-12 pb-12">
+                <div className="flex justify-center items-center gap-2 md:gap-4 mt-12 pb-12">
                   <Button
                     variant="outline"
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="w-24 border-[#480000]/20 text-foreground hover:border-[#480000] hover:text-[#480000] disabled:opacity-50"
+                    className="h-8 w-20 md:h-10 md:w-24 text-xs md:text-sm border-[#480000]/20 text-foreground hover:border-[#480000] hover:text-[#480000] disabled:opacity-50"
                   >
                     Anterior
                   </Button>
-                  <span className="text-sm font-medium text-current">
+                  <span className="text-xs md:text-sm font-medium text-current whitespace-nowrap">
                     Página {currentPage} de {totalPages}
                   </span>
                   <Button
                     variant="outline"
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="w-24 border-[#480000]/20 text-foreground hover:border-[#480000] hover:text-[#480000] disabled:opacity-50"
+                    className="h-8 w-20 md:h-10 md:w-24 text-xs md:text-sm border-[#480000]/20 text-foreground hover:border-[#480000] hover:text-[#480000] disabled:opacity-50"
                   >
                     Próxima
                   </Button>
