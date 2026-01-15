@@ -165,7 +165,7 @@ export default function CollectionSearchClient({
 
           {photosToDisplay.length > 0 ? (
             <>
-              <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-8">
                 {currentPhotos.map((photo, index) => (
                   <PhotoCard
                     key={photo.id}
@@ -230,19 +230,20 @@ export default function CollectionSearchClient({
         {typeof document !== "undefined" &&
           createPortal(
             <div
-              className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 ${
+              className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 w-[95%] md:w-auto ${
                 selectedIds.size > 0
                   ? "translate-y-0 opacity-100"
                   : "translate-y-24 opacity-0 pointer-events-none"
               }`}
             >
-              <div className="bg-zinc-900/95 text-white pl-6 pr-2 py-2 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.5)] flex items-center gap-4 min-w-[320px] justify-between border border-white/10 ring-1 ring-white/10 backdrop-blur-md">
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center justify-center bg-white/20 h-8 w-8 rounded-full text-sm font-bold shadow-inner">
+              <div className="bg-zinc-900/95 text-white pl-4 pr-2 py-2 md:pl-6 md:pr-2 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.5)] flex items-center justify-between gap-3 md:gap-4 md:min-w-[320px] border border-white/10 ring-1 ring-white/10 backdrop-blur-md">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <span className="flex items-center justify-center bg-white/20 h-6 w-6 md:h-8 md:w-8 rounded-full text-xs md:text-sm font-bold shadow-inner">
                     {selectedIds.size}
                   </span>
-                  <span className="font-medium text-sm tracking-wide">
-                    fotos selecionadas
+                  <span className="font-medium text-xs md:text-sm tracking-wide">
+                    <span className="hidden md:inline">fotos selecionadas</span>
+                    <span className="md:hidden">selecionadas</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -250,16 +251,16 @@ export default function CollectionSearchClient({
                     onClick={() => setSelectedIds(new Set())}
                     variant="ghost"
                     size="sm"
-                    className="h-9 px-3 hover:bg-white/10 hover:text-white rounded-full text-xs uppercase tracking-wide opacity-70 hover:opacity-100 transition-all font-semibold"
+                    className="h-8 md:h-9 px-2 md:px-3 hover:bg-white/10 hover:text-white rounded-full text-[10px] md:text-xs uppercase tracking-wide opacity-70 hover:opacity-100 transition-all font-semibold"
                   >
                     Cancelar
                   </Button>
                   <Button
                     onClick={handleBulkAddToCart}
                     size="sm"
-                    className="h-10 px-6 bg-white text-black hover:bg-gray-200 rounded-full font-bold shadow-lg hover:scale-105 transition-all"
+                    className="h-8 md:h-10 px-4 md:px-6 bg-white text-black hover:bg-gray-200 rounded-full font-bold shadow-lg hover:scale-105 transition-all text-xs md:text-sm"
                   >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    <ShoppingCart className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                     Adicionar
                   </Button>
                 </div>
