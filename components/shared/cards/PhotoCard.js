@@ -116,39 +116,71 @@ export default function PhotoCard({
 
         {/* Variant: Centered Hover Actions (New) */}
         {variant === "centered-hover" && (
-          <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 scale-90 group-hover:scale-100">
-            <Button
-              size="icon"
-              className="h-12 w-12 rounded-lg bg-white/10 backdrop-blur-md border border-[#480000]/20 hover:bg-white hover:text-black text-white transition-all duration-200 shadow-lg"
-              onClick={handleOpenModal}
-              title="Ver detalhes"
-            >
-              <Eye className="h-6 w-6" />
-            </Button>
-
-            {/* Selection Button (Styled as Cart) */}
-            {showSelection && (
+          <>
+            {/* Desktop: Centered Hover Actions */}
+            <div className="absolute inset-0 hidden md:flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 scale-90 group-hover:scale-100">
               <Button
                 size="icon"
-                className={cn(
-                  "h-12 w-12 rounded-lg backdrop-blur-md border transition-all duration-200 shadow-lg",
-                  isSelected
-                    ? "bg-[#480000] border-[#480000] text-white shadow-[#480000]/30 scale-105"
-                    : "bg-white/10 border-[#480000]/20 text-white hover:bg-white hover:text-black"
-                )}
-                onClick={handleSelection}
-                title={
-                  isSelected ? "Remover da seleção" : "Selecionar para comprar"
-                }
+                className="h-12 w-12 rounded-lg bg-white/10 backdrop-blur-md border border-[#480000]/20 hover:bg-white hover:text-black text-white transition-all duration-200 shadow-lg"
+                onClick={handleOpenModal}
+                title="Ver detalhes"
               >
-                {isSelected ? (
-                  <Check className="h-6 w-6 stroke-[3]" />
-                ) : (
-                  <ShoppingCart className="h-6 w-6" />
-                )}
+                <Eye className="h-6 w-6" />
               </Button>
-            )}
-          </div>
+
+              {/* Selection Button (Styled as Cart) */}
+              {showSelection && (
+                <Button
+                  size="icon"
+                  className={cn(
+                    "h-12 w-12 rounded-lg backdrop-blur-md border transition-all duration-200 shadow-lg",
+                    isSelected
+                      ? "bg-[#480000] border-[#480000] text-white shadow-[#480000]/30 scale-105"
+                      : "bg-white/10 border-[#480000]/20 text-white hover:bg-white hover:text-black"
+                  )}
+                  onClick={handleSelection}
+                  title={
+                    isSelected
+                      ? "Remover da seleção"
+                      : "Selecionar para comprar"
+                  }
+                >
+                  {isSelected ? (
+                    <Check className="h-6 w-6 stroke-[3]" />
+                  ) : (
+                    <ShoppingCart className="h-6 w-6" />
+                  )}
+                </Button>
+              )}
+            </div>
+
+            {/* Mobile: Corner Action (Always Visible) */}
+            <div className="absolute top-1 right-1 z-30 md:hidden">
+              {showSelection && (
+                <Button
+                  size="icon"
+                  className={cn(
+                    "h-9 w-9 rounded-full backdrop-blur-md border transition-all duration-200 shadow-md",
+                    isSelected
+                      ? "bg-[#480000] border-[#480000] text-white shadow-[#480000]/30"
+                      : "bg-white/20 border-[#480000]/20 text-white"
+                  )}
+                  onClick={handleSelection}
+                  title={
+                    isSelected
+                      ? "Remover da seleção"
+                      : "Selecionar para comprar"
+                  }
+                >
+                  {isSelected ? (
+                    <Check className="h-5 w-5 stroke-[3]" />
+                  ) : (
+                    <ShoppingCart className="h-5 w-5" />
+                  )}
+                </Button>
+              )}
+            </div>
+          </>
         )}
 
         {/* Selection Checkbox (Only for non-centered-hover) */}
