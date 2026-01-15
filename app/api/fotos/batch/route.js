@@ -14,6 +14,8 @@ function resolveOrientation(value) {
 }
 
 import { getAuthenticatedUser } from "@/lib/auth";
+import { deleteManyFromS3 } from "@/lib/s3-delete";
+import { indexFace } from "@/lib/rekognition";
 
 export async function POST(request) {
   const user = await getAuthenticatedUser();
@@ -62,6 +64,22 @@ export async function POST(request) {
 
     // Delete removed photos
     if (deletedPhotoIds.length > 0) {
+      // Fetch s3Keys before deletion
+      const photosToDelete = await prisma.foto.findMany({
+        where: {
+          id: { in: deletedPhotoIds },
+          fotografoId: fotografoId
+        },
+        select: { s3Key: true }
+      });
+
+      const s3KeysToDelete = photosToDelete.map(p => p.s3Key).filter(Boolean);
+
+      // Clean up S3
+      if (s3KeysToDelete.length > 0) {
+        await deleteManyFromS3(s3KeysToDelete);
+      }
+
       await prisma.foto.deleteMany({
         where: {
           id: { in: deletedPhotoIds },
@@ -78,20 +96,33 @@ export async function POST(request) {
     }
 
     const processedFotos = [];
+    
+    // Get the collectionId from the first photo or the common context
+    const targetCollectionId = fotos[0]?.colecaoId || null;
+
+    // Get the current max sequential number for this specific collection (or photographer if no collection)
+    const lastPhoto = await prisma.foto.findFirst({
+      where: targetCollectionId 
+        ? { colecaoId: targetCollectionId } 
+        : { fotografoId },
+      orderBy: { numeroSequencial: 'desc' },
+      select: { numeroSequencial: true }
+    });
+    
+    let nextNumber = (lastPhoto?.numeroSequencial || 0) + 1;
 
     for (const foto of fotos) {
-      // Common data supported by the current schema
+      // Use the targetCollectionId if not explicitly provided in the photo object
+      const currentCollectionId = foto.colecaoId || targetCollectionId;
+      
       const commonData = {
-        titulo: foto.titulo || "Foto sem titulo",
+        titulo: `Foto #${nextNumber.toString().padStart(3, '0')}`,
         descricao: foto.descricao,
-        tags: Array.isArray(foto.tags)
-          ? foto.tags
-          : typeof foto.tags === "string" && foto.tags.length
-          ? foto.tags.split(",").map((tag) => tag.trim()).filter(Boolean)
-          : [],
+        tags: [],
         orientacao: resolveOrientation(foto.orientacao),
-        folderId: foto.folderId || null, // Handle folderId
-        status: "PUBLICADA", // Auto-publish for MVP
+        folderId: foto.folderId || null,
+        status: "PUBLICADA",
+        numeroSequencial: foto.numeroSequencial || nextNumber++,
       };
 
       let processedFoto;
@@ -169,6 +200,29 @@ export async function POST(request) {
             }
           },
         });
+
+        // Trigger Face Indexing (Async)
+        // We don't await this to keep the UI response fast, or we await if we want to ensure it happens.
+        // For reliability, let's await it but catch errors so we don't fail the batch.
+        try {
+            await indexFace({
+                s3Object: {
+                    Bucket: process.env.S3_UPLOAD_BUCKET,
+                    Name: foto.s3Key
+                }
+            }, processedFoto.id);
+            
+            await prisma.foto.update({
+                where: { id: processedFoto.id },
+                data: { indexingStatus: 'INDEXED' }
+            });
+        } catch (idxError) {
+            console.error("Failed to index face for photo:", processedFoto.id, idxError);
+            await prisma.foto.update({
+                where: { id: processedFoto.id },
+                data: { indexingStatus: 'FAILED' }
+            });
+        }
       }
 
       processedFotos.push(processedFoto);

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { stackServerApp } from "@/stack/server";
 import { slugify } from "@/lib/slug";
+import { deleteManyFromS3 } from "@/lib/s3-delete";
 
 export async function PUT(request, context) {
   try {
@@ -114,16 +115,26 @@ export async function DELETE(request, context) {
       return NextResponse.json({ error: "Coleção não encontrada ou não autorizada" }, { status: 404 });
     }
 
-    // Delete collection (cascade should handle photos and folders if configured, 
-    // but let's check schema. Usually better to be explicit or rely on cascade)
-    // Assuming schema has onDelete: Cascade for relations. 
-    // If not, we might need to delete photos/folders first.
-    // Based on previous context, we added Cascade to Folders. 
-    // Let's assume it's fine for now, or Prisma will throw.
+    // 1. Fetch all photos in this collection to get their S3 keys
+    const photosToDelete = await prisma.foto.findMany({
+      where: { colecaoId },
+      select: { s3Key: true }
+    });
+
+    const s3KeysToDelete = photosToDelete.map(p => p.s3Key).filter(Boolean);
+
+    // 2. Delete from Database (Cascade should handle relations, but let's be safe with manual deletion if needed)
+    // The previous logic assumed simple delete. Let's stick to it, relying on Cascade or manual cleanup if needed.
+    // However, for S3 sync, step 1 was crucial.
 
     await prisma.colecao.delete({
       where: { id: colecaoId },
     });
+
+    // 3. Delete from S3 (Fire and forget or await, but don't block response on error effectively)
+    if (s3KeysToDelete.length > 0) {
+      await deleteManyFromS3(s3KeysToDelete);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

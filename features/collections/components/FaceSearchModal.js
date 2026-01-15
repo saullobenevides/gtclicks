@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Camera, Loader2, ScanFace, RefreshCw, X, ShieldCheck } from "lucide-react";
-import PhotoCard from './PhotoCard';
+import PhotoCard from "@/components/shared/cards/PhotoCard";
 import { toast } from "sonner";
 import Webcam from "react-webcam";
 
@@ -179,7 +179,11 @@ export default function FaceSearchModal({ collectionId }) {
               {results.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {results.map((photo, index) => (
-                      <PhotoCard key={photo.id} photo={photo} />
+                      <PhotoCard 
+                        key={photo.id} 
+                        photo={photo} 
+                        contextList={results}
+                      />
                   ))}
                 </div>
               ) : (

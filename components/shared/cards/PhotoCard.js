@@ -6,10 +6,11 @@ import { Card } from "@/components/ui/card";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { ShoppingCart, Check, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePhotoModal } from "@/components/providers/PhotoModalProvider";
 
 /**
  * PhotoCard - Componente padronizado para exibir fotos
- * 
+ *
  * @param {Object} props
  * @param {Object} props.photo - Objeto da foto com id, titulo, previewUrl, etc
  * @param {'default'|'compact'|'large'} props.variant - Variante visual do card
@@ -21,10 +22,11 @@ import { cn } from "@/lib/utils";
  * @param {Function} props.onSelect - Callback ao selecionar foto
  * @param {boolean} props.isSelected - Se a foto está selecionada
  * @param {string} props.className - Classes CSS adicionais
+ * @param {Array} props.contextList - Lista de fotos para navegação no modal
  */
-export default function PhotoCard({ 
+export default function PhotoCard({
   photo,
-  variant = 'default',
+  variant = "default",
   priority = false,
   showSelection = true,
   showQuickAdd = true,
@@ -32,12 +34,15 @@ export default function PhotoCard({
   onAddToCart,
   onSelect,
   isSelected = false,
-  className
+  className,
+  contextList = [],
 }) {
+  const { openPhoto } = usePhotoModal();
+
   const handleQuickAdd = (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     e.stopPropagation();
-    
+
     if (onAddToCart) {
       onAddToCart(photo);
     }
@@ -46,68 +51,108 @@ export default function PhotoCard({
   const handleSelection = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (onSelect) {
       onSelect(photo.id);
     }
   };
 
-  const aspectClass = 'aspect-square'; // Sempre 1:1
-  const textSize = variant === 'compact' ? 'text-xs' : variant === 'large' ? 'text-base' : 'text-sm';
+  const handleOpenModal = (e) => {
+    e.preventDefault();
+    openPhoto(photo, contextList);
+  };
+
+  const aspectClass = "aspect-square"; // Sempre 1:1
+  const textSize =
+    variant === "compact"
+      ? "text-xs"
+      : variant === "large"
+      ? "text-base"
+      : "text-sm";
 
   return (
-    <div 
-      className={cn("relative group", className)}
+    <div
+      className={cn("relative group cursor-pointer", className)}
       data-testid="photo-card"
       data-photo-id={photo.id}
+      onClick={handleOpenModal}
     >
-      <Link href={`/foto/${photo.id}`}>
-        <Card
-          className={cn(
-            "relative overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10 border-0",
-            aspectClass,
-            isSelected ? "ring-4 ring-primary translate-y-[-4px] shadow-xl" : ""
-          )}
-          aria-label={`Ver detalhes de ${photo.titulo || 'foto'}`}
-        >
-          <ImageWithFallback
-            src={photo.previewUrl}
-            alt={photo.titulo || 'Foto'}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            priority={priority}
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-          
-          {/* Gradient Overlay */}
-          <div className={cn(
-            "absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent",
-            isSelected ? "opacity-60 bg-primary/20" : "opacity-80"
-          )} />
-          
-          {/* Selection Checkbox */}
-          {showSelection && (
-            <div className="absolute top-4 left-4 z-20">
-              <button
-                onClick={handleSelection}
-                className={cn(
-                  "h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg",
-                  isSelected 
-                    ? "bg-primary border-primary text-white scale-110" 
-                    : "bg-black/40 border-white/50 text-transparent hover:bg-black/60 hover:border-white"
-                )}
-                aria-label={isSelected ? "Desselecionar foto" : "Selecionar foto"}
-                aria-pressed={isSelected}
-              >
-                <Check className="h-5 w-5 stroke-[3]" />
-              </button>
-            </div>
-          )}
+      <Card
+        className={cn(
+          "relative overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10 border-0",
+          aspectClass,
+          isSelected ? "ring-4 ring-primary translate-y-[-4px] shadow-xl" : ""
+        )}
+        aria-label={`Ver detalhes de ${photo.titulo || "foto"}`}
+      >
+        <ImageWithFallback
+          src={photo.previewUrl}
+          alt={photo.titulo || "Foto"}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          priority={priority}
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
 
-          {/* Quick Actions */}
+        {/* Gradient Overlay */}
+        <div
+          className={cn(
+            "absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent",
+            isSelected ? "opacity-60 bg-primary/20" : "opacity-80",
+            variant === "centered-hover"
+              ? "opacity-0 group-hover:opacity-40 transition-opacity duration-300 bg-black"
+              : ""
+          )}
+        />
+
+        {/* Variant: Centered Hover Actions (New) */}
+        {variant === "centered-hover" && (
+          <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 scale-90 group-hover:scale-100">
+            <Button
+              size="icon"
+              className="h-10 w-10 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white hover:text-black text-white transition-all"
+              onClick={handleOpenModal}
+              title="Ver detalhes"
+            >
+              <Eye className="h-5 w-5" />
+            </Button>
+            {onAddToCart && (
+              <Button
+                size="icon"
+                className="h-10 w-10 rounded-lg bg-primary/90 backdrop-blur-md border border-primary/20 hover:bg-primary hover:text-white text-white transition-all shadow-lg shadow-primary/20"
+                onClick={handleQuickAdd}
+                title="Adicionar ao carrinho"
+              >
+                <ShoppingCart className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Default Selection Checkbox (Hide if centered-hover) */}
+        {showSelection && variant !== "centered-hover" && (
+          <div className="absolute top-4 left-4 z-20">
+            <button
+              onClick={handleSelection}
+              className={cn(
+                "h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg",
+                isSelected
+                  ? "bg-primary border-primary text-white scale-110"
+                  : "bg-black/40 border-white/50 text-transparent hover:bg-black/60 hover:border-white"
+              )}
+              aria-label={isSelected ? "Desselecionar foto" : "Selecionar foto"}
+              aria-pressed={isSelected}
+            >
+              <Check className="h-5 w-5 stroke-[3]" />
+            </button>
+          </div>
+        )}
+
+        {/* Default Quick Actions (Hide if centered-hover) */}
+        {variant !== "centered-hover" && (
           <div className="absolute top-4 right-4 translate-y-0 opacity-100 z-10 flex gap-2">
             {showQuickAdd && onAddToCart && (
-              <Button 
-                size="icon" 
+              <Button
+                size="icon"
                 className="rounded-full h-10 w-10 bg-white/90 text-black hover:bg-neutral-900 hover:text-white shadow-lg backdrop-blur-sm transition-colors"
                 onClick={handleQuickAdd}
                 title="Adicionar ao carrinho"
@@ -118,21 +163,28 @@ export default function PhotoCard({
             )}
             {customActions}
           </div>
+        )}
 
-          {/* Photo Info */}
-          <div className="absolute bottom-0 left-0 w-full p-4">
-            <h3 className={cn(
+        {/* Photo Info (Always visible, simpler for centered-hover?) */}
+        <div className="absolute bottom-0 left-0 w-full p-4 pointer-events-none">
+          {/* Hide text in centered-hover unless hovered? Or keep it? keeping it for now but maybe lighter */}
+          <h3
+            className={cn(
               "font-bold text-white line-clamp-1 shadow-black/80 drop-shadow-md",
-              textSize
-            )}>
-              {photo.title || photo.titulo || "Sem título"}
-            </h3>
-            <span className="text-xs text-gray-300 font-medium opacity-90">
-              #{photo.id ? photo.id.slice(-4) : '...'}
-            </span>
-          </div>
-        </Card>
-      </Link>
+              textSize,
+              variant === "centered-hover"
+                ? "opacity-0 group-hover:opacity-100 transition-opacity"
+                : ""
+            )}
+          >
+            {photo.numeroSequencial
+              ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
+              : `Foto #${
+                  photo.id ? photo.id.replace(/\D/g, "").slice(-3) : "..."
+                }`}
+          </h3>
+        </div>
+      </Card>
     </div>
   );
 }

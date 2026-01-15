@@ -19,6 +19,7 @@ import ImageWithFallback from '@/components/shared/ImageWithFallback';
 import { ResponsiveGrid } from '@/components/shared/layout';
 import { EmptyState } from '@/components/shared/states';
 import { Eye, Heart, Download, PlusCircle, ImageIcon } from 'lucide-react';
+import PhotoCard from '@/components/shared/cards/PhotoCard';
 
 function PhotoCardSkeleton() {
   return (
@@ -100,32 +101,13 @@ export default function MinhasFotosPage() {
     return (
       <ResponsiveGrid cols={{ sm: 1, md: 2, lg: 3, xl: 4 }} gap={8}>
         {fotos.map((foto) => (
-          <Card key={foto.id} className="overflow-hidden">
-            <CardContent className="aspect-[4/3] w-full p-0">
-              <ImageWithFallback
-                src={foto.previewUrl}
-                alt={foto.titulo}
-                className="h-full w-full object-cover"
-              />
-            </CardContent>
-            <div className="flex flex-col p-5">
-              <h3 className="mb-2 font-bold leading-tight">{foto.titulo}</h3>
-              <div className="mb-3 flex flex-wrap gap-2">
-                <Badge variant="secondary">{foto.categoria || 'Sem categoria'}</Badge>
-                <Badge variant="secondary">{foto.orientacao}</Badge>
-              </div>
-              <div className="mb-4 flex gap-4 text-sm text-muted-foreground">
-                <span className='flex items-center gap-1'><Eye className='w-4 h-4'/> {foto.views || 0}</span>
-                <span className='flex items-center gap-1'><Heart className='w-4 h-4'/> {foto.likes || 0}</span>
-                <span className='flex items-center gap-1'><Download className='w-4 h-4'/> {foto.downloads || 0}</span>
-              </div>
-              <div className="mt-auto flex gap-2">
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/foto/${foto.id}`}>Ver Detalhes</Link>
-                </Button>
-              </div>
-            </div>
-          </Card>
+          <PhotoCard 
+            key={foto.id} 
+            photo={foto}
+            contextList={fotos}
+            showSelection={false}
+            showQuickAdd={false} // Hide cart button in dashboard as it's the owner viewing
+          />
         ))}
       </ResponsiveGrid>
     );

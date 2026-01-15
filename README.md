@@ -72,11 +72,12 @@ O endpoint `/api/upload` gera URLs assinadas que o dashboard de upload usa para 
 - `prisma/schema.prisma` - Schema completo (User, Fotografo, Colecao, Foto, Licenca, Pedido).
 - `prisma/seed.mjs` - Seed com conteudo em pt-BR.
 
-## Proximos passos sugeridos
+## Próximos Passos
 
-1. **Dashboard protegido** - usar `stackClientApp.getCurrentUser` para condicionar rotas (dashboard do fotografo, downloads, etc.).
-2. **Sync Neon -> Prisma** - criar uma rotina para garantir que todo usuario autenticado no Neon exista na tabela `User` (usando email ou webhook).
-3. **Pagamentos** - conectar Stripe ou PSP BR e acionar webhooks para liberar `downloadUrlAssinada`.
-4. **Armazenamento** - integrar S3/Spaces com URLs pre-assinadas reais na rota `/api/upload` e nos itens do pedido.
+1.  **Refinamento do Checkout** - integrar gateway de pagamento real (Stripe/MercadoPago) e webhooks.
+2.  **Sync Neon -> Prisma** - [CONCLUÍDO] Sincronização automática implementada em `lib/auth.js` e `api/auth/sync`.
+3.  **Área do Cliente** - painel para visualizar pedidos e downloads (já iniciado em `/meus-downloads`).
+4.  **Armazenamento** - integrar S3/Spaces com URLs pre-assinadas reais na rota `/api/upload` e nos itens do pedido.
+5.  **Notificações** - [CONCLUÍDO] Sistema de notificação interna implementado no banco de dados.
 
 Qualquer duvida sobre a camada de dados, confira `lib/data/marketplace.js` e os comentarios do seed. Boas fotos!

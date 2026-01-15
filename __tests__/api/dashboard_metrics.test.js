@@ -10,6 +10,17 @@ jest.mock('../../lib/prisma', () => ({
   fotografo: {
     findFirst: jest.fn(),
   },
+  itemPedido: {
+    aggregate: jest.fn(),
+    count: jest.fn(),
+  },
+  foto: {
+    aggregate: jest.fn(),
+  },
+  pedido: {
+    count: jest.fn(),
+  },
+  $transaction: jest.fn(),
 }));
 
 describe('API Dashboard Fotógrafo', () => {
@@ -37,6 +48,15 @@ describe('API Dashboard Fotógrafo', () => {
     };
 
     prisma.fotografo.findFirst.mockResolvedValue(mockFotografo);
+    
+    // Mock do retorno da transação
+    prisma.$transaction.mockResolvedValue([
+      { _sum: { precoPago: 1000 } }, // revenueData
+      10, // salesCount
+      { _sum: { views: 500 } }, // viewsData
+      { _sum: { downloads: 50 } }, // downloadsData
+      8 // ordersCount
+    ]);
 
     // Simula a requisição
     const req = {
@@ -50,6 +70,7 @@ describe('API Dashboard Fotógrafo', () => {
     expect(response.status).toBe(200);
     expect(json.data.saldo.disponivel).toBe(150.00);
     expect(json.data.colecoes).toHaveLength(1);
+    expect(json.data.stats.revenue).toBe(1000);
     
     // Verifica se os campos novos de analytics estão presentes
     const colecao = json.data.colecoes[0];

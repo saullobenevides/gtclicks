@@ -32,11 +32,20 @@ export async function POST(request, { params }) {
       }
     );
     
-    // TODO: Send notification to photographer
+    // Create in-app notification
+    await prisma.notification.create({
+      data: {
+        userId: collection.fotografo.userId,
+        title: "Coleção Rejeitada",
+        message: `Sua coleção "${collection.nome}" foi rejeitada. Motivo: ${reason || 'Não especificado'}. Faça os ajustes e envie novamente.`,
+        type: "ERROR",
+        link: `/dashboard/fotografo/colecoes/${id}/editar`
+      }
+    });
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Coleção rejeitada' 
+      message: 'Coleção rejeitada e fotógrafo notificado' 
     });
     
   } catch (error) {

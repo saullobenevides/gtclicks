@@ -2,19 +2,19 @@ import { formatCurrency, calcularDescontoProgressivo, aplicarDesconto } from '@/
 
 describe('formatCurrency', () => {
   test('formats currency correctly', () => {
-    expect(formatCurrency(10)).toBe('R$ 10,00');
-    expect(formatCurrency(1234.56)).toBe('R$ 1.234,56');
-    expect(formatCurrency(0)).toBe('R$ 0,00');
+    expect(formatCurrency(10).replace(/\u00a0/g, ' ')).toBe('R$ 10,00');
+    expect(formatCurrency(1234.56).replace(/\u00a0/g, ' ')).toBe('R$ 1.234,56');
+    expect(formatCurrency(0).replace(/\u00a0/g, ' ')).toBe('R$ 0,00');
   });
 
   test('handles decimal values', () => {
-    expect(formatCurrency(9.99)).toBe('R$ 9,99');
-    expect(formatCurrency(100.5)).toBe('R$ 100,50');
+    expect(formatCurrency(9.99).replace(/\u00a0/g, ' ')).toBe('R$ 9,99');
+    expect(formatCurrency(100.5).replace(/\u00a0/g, ' ')).toBe('R$ 100,50');
   });
 
   test('handles large numbers', () => {
-    expect(formatCurrency(1000000)).toBe('R$ 1.000.000,00');
-    expect(formatCurrency(999999.99)).toBe('R$ 999.999,99');
+    expect(formatCurrency(1000000).replace(/\u00a0/g, ' ')).toBe('R$ 1.000.000,00');
+    expect(formatCurrency(999999.99).replace(/\u00a0/g, ' ')).toBe('R$ 999.999,99');
   });
 });
 
@@ -59,7 +59,7 @@ describe('aplicarDesconto', () => {
 
   test('handles decimal values', () => {
     expect(aplicarDesconto(99.99, 0.10)).toBeCloseTo(89.99, 2);
-    expect(aplicarDesconto(15.50, 0.15)).toBeCloseTo(13.18, 2);
+    expect(aplicarDesconto(15.50, 0.15)).toBeCloseTo(13.175, 2);
   });
 
   test('returns 0 for 100% discount', () => {

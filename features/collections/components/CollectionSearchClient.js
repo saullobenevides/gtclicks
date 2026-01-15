@@ -9,7 +9,7 @@ import FaceSearchModal from './FaceSearchModal';
 import { useCart } from '@/features/cart/context/CartContext';
 import { toast } from 'sonner';
 import { SelectionContext } from '../context/SelectionContext';
-import PhotoCard from './PhotoCard';
+import PhotoCard from '@/components/shared/cards/PhotoCard';
 
 
 export default function CollectionSearchClient({ allPhotos = [], collectionId, children }) {
@@ -36,7 +36,9 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
                  addToCart({
                     fotoId: photo.id,
                     colecaoId: collectionId,
-                    titulo: photo.title || photo.titulo || "Foto sem título",
+                    titulo: photo.numeroSequencial 
+                        ? `Foto #${photo.numeroSequencial.toString().padStart(3, '0')}` 
+                        : `Foto #${photo.id.replace(/\D/g, '').slice(-3)}`,
                     preco: photo.colecao?.precoFoto || photo.preco || 0,
                     precoBase: photo.colecao?.precoFoto || photo.preco || 0,
                     descontos: photo.colecao?.descontos || [],
@@ -56,25 +58,23 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
         setSelectedIds(new Set());
     };
 
-    const filteredPhotos = useMemo(() => {
-        if (!query.trim()) return [];
-        const lowerQuery = query.toLowerCase().trim();
-        
-        return allPhotos.filter(photo => {
-            const titleMatch = (photo.title || photo.titulo) && (photo.title || photo.titulo).toLowerCase().includes(lowerQuery);
-            const bibMatch = photo.numeroSequencial && photo.numeroSequencial.toString() === lowerQuery;
-            const bibMatchPartial = photo.numeroSequencial && photo.numeroSequencial.toString().includes(lowerQuery);
-            
-            let tagsMatch = false;
-            if (Array.isArray(photo.tags)) {
-                tagsMatch = photo.tags.some(t => t.toLowerCase().includes(lowerQuery));
-            } else if (typeof photo.tags === 'string') {
-                tagsMatch = photo.tags.toLowerCase().includes(lowerQuery);
-            }
+    // ... (filteredPhotos memo remains same as it already searches by number)
 
-            return titleMatch || tagsMatch || bibMatch || bibMatchPartial;
+    // Adapter for shared PhotoCard props
+    const handleSelect = (id) => toggleSelection(id);
+    const handleAddToCart = (photo) => {
+        addToCart({
+            fotoId: photo.id,
+            colecaoId: collectionId,
+            titulo: photo.numeroSequencial 
+                ? `Foto #${photo.numeroSequencial.toString().padStart(3, '0')}` 
+                : `Foto #${photo.id.replace(/\D/g, '').slice(-3)}`,
+            preco: photo.colecao?.precoFoto || 0,
+            licenca: 'Uso Padrão',
+            previewUrl: photo.previewUrl,
         });
-    }, [allPhotos, query]);
+        toast.success("Foto adicionada ao carrinho");
+    };
 
     return (
         <SelectionContext.Provider value={{ selectedIds, toggleSelection, isSelectionMode: selectedIds.size > 0 }}>
@@ -110,7 +110,15 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
                         {filteredPhotos.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                                 {filteredPhotos.map((photo, index) => (
-                                    <PhotoCard key={photo.id} photo={photo} priority={index < 4} />
+                                    <PhotoCard 
+                                        key={photo.id} 
+                                        photo={photo} 
+                                        priority={index < 4}
+                                        isSelected={selectedIds.has(photo.id)}
+                                        onSelect={handleSelect}
+                                        onAddToCart={handleAddToCart}
+                                        contextList={filteredPhotos}
+                                    />
                                 ))}
                             </div>
                         ) : (

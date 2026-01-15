@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MapPin, Camera, Image as ImageIcon, Download, Share2 } from "lucide-react";
-import ShareButton from "@/components/ShareButton";
+import ShareButton from "@/components/shared/actions/ShareButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

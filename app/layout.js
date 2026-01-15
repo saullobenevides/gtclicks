@@ -71,7 +71,9 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} ${syne.variable} font-sans antialiased min-h-screen flex flex-col bg-black text-foreground selection:bg-primary selection:text-white`}>
         <AppProviders>
             <Header />
-            <main className="flex-1 w-full pt-20">{children}</main>
+            <main className="flex-1 w-full pt-20">
+              {children}
+            </main>
             <Footer />
             <LazyClientComponents />
             <BottomNav />

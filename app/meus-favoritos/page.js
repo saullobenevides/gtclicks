@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@stackframe/stack';
 import Link from 'next/link';
-import Image from 'next/image';
 import { PageSection, SectionHeader } from '@/components/shared/layout';
 import { ResponsiveGrid } from '@/components/shared/layout';
 import { EmptyState, LoadingState } from '@/components/shared/states';
 import { ImageIcon } from 'lucide-react';
+import PhotoCard from '@/components/shared/cards/PhotoCard';
 
 export default function MyFavoritesPage() {
   const user = useUser({ or: 'redirect' });
@@ -54,23 +54,11 @@ export default function MyFavoritesPage() {
           }
         >
           {likedPhotos.map((photo) => (
-            <Link 
+            <PhotoCard 
               key={photo.id} 
-              href={`/foto/${photo.id}`} 
-              className="group relative aspect-[3/4] overflow-hidden rounded-lg bg-muted"
-            >
-              <Image
-                src={photo.previewUrl}
-                alt={photo.titulo}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-              <div className="absolute bottom-0 left-0 p-4 text-white opacity-0 transition-opacity group-hover:opacity-100">
-                <p className="font-semibold truncate">{photo.titulo}</p>
-                <p className="text-sm text-gray-300 truncate">{photo.fotografo?.username || 'Fotógrafo'}</p>
-              </div>
-            </Link>
+              photo={photo} 
+              contextList={likedPhotos}
+            />
           ))}
         </ResponsiveGrid>
       )}

@@ -1852,3 +1852,11 @@ The column `Fotografo.portfolioUrl` does not exist in the current database.
     at processFullBinaryRow (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2349:9)
     at processBinaryChunk (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2459:98)
     at progress (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_9212ccad._.js:2628:13)
+[2026-01-15T17:24:28.399Z] [ERROR] Batch API: TypeError: _prisma.default.foto.findFirst is not a function
+    at findFirst (C:\Users\saull\gtclicks\app\api\fotos\batch\route.js:104:41)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.<anonymous> (C:\Users\saull\gtclicks\__tests__\api\photo_batch.test.js:104:22)
+[2026-01-15T17:24:28.410Z] [ERROR] Batch API: TypeError: _prisma.default.foto.findFirst is not a function
+    at findFirst (C:\Users\saull\gtclicks\app\api\fotos\batch\route.js:104:41)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.<anonymous> (C:\Users\saull\gtclicks\__tests__\api\photo_batch.test.js:126:22)
