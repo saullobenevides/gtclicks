@@ -97,7 +97,7 @@ export default function CollectionSearchClient({
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "auto" });
   };
 
   // Shared handlers
@@ -165,7 +165,7 @@ export default function CollectionSearchClient({
 
           {photosToDisplay.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+              <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-8">
                 {currentPhotos.map((photo, index) => (
                   <PhotoCard
                     key={photo.id}

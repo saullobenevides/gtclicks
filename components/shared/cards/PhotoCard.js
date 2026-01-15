@@ -72,7 +72,7 @@ export default function PhotoCard({
     openPhoto(photo, contextList);
   };
 
-  const aspectClass = "aspect-[2/3]";
+  const aspectClass = "aspect-square md:aspect-[2/3]";
   const textSize =
     variant === "compact"
       ? "text-xs"

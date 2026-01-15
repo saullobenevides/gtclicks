@@ -46,7 +46,7 @@ export default function CollectionCard({
   const isFeatured = variant === "featured";
   const isCompact = variant === "compact";
 
-  const aspectClass = "aspect-[2/3]";
+  const aspectClass = "aspect-square md:aspect-[2/3]";
   const titleSize = isFeatured
     ? "text-2xl"
     : isCompact
