@@ -3,7 +3,7 @@ import ClientDashboard from "@/components/dashboard/ClientDashboard";
 
 export const metadata = {
   title: "Dashboard | GTClicks",
-
+};
 
 export default async function DashboardPage() {
   // 1. Verificar autenticação

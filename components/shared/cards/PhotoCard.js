@@ -1,5 +1,7 @@
 "use client";
 
+import { useContext } from "react";
+import { SelectionContext } from "@/features/collections/context/SelectionContext";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -32,12 +34,20 @@ export default function PhotoCard({
   showQuickAdd = true,
   customActions,
   onAddToCart,
-  onSelect,
-  isSelected = false,
+  onSelect: propOnSelect,
+  isSelected: propIsSelected = false,
   className,
   contextList = [],
 }) {
   const { openPhoto } = usePhotoModal();
+  const selectionContext = useContext(SelectionContext);
+
+  // Derived state: Use props if provided, otherwise fallback to context
+  const isSelected = propOnSelect
+    ? propIsSelected
+    : selectionContext?.selectedIds?.has(photo.id);
+  const onSelect =
+    propOnSelect || ((id) => selectionContext?.toggleSelection(id));
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
@@ -128,21 +138,28 @@ export default function PhotoCard({
           </div>
         )}
 
-        {/* Default Selection Checkbox (Hide if centered-hover) */}
-        {showSelection && variant !== "centered-hover" && (
-          <div className="absolute top-4 left-4 z-20">
+        {/* Selection Checkbox */}
+        {showSelection && (
+          <div
+            className={cn(
+              "absolute top-4 left-4 z-30 transition-all duration-200",
+              variant === "centered-hover" && !isSelected
+                ? "opacity-0 group-hover:opacity-100"
+                : "opacity-100"
+            )}
+          >
             <button
               onClick={handleSelection}
               className={cn(
-                "h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg",
+                "h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-sm z-50",
                 isSelected
-                  ? "bg-primary border-primary text-white scale-110"
-                  : "bg-black/40 border-white/50 text-transparent hover:bg-black/60 hover:border-white"
+                  ? "bg-zinc-900 border-zinc-900 text-white scale-110 shadow-black/20"
+                  : "bg-black/50 border-white/50 text-white/80 hover:bg-black/80 hover:border-white hover:text-white hover:scale-105"
               )}
               aria-label={isSelected ? "Desselecionar foto" : "Selecionar foto"}
               aria-pressed={isSelected}
             >
-              <Check className="h-5 w-5 stroke-[3]" />
+              <Check className="h-4 w-4 stroke-[4]" />
             </button>
           </div>
         )}

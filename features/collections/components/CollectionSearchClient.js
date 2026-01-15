@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom';
 import { Search, X, CheckSquare, ShoppingCart, PlusCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import FaceSearchModal from './FaceSearchModal';
 import { useCart } from '@/features/cart/context/CartContext';
 import { toast } from 'sonner';
 import { SelectionContext } from '../context/SelectionContext';
@@ -58,7 +57,18 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
         setSelectedIds(new Set());
     };
 
-    // ... (filteredPhotos memo remains same as it already searches by number)
+    const filteredPhotos = useMemo(() => {
+        if (!query.trim()) return [];
+        const lowerQuery = query.toLowerCase().trim();
+        
+        return allPhotos.filter(photo => {
+            // Priority: Sequential Number match
+            const bibMatch = photo.numeroSequencial && photo.numeroSequencial.toString() === lowerQuery;
+            const bibMatchPartial = photo.numeroSequencial && photo.numeroSequencial.toString().includes(lowerQuery);
+            
+            return bibMatch || bibMatchPartial;
+        });
+    }, [allPhotos, query]);
 
     // Adapter for shared PhotoCard props
     const handleSelect = (id) => toggleSelection(id);
@@ -97,7 +107,6 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
                             </button>
                         )}
                     </div>
-                    <FaceSearchModal collectionId={collectionId} />
                 </div>
 
                 {query ? (
@@ -175,6 +184,3 @@ export default function CollectionSearchClient({ allPhotos = [], collectionId, c
         </SelectionContext.Provider>
     );
 }
-
-
-

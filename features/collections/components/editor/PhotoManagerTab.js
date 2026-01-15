@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, Trash2, Sparkles, Loader2 } from 'lucide-react';
+import { UploadCloud, Trash2 } from 'lucide-react';
 import FolderManager from '../FolderManager';
 import Breadcrumbs from '@/components/shared/Breadcrumbs';
 import PhotoEditorCard from './PhotoEditorCard';
@@ -14,16 +14,12 @@ export default function PhotoManagerTab({
   currentPhotos,
   collectionData,
   uploadState,
-  analyzingId,
-  analyzingCollection,
   onNavigate,
-  onAnalyzeCollection,
   onDeleteAllInFolder,
   onBulkUpload,
   onSetCover,
   onRemovePhoto,
-  onUpdatePhoto,
-  onAnalyzePhoto
+  onUpdatePhoto
 }) {
   return (
     <Card>
@@ -54,16 +50,6 @@ export default function PhotoManagerTab({
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium">Fotos nesta pasta ({currentPhotos.length})</h3>
               <div className="flex gap-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 border-yellow-500/20 gap-2"
-                  onClick={onAnalyzeCollection}
-                  disabled={analyzingCollection}
-                >
-                  {analyzingCollection ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                  IA na Capa
-                </Button>
                 {currentPhotos.length > 0 && (
                   <Button variant="outline" size="sm" onClick={onDeleteAllInFolder} className="text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
                     <Trash2 className="mr-2 h-3 w-3" /> Limpar Pasta
@@ -101,11 +87,9 @@ export default function PhotoManagerTab({
                   photo={photo}
                   isCover={collectionData.capaUrl === photo.previewUrl}
                   uploadState={uploadState}
-                  analyzingId={analyzingId}
                   onSetCover={onSetCover}
                   onRemove={onRemovePhoto}
                   onUpdate={onUpdatePhoto}
-                  onAnalyze={onAnalyzePhoto}
                 />
               ))}
             </div>

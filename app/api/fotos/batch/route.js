@@ -15,7 +15,6 @@ function resolveOrientation(value) {
 
 import { getAuthenticatedUser } from "@/lib/auth";
 import { deleteManyFromS3 } from "@/lib/s3-delete";
-import { indexFace } from "@/lib/rekognition";
 
 export async function POST(request) {
   const user = await getAuthenticatedUser();
@@ -200,29 +199,6 @@ export async function POST(request) {
             }
           },
         });
-
-        // Trigger Face Indexing (Async)
-        // We don't await this to keep the UI response fast, or we await if we want to ensure it happens.
-        // For reliability, let's await it but catch errors so we don't fail the batch.
-        try {
-            await indexFace({
-                s3Object: {
-                    Bucket: process.env.S3_UPLOAD_BUCKET,
-                    Name: foto.s3Key
-                }
-            }, processedFoto.id);
-            
-            await prisma.foto.update({
-                where: { id: processedFoto.id },
-                data: { indexingStatus: 'INDEXED' }
-            });
-        } catch (idxError) {
-            console.error("Failed to index face for photo:", processedFoto.id, idxError);
-            await prisma.foto.update({
-                where: { id: processedFoto.id },
-                data: { indexingStatus: 'FAILED' }
-            });
-        }
       }
 
       processedFotos.push(processedFoto);
