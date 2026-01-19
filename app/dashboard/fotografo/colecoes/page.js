@@ -24,14 +24,15 @@ const formatDate = (date) => {
 };
 
 export default async function MinhasColecoesPage() {
-  const user = await stackServerApp.getUser();
+  let user;
+  try {
+    user = await stackServerApp.getUser();
+  } catch (error) {
+    console.error("Error fetching user:", error);
+  }
 
   if (!user) {
-    return (
-      <div className="container">
-        <p>Você precisa estar logado para acessar esta página.</p>
-      </div>
-    );
+    redirect("/login?callbackUrl=/dashboard/fotografo/colecoes");
   }
 
   const fotografo = await prisma.fotografo.findUnique({

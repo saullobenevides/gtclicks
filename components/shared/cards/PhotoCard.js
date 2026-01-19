@@ -106,7 +106,7 @@ export default function PhotoCard({
         {/* Gradient Overlay */}
         <div
           className={cn(
-            "absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent",
+            "absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent",
             isSelected ? "opacity-60 bg-primary/20" : "opacity-80",
             variant === "centered-hover"
               ? "opacity-0 group-hover:opacity-40 transition-opacity duration-300 bg-black"
@@ -146,7 +146,7 @@ export default function PhotoCard({
                   }
                 >
                   {isSelected ? (
-                    <Check className="h-6 w-6 stroke-[3]" />
+                    <Check className="h-6 w-6 stroke-3" />
                   ) : (
                     <ShoppingCart className="h-6 w-6" />
                   )}
@@ -173,7 +173,7 @@ export default function PhotoCard({
                   }
                 >
                   {isSelected ? (
-                    <Check className="h-5 w-5 stroke-[3]" />
+                    <Check className="h-5 w-5 stroke-3" />
                   ) : (
                     <ShoppingCart className="h-5 w-5" />
                   )}
@@ -202,7 +202,7 @@ export default function PhotoCard({
               aria-label={isSelected ? "Desselecionar foto" : "Selecionar foto"}
               aria-pressed={isSelected}
             >
-              <Check className="h-4 w-4 stroke-[4]" />
+              <Check className="h-4 w-4 stroke-4" />
             </button>
           </div>
         )}

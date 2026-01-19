@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -34,9 +35,11 @@ export default function CollectionHero({ collection }) {
         {/* Location */}
         {collection.location && (
           <div className="flex items-center gap-2 text-sm md:text-base text-gray-200">
-            <img
+            <Image
               src="/icons/icon-location.png"
               alt="Localização"
+              width={20}
+              height={20}
               className="h-5 w-5 object-contain"
             />
             <span>{collection.location}</span>
@@ -46,9 +49,11 @@ export default function CollectionHero({ collection }) {
         {/* Date */}
         {collection.eventDate && (
           <div className="flex items-center gap-2 text-sm md:text-base text-gray-200">
-            <img
+            <Image
               src="/icons/icon-calendar.png"
               alt="Data"
+              width={20}
+              height={20}
               className="h-5 w-5 object-contain"
             />
             <span>{formatDateLong(collection.eventDate)}</span>

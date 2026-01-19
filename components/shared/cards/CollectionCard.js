@@ -76,14 +76,14 @@ export default function CollectionCard({
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
           ) : (
-            <div className="h-full w-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
+            <div className="h-full w-full bg-linear-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
               <ImageIconLucide className="h-12 w-12 text-zinc-700" />
             </div>
           )}
         </div>
 
         {/* Overlay Gradient */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80" />
+        <div className="absolute inset-0 z-10 bg-linear-to-t from-black/90 via-black/40 to-transparent opacity-80" />
 
         {/* Badges */}
         {badges.length > 0 && (

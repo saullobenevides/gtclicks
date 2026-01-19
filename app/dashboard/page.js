@@ -1,5 +1,7 @@
 import { stackServerApp } from "@/stack/server";
 import ClientDashboard from "@/components/dashboard/ClientDashboard";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
 
 export const metadata = {
   title: "Dashboard | GTClicks",
@@ -7,15 +9,21 @@ export const metadata = {
 
 export default async function DashboardPage() {
   // 1. Verificar autenticação
-  const user = await stackServerApp.getUser();
+  let user;
+  try {
+    user = await stackServerApp.getUser();
+  } catch (error) {
+    console.error("Error fetching user from Stack Auth:", error);
+    // If error occurs, user remains undefined/null, triggering redirect below
+  }
 
   if (!user) {
-    redirect("/handler/sign-in");
+    redirect("/login?callbackUrl=/dashboard");
   }
 
   // 2. Verificar role no nosso banco
   const dbUser = await prisma.user.findUnique({
-    where: { email: user.primaryEmail },
+    where: { id: user.id },
     include: { fotografo: true },
   });
 

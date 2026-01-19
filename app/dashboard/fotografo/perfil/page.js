@@ -8,10 +8,15 @@ export const metadata = {
 };
 
 export default async function ProfilePage() {
-  const user = await stackServerApp.getUser();
+  let user;
+  try {
+    user = await stackServerApp.getUser();
+  } catch (error) {
+    console.error("Error fetching user:", error);
+  }
 
   if (!user) {
-    redirect("/login");
+    redirect("/login?callbackUrl=/dashboard/fotografo/perfil");
   }
 
   const photographer = await prisma.fotografo.findUnique({
@@ -31,7 +36,7 @@ export default async function ProfilePage() {
           Gerencie suas informações públicas e dados de recebimento.
         </p>
       </div>
-      
+
       <PhotographerProfileForm photographer={photographer} />
     </div>
   );
