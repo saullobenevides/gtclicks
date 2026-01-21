@@ -27,7 +27,7 @@ export default function PricingTab({
           Defina o valor base e descontos progressivos.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-8">
+      <CardContent className="space-y-6">
         <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4">
           <Label
             htmlFor="price-base"

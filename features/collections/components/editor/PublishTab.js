@@ -60,7 +60,7 @@ export default function PublishTab({
         </div>
 
         {initialCollection.slug && (
-          <div className="bg-muted/50 rounded-lg space-y-2">
+          <div className="bg-muted/50 rounded-lg space-y-2 p-4">
             <Label>Link Público</Label>
             <div className="flex gap-2 w-full max-w-full min-w-0">
               <Input

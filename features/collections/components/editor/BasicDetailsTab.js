@@ -31,7 +31,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
           Informações básicas para identificar o evento.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-6">
+      <CardContent className="space-y-6">
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label htmlFor="collection-name">Título da Coleção</Label>
