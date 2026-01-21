@@ -169,6 +169,73 @@ async function main() {
         },
       },
     },
+    {
+      data: {
+        nome: "Corrida São Paulo 2024",
+        slug: "corrida-sao-paulo-2024",
+        descricao: "Fotos da corrida de rua em São Paulo",
+        capaUrl:
+          "https://images.unsplash.com/photo-1552674605-469523f54050?auto=compress&fit=crop&w=900&q=80",
+        fotografoId: marinaProfile.id,
+        precoFoto: 10.0,
+        status: "PUBLICADA",
+        descontos: [{ min: 5, price: 9.0 }, { min: 10, price: 8.0 }],
+        fotos: {
+          create: [
+            {
+              titulo: "Chegada dos Atletas",
+              slug: "chegada-atletas",
+              descricao: "Atletas cruzando a linha de chegada.",
+              tags: ["esporte", "corrida"],
+              orientacao: OrientacaoFoto.HORIZONTAL,
+              corPredominante: "vermelho",
+              numeroSequencial: 1234,
+              previewUrl:
+                "https://images.unsplash.com/photo-1552674605-469523f54050?auto=compress",
+              s3Key: "uploads/chegada-atletas.jpg",
+              width: 800,
+              height: 600,
+              formato: "jpg",
+              tamanhoBytes: 102400,
+              status: "PUBLICADA",
+            },
+            {
+              titulo: "Linha de Chegada",
+              slug: "linha-chegada",
+              descricao: "Detalhe da fita de chegada.",
+              tags: ["esporte", "detalhe"],
+              orientacao: OrientacaoFoto.HORIZONTAL,
+              corPredominante: "verde",
+              numeroSequencial: 5678,
+              previewUrl:
+                "https://images.unsplash.com/photo-1516731415730-18fb73d57879?auto=compress",
+              s3Key: "uploads/linha-chegada.jpg",
+              width: 800,
+              height: 600,
+              formato: "jpg",
+              tamanhoBytes: 102400,
+              status: "PUBLICADA",
+            },
+            {
+              titulo: "Pódio",
+              slug: "podio",
+              descricao: "Vencedores no pódio.",
+              tags: ["esporte", "podio"],
+              orientacao: OrientacaoFoto.HORIZONTAL,
+              corPredominante: "azul",
+              previewUrl:
+                "https://images.unsplash.com/photo-1565992441121-4367c2967103?auto=compress",
+              s3Key: "uploads/podio.jpg",
+              width: 800,
+              height: 600,
+              formato: "jpg",
+              tamanhoBytes: 102400,
+              status: "PUBLICADA",
+            },
+          ],
+        },
+      },
+    },
   ];
 
   const createdColecoes = [];

@@ -1,0 +1,142 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e12]
+  - banner [ref=e13]:
+    - generic [ref=e14]:
+      - link "GTClicks Logo" [ref=e15] [cursor=pointer]:
+        - /url: /
+        - img "GTClicks Logo" [ref=e17]
+      - navigation
+      - navigation [ref=e18]:
+        - link "Explorar" [ref=e19] [cursor=pointer]:
+          - /url: /busca
+        - link "Categorias" [ref=e20] [cursor=pointer]:
+          - /url: /categorias
+        - link "Coleções" [ref=e21] [cursor=pointer]:
+          - /url: /colecoes
+      - generic [ref=e22]:
+        - link [ref=e23] [cursor=pointer]:
+          - /url: /busca
+          - img
+        - link [ref=e24] [cursor=pointer]:
+          - /url: /meus-favoritos
+          - img
+        - button [ref=e25] [cursor=pointer]:
+          - img
+        - link "Entrar" [ref=e28] [cursor=pointer]:
+          - /url: /login
+  - main [ref=e29]:
+    - generic [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]: Coleções
+        - heading "Séries Exclusivas" [level=1] [ref=e34]
+        - paragraph [ref=e35]: Navegue por coleções completas com curadoria especial. Encontre a narrativa visual perfeita para sua marca ou projeto.
+      - generic [ref=e36]:
+        - link "Ver coleção Condomínio" [ref=e37] [cursor=pointer]:
+          - /url: /colecoes/condominio
+          - generic "Ver coleção Condomínio" [ref=e38]:
+            - img "Condomínio" [ref=e41]
+            - generic [ref=e44]:
+              - heading "Condomínio" [level=3] [ref=e45]
+              - generic [ref=e47]:
+                - img [ref=e48]
+                - text: 14 fotos
+        - link "Ver coleção Nova Coleção" [ref=e52] [cursor=pointer]:
+          - /url: /colecoes/nova-colecao
+          - generic "Ver coleção Nova Coleção" [ref=e53]:
+            - img "Nova Coleção" [ref=e56]
+            - generic [ref=e59]:
+              - heading "Nova Coleção" [level=3] [ref=e60]
+              - generic [ref=e62]:
+                - img [ref=e63]
+                - text: 23 fotos
+        - link "Ver coleção Corrida" [ref=e67] [cursor=pointer]:
+          - /url: /colecoes/corrida
+          - generic "Ver coleção Corrida" [ref=e68]:
+            - img "Corrida" [ref=e71]
+            - generic [ref=e74]:
+              - heading "Corrida" [level=3] [ref=e75]
+              - generic [ref=e77]:
+                - img [ref=e78]
+                - text: 1 foto
+        - link "Ver coleção Minha Primeira Coleção" [ref=e82] [cursor=pointer]:
+          - /url: /colecoes/minha-primeira-colecao
+          - generic "Ver coleção Minha Primeira Coleção" [ref=e83]:
+            - img "Minha Primeira Coleção" [ref=e86]
+            - generic [ref=e89]:
+              - heading "Minha Primeira Coleção" [level=3] [ref=e90]
+              - generic [ref=e92]:
+                - img [ref=e93]
+                - text: 9 fotos
+  - contentinfo [ref=e97]:
+    - generic [ref=e98]:
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - link "GTClicks Logo" [ref=e101] [cursor=pointer]:
+            - /url: /
+            - img "GTClicks Logo" [ref=e103]
+          - paragraph [ref=e104]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
+          - generic [ref=e105]:
+            - link [ref=e106] [cursor=pointer]:
+              - /url: https://instagram.com/gt.clicks
+              - img [ref=e107]
+            - link [ref=e111] [cursor=pointer]:
+              - /url: https://youtube.com/@gtclicks
+              - img [ref=e112]
+            - link [ref=e115] [cursor=pointer]:
+              - /url: https://twitter.com/gtclicks
+              - img [ref=e116]
+            - link [ref=e118] [cursor=pointer]:
+              - /url: https://tiktok.com/@gtclicks
+              - img [ref=e119]
+        - generic [ref=e121]:
+          - heading "Plataforma" [level=4] [ref=e122]
+          - list [ref=e123]:
+            - listitem [ref=e124]:
+              - link "Explorar Fotos" [ref=e125] [cursor=pointer]:
+                - /url: /busca
+            - listitem [ref=e126]:
+              - link "Coleções" [ref=e127] [cursor=pointer]:
+                - /url: /colecoes
+            - listitem [ref=e128]:
+              - link "Categorias" [ref=e129] [cursor=pointer]:
+                - /url: /categorias
+            - listitem [ref=e130]:
+              - link "Meus Favoritos" [ref=e131] [cursor=pointer]:
+                - /url: /meus-favoritos
+        - generic [ref=e132]:
+          - heading "Fotógrafos" [level=4] [ref=e133]
+          - list [ref=e134]:
+            - listitem [ref=e135]:
+              - link "Começar a Vender" [ref=e136] [cursor=pointer]:
+                - /url: /cadastro
+            - listitem [ref=e137]:
+              - link "Fazer Upload" [ref=e138] [cursor=pointer]:
+                - /url: /dashboard/fotografo/colecoes
+            - listitem [ref=e139]:
+              - link "Painel Financeiro" [ref=e140] [cursor=pointer]:
+                - /url: /dashboard/fotografo/financeiro
+        - generic [ref=e141]:
+          - heading "Suporte" [level=4] [ref=e142]
+          - list [ref=e143]:
+            - listitem [ref=e144]:
+              - link "Perguntas Frequentes" [ref=e145] [cursor=pointer]:
+                - /url: /faq
+            - listitem [ref=e146]:
+              - link "Termos de Uso" [ref=e147] [cursor=pointer]:
+                - /url: /termos
+            - listitem [ref=e148]:
+              - link "Privacidade" [ref=e149] [cursor=pointer]:
+                - /url: /privacidade
+            - listitem [ref=e150]:
+              - link "Fale Conosco" [ref=e151] [cursor=pointer]:
+                - /url: /contato
+      - generic [ref=e152]:
+        - paragraph [ref=e153]: © 2026 GTClicks. Todos os direitos reservados.
+        - generic [ref=e155]: Feito com ❤️ para criadores
+  - region "Notifications alt+T"
+```

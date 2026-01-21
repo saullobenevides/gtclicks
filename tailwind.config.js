@@ -2,7 +2,7 @@ import tailwindcssAnimate from "tailwindcss-animate";
 import aspectRatio from "@tailwindcss/aspect-ratio";
 
 /** @type {import('tailwindcss').Config} */
-export default {
+const config = {
   darkMode: "class",
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -19,9 +19,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-geist-sans)'], // Note: 'inter' variable is unused in this config but used in layout? keeping original
-        mono: ['var(--font-geist-mono)'],
-        display: ['var(--font-syne)', 'sans-serif'],
+        sans: ["var(--font-geist-sans)"], // Note: 'inter' variable is unused in this config but used in layout? keeping original
+        mono: ["var(--font-geist-mono)"],
+        display: ["var(--font-syne)", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border) / <alpha-value>)",
@@ -81,3 +81,5 @@ export default {
   },
   plugins: [tailwindcssAnimate, aspectRatio],
 };
+
+export default config;

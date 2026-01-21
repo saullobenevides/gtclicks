@@ -1,0 +1,135 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]
+  - banner [ref=e12]:
+    - generic [ref=e13]:
+      - link "GTClicks Logo" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img "GTClicks Logo" [ref=e16]
+      - generic [ref=e17]:
+        - button [ref=e18] [cursor=pointer]:
+          - img
+        - button [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+  - generic:
+    - generic:
+      - generic:
+        - generic: Menu
+        - button:
+          - img
+      - generic:
+        - link "Explorar":
+          - /url: /busca
+        - link "Categorias":
+          - /url: /categorias
+        - link "Coleções":
+          - /url: /colecoes
+        - separator
+        - link "Meus Favoritos":
+          - /url: /meus-favoritos
+          - img
+          - text: Meus Favoritos
+        - generic:
+          - generic:
+            - link "Entrar":
+              - /url: /login
+            - link "Criar Conta":
+              - /url: /login
+  - main [ref=e21]:
+    - generic [ref=e23]:
+      - heading "404" [level=1] [ref=e24]
+      - heading "This page could not be found." [level=2] [ref=e26]
+  - contentinfo [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - link "GTClicks Logo" [ref=e31] [cursor=pointer]:
+            - /url: /
+            - img "GTClicks Logo" [ref=e33]
+          - paragraph [ref=e34]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
+          - generic [ref=e35]:
+            - link [ref=e36] [cursor=pointer]:
+              - /url: https://instagram.com/gt.clicks
+              - img [ref=e37]
+            - link [ref=e40] [cursor=pointer]:
+              - /url: https://youtube.com/@gtclicks
+              - img [ref=e41]
+            - link [ref=e44] [cursor=pointer]:
+              - /url: https://twitter.com/gtclicks
+              - img [ref=e45]
+            - link [ref=e47] [cursor=pointer]:
+              - /url: https://tiktok.com/@gtclicks
+              - img [ref=e48]
+        - generic [ref=e50]:
+          - heading "Plataforma" [level=4] [ref=e51]
+          - list [ref=e52]:
+            - listitem [ref=e53]:
+              - link "Explorar Fotos" [ref=e54] [cursor=pointer]:
+                - /url: /busca
+            - listitem [ref=e55]:
+              - link "Coleções" [ref=e56] [cursor=pointer]:
+                - /url: /colecoes
+            - listitem [ref=e57]:
+              - link "Categorias" [ref=e58] [cursor=pointer]:
+                - /url: /categorias
+            - listitem [ref=e59]:
+              - link "Meus Favoritos" [ref=e60] [cursor=pointer]:
+                - /url: /meus-favoritos
+        - generic [ref=e61]:
+          - heading "Fotógrafos" [level=4] [ref=e62]
+          - list [ref=e63]:
+            - listitem [ref=e64]:
+              - link "Começar a Vender" [ref=e65] [cursor=pointer]:
+                - /url: /cadastro
+            - listitem [ref=e66]:
+              - link "Fazer Upload" [ref=e67] [cursor=pointer]:
+                - /url: /dashboard/fotografo/colecoes
+            - listitem [ref=e68]:
+              - link "Painel Financeiro" [ref=e69] [cursor=pointer]:
+                - /url: /dashboard/fotografo/financeiro
+        - generic [ref=e70]:
+          - heading "Suporte" [level=4] [ref=e71]
+          - list [ref=e72]:
+            - listitem [ref=e73]:
+              - link "Perguntas Frequentes" [ref=e74] [cursor=pointer]:
+                - /url: /faq
+            - listitem [ref=e75]:
+              - link "Termos de Uso" [ref=e76] [cursor=pointer]:
+                - /url: /termos
+            - listitem [ref=e77]:
+              - link "Privacidade" [ref=e78] [cursor=pointer]:
+                - /url: /privacidade
+            - listitem [ref=e79]:
+              - link "Fale Conosco" [ref=e80] [cursor=pointer]:
+                - /url: /contato
+      - generic [ref=e81]:
+        - paragraph [ref=e82]: © 2026 GTClicks. Todos os direitos reservados.
+        - generic [ref=e84]: Feito com ❤️ para criadores
+  - region "Notifications alt+T"
+  - navigation [ref=e85]:
+    - generic [ref=e86]:
+      - link "Início" [ref=e87] [cursor=pointer]:
+        - /url: /
+        - img [ref=e89]
+        - generic [ref=e92]: Início
+      - link "Buscar" [ref=e93] [cursor=pointer]:
+        - /url: /busca
+        - img [ref=e95]
+        - generic [ref=e98]: Buscar
+      - link "Carrinho" [ref=e99] [cursor=pointer]:
+        - /url: /carrinho
+        - img [ref=e101]
+        - generic [ref=e105]: Carrinho
+      - link "Favoritos" [ref=e106] [cursor=pointer]:
+        - /url: /meus-favoritos
+        - img [ref=e108]
+        - generic [ref=e110]: Favoritos
+      - link "Perfil" [ref=e111] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e113]
+        - generic [ref=e116]: Perfil
+```

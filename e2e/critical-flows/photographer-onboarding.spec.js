@@ -7,7 +7,7 @@ test.describe('Photographer Onboarding Flow', () => {
     await page.goto('/dashboard/fotografo');
 
     // Verify registration form is displayed
-    await expect(page.getByText(/Cadastro|Perfil de Fotógrafo/i)).toBeVisible();
+    await expect(page.getByText('Vamos criar sua identidade')).toBeVisible();
 
     // STEP 1: Identidade (Identity)
     await expect(page.getByText(/Identidade|Passo 1/i)).toBeVisible();
@@ -127,7 +127,7 @@ test.describe('Photographer Dashboard Navigation', () => {
     await page.goto('/dashboard/fotografo');
 
     // Wait for dashboard to load
-    await expect(page.getByText(/Dashboard|Início/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Visão Geral')).toBeVisible({ timeout: 10000 });
 
     // Test navigation to "Minhas Coleções"
     const collectionsLink = page.locator('a:has-text("Minhas Coleções"), nav a:has-text("Coleções")').first();
@@ -169,7 +169,7 @@ test.describe('Photographer Dashboard Navigation', () => {
     await page.goto('/dashboard/fotografo');
 
     // Verify statistics are displayed (if available on the page)
-    const statsSection = page.locator('text=/coleções|fotos|vendas/i').first();
+    const statsSection = page.getByText('Visão Geral');
     await expect(statsSection).toBeVisible({ timeout: 5000 });
   });
 });

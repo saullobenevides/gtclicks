@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 /**
  * EmptyState - Componente padronizado para estados vazios
- * 
+ *
  * @param {Object} props
  * @param {React.ComponentType} props.icon - Ícone do Lucide React
  * @param {string} props.title - Título do estado vazio
@@ -25,14 +26,14 @@ export default function EmptyState({
   description,
   action,
   illustration,
-  variant = 'default',
-  className
+  variant = "default",
+  className,
 }) {
-  const isMinimal = variant === 'minimal';
-  const isIllustrated = variant === 'illustrated';
+  const isMinimal = variant === "minimal";
+  const isIllustrated = variant === "illustrated";
 
   const content = (
-    <div 
+    <div
       className={cn(
         "flex flex-col items-center justify-center text-center",
         isMinimal ? "py-8" : "py-16",
@@ -43,60 +44,64 @@ export default function EmptyState({
       {/* Icon or Illustration */}
       {isIllustrated && illustration ? (
         <div className="mb-6">
-          <img 
-            src={illustration} 
-            alt="" 
-            className="h-48 w-48 opacity-50" 
+          <Image
+            src={illustration}
+            alt=""
+            className="h-48 w-48 opacity-50"
             aria-hidden="true"
           />
         </div>
-      ) : Icon && (
-        <div className={cn(
-          "rounded-full bg-muted flex items-center justify-center mb-6",
-          isMinimal ? "h-12 w-12" : "h-16 w-16"
-        )}>
-          <Icon className={cn(
-            "text-muted-foreground",
-            isMinimal ? "h-6 w-6" : "h-8 w-8"
-          )} />
-        </div>
+      ) : (
+        Icon && (
+          <div
+            className={cn(
+              "rounded-full bg-muted flex items-center justify-center mb-6",
+              isMinimal ? "h-12 w-12" : "h-16 w-16"
+            )}
+          >
+            <Icon
+              className={cn(
+                "text-muted-foreground",
+                isMinimal ? "h-6 w-6" : "h-8 w-8"
+              )}
+            />
+          </div>
+        )
       )}
 
       {/* Title */}
-      <h3 className={cn(
-        "font-semibold text-foreground mb-2",
-        isMinimal ? "text-base" : "text-xl"
-      )}>
+      <h3
+        className={cn(
+          "font-semibold text-foreground mb-2",
+          isMinimal ? "text-base" : "text-xl"
+        )}
+      >
         {title}
       </h3>
 
       {/* Description */}
       {description && (
-        <p className={cn(
-          "text-muted-foreground max-w-md",
-          isMinimal ? "text-sm mb-4" : "text-base mb-6"
-        )}>
+        <p
+          className={cn(
+            "text-muted-foreground max-w-md",
+            isMinimal ? "text-sm mb-4" : "text-base mb-6"
+          )}
+        >
           {description}
         </p>
       )}
 
       {/* Action Button */}
-      {action && (
-        action.href ? (
+      {action &&
+        (action.href ? (
           <Button asChild size={isMinimal ? "default" : "lg"}>
-            <Link href={action.href}>
-              {action.label}
-            </Link>
+            <Link href={action.href}>{action.label}</Link>
           </Button>
         ) : (
-          <Button 
-            onClick={action.onClick}
-            size={isMinimal ? "default" : "lg"}
-          >
+          <Button onClick={action.onClick} size={isMinimal ? "default" : "lg"}>
             {action.label}
           </Button>
-        )
-      )}
+        ))}
     </div>
   );
 

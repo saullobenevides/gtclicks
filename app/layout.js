@@ -77,7 +77,12 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning className="dark">
+    <html
+      lang="pt-BR"
+      suppressHydrationWarning
+      className="dark"
+      data-scroll-behavior="smooth"
+    >
       <body
         className={`${inter.className} ${syne.variable} font-sans antialiased min-h-screen flex flex-col bg-black text-foreground`}
       >

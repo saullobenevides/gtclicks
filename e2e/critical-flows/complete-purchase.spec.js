@@ -28,7 +28,7 @@ test.describe('Complete Purchase Flow', () => {
 
     // Step 2: Browse collections
     await page.goto('/colecoes');
-    await expect(page.getByText(/Coleções/i)).toBeVisible();
+    await expect(page.getByText('Séries Exclusivas')).toBeVisible();
 
     // Step 3: Click on a collection
     const collectionLink = page.locator(`a[href*="/colecoes/${TEST_COLLECTIONS.sportsEvent.slug}"]`).first();
@@ -36,20 +36,28 @@ test.describe('Complete Purchase Flow', () => {
     await page.waitForURL(`**/colecoes/${TEST_COLLECTIONS.sportsEvent.slug}`);
 
     // Step 4: Add first photo to cart
-    const firstAddButton = page.locator('button:has-text("carrinho"), button[title*="carrinho"]').first();
-    await firstAddButton.click();
+    const firstCard = page.locator('[data-testid="photo-card"]').nth(0);
+    await firstCard.hover();
+    await firstCard.locator('button[title="Selecionar para comprar"]').click({ force: true });
+    await page.locator('button:has-text("Adicionar")').click();
     
     // Verify cart badge updated
     await expect(page.locator('[data-testid="cart-badge"], .cart-badge').first()).toContainText('1');
 
     // Step 5: Add second photo to cart
-    const secondAddButton = page.locator('button:has-text("carrinho"), button[title*="carrinho"]').nth(1);
-    await secondAddButton.click();
+    const secondCard = page.locator('[data-testid="photo-card"]').nth(1);
+    await secondCard.hover();
+    await secondCard.locator('button[title="Selecionar para comprar"]').click({ force: true });
+    await page.locator('button:has-text("Adicionar")').click();
+    
     await expect(page.locator('[data-testid="cart-badge"], .cart-badge').first()).toContainText('2');
 
     // Step 6: Add third photo to cart
-    const thirdAddButton = page.locator('button:has-text("carrinho"), button[title*="carrinho"]').nth(2);
-    await thirdAddButton.click();
+    const thirdCard = page.locator('[data-testid="photo-card"]').nth(2);
+    await thirdCard.hover();
+    await thirdCard.locator('button[title="Selecionar para comprar"]').click({ force: true });
+    await page.locator('button:has-text("Adicionar")').click();
+    
     await expect(page.locator('[data-testid="cart-badge"], .cart-badge').first()).toContainText('3');
 
     // Step 7: Navigate to cart page
@@ -81,8 +89,11 @@ test.describe('Complete Purchase Flow', () => {
 
     // Add 3 photos sequentially
     for (let i = 0; i < 3; i++) {
-      const addButton = page.locator('button:has-text("carrinho")').nth(i);
-      await addButton.click();
+      const card = page.locator('[data-testid="photo-card"]').nth(i);
+      await card.hover();
+      await card.locator('button[title="Selecionar para comprar"]').click({ force: true });
+      await page.locator('button:has-text("Adicionar")').click();
+      
       await page.waitForTimeout(300); // Wait for cart to update
       
       // Verify badge shows correct count
@@ -115,7 +126,7 @@ test.describe('Complete Purchase Flow', () => {
     await page.goto('/carrinho');
 
     // Verify discount is displayed
-    await expect(page.getByText(/desconto/i)).toBeVisible();
+    await expect(page.getByText(/Economia Progressiva/i)).toBeVisible();
     await expect(page.getByText(/5.*00|10%/i)).toBeVisible();
     
     // Verify final total with discount
@@ -126,10 +137,13 @@ test.describe('Complete Purchase Flow', () => {
     await page.goto(`/colecoes/${TEST_COLLECTIONS.sportsEvent.slug}`);
 
     // Add 2 photos
-    await page.locator('button:has-text("carrinho")').first().click();
-    await page.waitForTimeout(300);
-    await page.locator('button:has-text("carrinho")').nth(1).click();
-    await page.waitForTimeout(300);
+    for (let i = 0; i < 2; i++) {
+        const card = page.locator('[data-testid="photo-card"]').nth(i);
+        await card.hover();
+        await card.locator('button[title="Selecionar para comprar"]').click({ force: true });
+        await page.locator('button:has-text("Adicionar")').click();
+        await page.waitForTimeout(300);
+    }
 
     // Go to cart
     await page.goto('/carrinho');
@@ -176,7 +190,11 @@ test.describe('Complete Purchase Flow', () => {
 
     // Add item to cart first
     await page.goto(`/colecoes/${TEST_COLLECTIONS.sportsEvent.slug}`);
-    await page.locator('button:has-text("carrinho")').first().click();
+    
+    const card = page.locator('[data-testid="photo-card"]').first();
+    await card.hover();
+    await card.locator('button[title="Selecionar para comprar"]').click({ force: true });
+    await page.locator('button:has-text("Adicionar")').click();
 
     // Go to checkout
     await page.goto('/checkout');

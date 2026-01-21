@@ -1,0 +1,103 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e12]
+  - banner [ref=e13]:
+    - generic [ref=e14]:
+      - link "GTClicks Logo" [ref=e15] [cursor=pointer]:
+        - /url: /
+        - img "GTClicks Logo" [ref=e17]
+      - navigation
+      - navigation [ref=e18]:
+        - link "Explorar" [ref=e19] [cursor=pointer]:
+          - /url: /busca
+        - link "Categorias" [ref=e20] [cursor=pointer]:
+          - /url: /categorias
+        - link "Coleções" [ref=e21] [cursor=pointer]:
+          - /url: /colecoes
+      - generic [ref=e22]:
+        - link [ref=e23] [cursor=pointer]:
+          - /url: /busca
+          - img
+        - link [ref=e24] [cursor=pointer]:
+          - /url: /meus-favoritos
+          - img
+        - button [ref=e25] [cursor=pointer]:
+          - img
+        - link "Entrar" [ref=e28] [cursor=pointer]:
+          - /url: /login
+  - main [ref=e29]:
+    - generic [ref=e31]:
+      - heading "404" [level=1] [ref=e32]
+      - heading "This page could not be found." [level=2] [ref=e34]
+  - contentinfo [ref=e35]:
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - link "GTClicks Logo" [ref=e39] [cursor=pointer]:
+            - /url: /
+            - img "GTClicks Logo" [ref=e41]
+          - paragraph [ref=e42]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
+          - generic [ref=e43]:
+            - link [ref=e44] [cursor=pointer]:
+              - /url: https://instagram.com/gt.clicks
+              - img [ref=e45]
+            - link [ref=e49] [cursor=pointer]:
+              - /url: https://youtube.com/@gtclicks
+              - img [ref=e50]
+            - link [ref=e53] [cursor=pointer]:
+              - /url: https://twitter.com/gtclicks
+              - img [ref=e54]
+            - link [ref=e56] [cursor=pointer]:
+              - /url: https://tiktok.com/@gtclicks
+              - img [ref=e57]
+        - generic [ref=e59]:
+          - heading "Plataforma" [level=4] [ref=e60]
+          - list [ref=e61]:
+            - listitem [ref=e62]:
+              - link "Explorar Fotos" [ref=e63] [cursor=pointer]:
+                - /url: /busca
+            - listitem [ref=e64]:
+              - link "Coleções" [ref=e65] [cursor=pointer]:
+                - /url: /colecoes
+            - listitem [ref=e66]:
+              - link "Categorias" [ref=e67] [cursor=pointer]:
+                - /url: /categorias
+            - listitem [ref=e68]:
+              - link "Meus Favoritos" [ref=e69] [cursor=pointer]:
+                - /url: /meus-favoritos
+        - generic [ref=e70]:
+          - heading "Fotógrafos" [level=4] [ref=e71]
+          - list [ref=e72]:
+            - listitem [ref=e73]:
+              - link "Começar a Vender" [ref=e74] [cursor=pointer]:
+                - /url: /cadastro
+            - listitem [ref=e75]:
+              - link "Fazer Upload" [ref=e76] [cursor=pointer]:
+                - /url: /dashboard/fotografo/colecoes
+            - listitem [ref=e77]:
+              - link "Painel Financeiro" [ref=e78] [cursor=pointer]:
+                - /url: /dashboard/fotografo/financeiro
+        - generic [ref=e79]:
+          - heading "Suporte" [level=4] [ref=e80]
+          - list [ref=e81]:
+            - listitem [ref=e82]:
+              - link "Perguntas Frequentes" [ref=e83] [cursor=pointer]:
+                - /url: /faq
+            - listitem [ref=e84]:
+              - link "Termos de Uso" [ref=e85] [cursor=pointer]:
+                - /url: /termos
+            - listitem [ref=e86]:
+              - link "Privacidade" [ref=e87] [cursor=pointer]:
+                - /url: /privacidade
+            - listitem [ref=e88]:
+              - link "Fale Conosco" [ref=e89] [cursor=pointer]:
+                - /url: /contato
+      - generic [ref=e90]:
+        - paragraph [ref=e91]: © 2026 GTClicks. Todos os direitos reservados.
+        - generic [ref=e93]: Feito com ❤️ para criadores
+  - region "Notifications alt+T"
+```
