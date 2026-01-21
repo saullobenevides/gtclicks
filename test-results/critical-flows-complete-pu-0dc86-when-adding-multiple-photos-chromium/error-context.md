@@ -3,106 +3,101 @@
 ```yaml
 - generic [active] [ref=e1]:
   - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
-    - generic [ref=e10]:
-      - text: Compiling
-      - generic [ref=e11]:
-        - generic [ref=e12]: .
-        - generic [ref=e13]: .
-        - generic [ref=e14]: .
-  - alert [ref=e15]
-  - banner [ref=e16]:
-    - generic [ref=e17]:
-      - link "GTClicks Logo" [ref=e18] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]
+  - banner [ref=e12]:
+    - generic [ref=e13]:
+      - link "GTClicks Logo" [ref=e14] [cursor=pointer]:
         - /url: /
-        - img "GTClicks Logo" [ref=e20]
+        - img "GTClicks Logo" [ref=e16]
       - navigation
-      - navigation [ref=e21]:
-        - link "Explorar" [ref=e22] [cursor=pointer]:
+      - navigation [ref=e17]:
+        - link "Explorar" [ref=e18] [cursor=pointer]:
           - /url: /busca
-        - link "Categorias" [ref=e23] [cursor=pointer]:
+        - link "Categorias" [ref=e19] [cursor=pointer]:
           - /url: /categorias
-        - link "Coleções" [ref=e24] [cursor=pointer]:
+        - link "Coleções" [ref=e20] [cursor=pointer]:
           - /url: /colecoes
-      - generic [ref=e25]:
-        - link [ref=e26] [cursor=pointer]:
+      - generic [ref=e21]:
+        - link [ref=e22] [cursor=pointer]:
           - /url: /busca
           - img
-        - link [ref=e27] [cursor=pointer]:
+        - link [ref=e23] [cursor=pointer]:
           - /url: /meus-favoritos
           - img
-        - button [ref=e28] [cursor=pointer]:
+        - button [ref=e24] [cursor=pointer]:
           - img
-        - link "Entrar" [ref=e31] [cursor=pointer]:
+        - link "Entrar" [ref=e27] [cursor=pointer]:
           - /url: /login
-  - main [ref=e32]:
-    - generic [ref=e34]:
-      - heading "404" [level=1] [ref=e35]
-      - heading "This page could not be found." [level=2] [ref=e37]
-  - contentinfo [ref=e38]:
-    - generic [ref=e39]:
-      - generic [ref=e40]:
-        - generic [ref=e41]:
-          - link "GTClicks Logo" [ref=e42] [cursor=pointer]:
+  - main [ref=e28]:
+    - generic [ref=e30]:
+      - heading "404" [level=1] [ref=e31]
+      - heading "This page could not be found." [level=2] [ref=e33]
+  - contentinfo [ref=e34]:
+    - generic [ref=e35]:
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - link "GTClicks Logo" [ref=e38] [cursor=pointer]:
             - /url: /
-            - img "GTClicks Logo" [ref=e44]
-          - paragraph [ref=e45]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
-          - generic [ref=e46]:
-            - link [ref=e47] [cursor=pointer]:
+            - img "GTClicks Logo" [ref=e40]
+          - paragraph [ref=e41]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
+          - generic [ref=e42]:
+            - link [ref=e43] [cursor=pointer]:
               - /url: https://instagram.com/gt.clicks
+              - img [ref=e44]
+            - link [ref=e47] [cursor=pointer]:
+              - /url: https://youtube.com/@gtclicks
               - img [ref=e48]
             - link [ref=e51] [cursor=pointer]:
-              - /url: https://youtube.com/@gtclicks
-              - img [ref=e52]
-            - link [ref=e55] [cursor=pointer]:
               - /url: https://twitter.com/gtclicks
-              - img [ref=e56]
-            - link [ref=e58] [cursor=pointer]:
+              - img [ref=e52]
+            - link [ref=e54] [cursor=pointer]:
               - /url: https://tiktok.com/@gtclicks
-              - img [ref=e59]
-        - generic [ref=e61]:
-          - heading "Plataforma" [level=4] [ref=e62]
-          - list [ref=e63]:
-            - listitem [ref=e64]:
-              - link "Explorar Fotos" [ref=e65] [cursor=pointer]:
+              - img [ref=e55]
+        - generic [ref=e57]:
+          - heading "Plataforma" [level=4] [ref=e58]
+          - list [ref=e59]:
+            - listitem [ref=e60]:
+              - link "Explorar Fotos" [ref=e61] [cursor=pointer]:
                 - /url: /busca
-            - listitem [ref=e66]:
-              - link "Coleções" [ref=e67] [cursor=pointer]:
+            - listitem [ref=e62]:
+              - link "Coleções" [ref=e63] [cursor=pointer]:
                 - /url: /colecoes
-            - listitem [ref=e68]:
-              - link "Categorias" [ref=e69] [cursor=pointer]:
+            - listitem [ref=e64]:
+              - link "Categorias" [ref=e65] [cursor=pointer]:
                 - /url: /categorias
-            - listitem [ref=e70]:
-              - link "Meus Favoritos" [ref=e71] [cursor=pointer]:
+            - listitem [ref=e66]:
+              - link "Meus Favoritos" [ref=e67] [cursor=pointer]:
                 - /url: /meus-favoritos
-        - generic [ref=e72]:
-          - heading "Fotógrafos" [level=4] [ref=e73]
-          - list [ref=e74]:
-            - listitem [ref=e75]:
-              - link "Começar a Vender" [ref=e76] [cursor=pointer]:
+        - generic [ref=e68]:
+          - heading "Fotógrafos" [level=4] [ref=e69]
+          - list [ref=e70]:
+            - listitem [ref=e71]:
+              - link "Começar a Vender" [ref=e72] [cursor=pointer]:
                 - /url: /cadastro
-            - listitem [ref=e77]:
-              - link "Fazer Upload" [ref=e78] [cursor=pointer]:
+            - listitem [ref=e73]:
+              - link "Fazer Upload" [ref=e74] [cursor=pointer]:
                 - /url: /dashboard/fotografo/colecoes
-            - listitem [ref=e79]:
-              - link "Painel Financeiro" [ref=e80] [cursor=pointer]:
+            - listitem [ref=e75]:
+              - link "Painel Financeiro" [ref=e76] [cursor=pointer]:
                 - /url: /dashboard/fotografo/financeiro
-        - generic [ref=e81]:
-          - heading "Suporte" [level=4] [ref=e82]
-          - list [ref=e83]:
-            - listitem [ref=e84]:
-              - link "Perguntas Frequentes" [ref=e85] [cursor=pointer]:
+        - generic [ref=e77]:
+          - heading "Suporte" [level=4] [ref=e78]
+          - list [ref=e79]:
+            - listitem [ref=e80]:
+              - link "Perguntas Frequentes" [ref=e81] [cursor=pointer]:
                 - /url: /faq
-            - listitem [ref=e86]:
-              - link "Termos de Uso" [ref=e87] [cursor=pointer]:
+            - listitem [ref=e82]:
+              - link "Termos de Uso" [ref=e83] [cursor=pointer]:
                 - /url: /termos
-            - listitem [ref=e88]:
-              - link "Privacidade" [ref=e89] [cursor=pointer]:
+            - listitem [ref=e84]:
+              - link "Privacidade" [ref=e85] [cursor=pointer]:
                 - /url: /privacidade
-            - listitem [ref=e90]:
-              - link "Fale Conosco" [ref=e91] [cursor=pointer]:
+            - listitem [ref=e86]:
+              - link "Fale Conosco" [ref=e87] [cursor=pointer]:
                 - /url: /contato
-      - generic [ref=e92]:
-        - paragraph [ref=e93]: © 2026 GTClicks. Todos os direitos reservados.
-        - generic [ref=e95]: Feito com ❤️ para criadores
+      - generic [ref=e88]:
+        - paragraph [ref=e89]: © 2026 GTClicks. Todos os direitos reservados.
+        - generic [ref=e91]: Feito com ❤️ para criadores
   - region "Notifications alt+T"
 ```

@@ -3,136 +3,131 @@
 ```yaml
 - generic [active] [ref=e1]:
   - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
-    - generic [ref=e10]:
-      - text: Compiling
-      - generic [ref=e11]:
-        - generic [ref=e12]: .
-        - generic [ref=e13]: .
-        - generic [ref=e14]: .
-  - alert [ref=e15]: GTClicks | Marketplace de Fotos
-  - banner [ref=e16]:
-    - generic [ref=e17]:
-      - link "GTClicks Logo" [ref=e18] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]
+  - banner [ref=e12]:
+    - generic [ref=e13]:
+      - link "GTClicks Logo" [ref=e14] [cursor=pointer]:
         - /url: /
-        - img "GTClicks Logo" [ref=e20]
+        - img "GTClicks Logo" [ref=e16]
       - navigation
-      - navigation [ref=e21]:
-        - link "Explorar" [ref=e22] [cursor=pointer]:
+      - navigation [ref=e17]:
+        - link "Explorar" [ref=e18] [cursor=pointer]:
           - /url: /busca
-        - link "Categorias" [ref=e23] [cursor=pointer]:
+        - link "Categorias" [ref=e19] [cursor=pointer]:
           - /url: /categorias
-        - link "Coleções" [ref=e24] [cursor=pointer]:
+        - link "Coleções" [ref=e20] [cursor=pointer]:
           - /url: /colecoes
-      - generic [ref=e25]:
-        - link [ref=e26] [cursor=pointer]:
+      - generic [ref=e21]:
+        - link [ref=e22] [cursor=pointer]:
           - /url: /busca
           - img
-        - link [ref=e27] [cursor=pointer]:
+        - link [ref=e23] [cursor=pointer]:
           - /url: /meus-favoritos
           - img
-        - button [ref=e28] [cursor=pointer]:
+        - button [ref=e24] [cursor=pointer]:
           - img
-        - link "Entrar" [ref=e31] [cursor=pointer]:
+        - link "Entrar" [ref=e27] [cursor=pointer]:
           - /url: /login
-  - main [ref=e32]:
-    - generic [ref=e33]:
-      - generic [ref=e34]:
-        - generic [ref=e35]: Login
-        - heading "Acesse sua conta" [level=1] [ref=e36]
-        - paragraph [ref=e37]:
-          - strong [ref=e38]: "Participante:"
+  - main [ref=e28]:
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: Login
+        - heading "Acesse sua conta" [level=1] [ref=e32]
+        - paragraph [ref=e33]:
+          - strong [ref=e34]: "Participante:"
           - text: acesse e baixe suas fotos compradas.
-          - strong [ref=e39]: "Fotógrafo:"
+          - strong [ref=e35]: "Fotógrafo:"
           - text: gerencie seus eventos, uploads e acompanhe suas vendas.
-      - generic [ref=e41]:
-        - generic [ref=e42]:
-          - heading "Sign in to your account" [level=2] [ref=e43]
-          - paragraph [ref=e44]:
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - heading "Sign in to your account" [level=2] [ref=e39]
+          - paragraph [ref=e40]:
             - text: Don't have an account?
-            - link "Sign up" [ref=e45] [cursor=pointer]:
+            - link "Sign up" [ref=e41] [cursor=pointer]:
               - /url: /handler/sign-up
-        - button "Sign in with Google" [ref=e49] [cursor=pointer]:
-          - generic [ref=e50]:
-            - img [ref=e51]
-            - generic [ref=e57]: Sign in with Google
-        - generic [ref=e60]: Or continue with
-        - generic [ref=e62]:
-          - generic [ref=e63]: Email
-          - textbox "Email" [ref=e65]
-          - generic [ref=e66]: Password
-          - generic [ref=e67]:
-            - textbox "Password" [ref=e69]
-            - button "Show password" [ref=e70] [cursor=pointer]:
-              - img [ref=e71]
-          - link "Forgot password?" [ref=e76] [cursor=pointer]:
+        - button "Sign in with Google" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46]:
+            - img [ref=e47]
+            - generic [ref=e53]: Sign in with Google
+        - generic [ref=e56]: Or continue with
+        - generic [ref=e58]:
+          - generic [ref=e59]: Email
+          - textbox "Email" [ref=e61]
+          - generic [ref=e62]: Password
+          - generic [ref=e63]:
+            - textbox "Password" [ref=e65]
+            - button "Show password" [ref=e66] [cursor=pointer]:
+              - img [ref=e67]
+          - link "Forgot password?" [ref=e72] [cursor=pointer]:
             - /url: /handler/forgot-password
-          - button "Sign In" [ref=e77] [cursor=pointer]:
-            - generic [ref=e78]: Sign In
-  - contentinfo [ref=e79]:
-    - generic [ref=e80]:
-      - generic [ref=e81]:
-        - generic [ref=e82]:
-          - link "GTClicks Logo" [ref=e83] [cursor=pointer]:
+          - button "Sign In" [ref=e73] [cursor=pointer]:
+            - generic [ref=e74]: Sign In
+  - contentinfo [ref=e75]:
+    - generic [ref=e76]:
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - link "GTClicks Logo" [ref=e79] [cursor=pointer]:
             - /url: /
-            - img "GTClicks Logo" [ref=e85]
-          - paragraph [ref=e86]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
-          - generic [ref=e87]:
-            - link [ref=e88] [cursor=pointer]:
+            - img "GTClicks Logo" [ref=e81]
+          - paragraph [ref=e82]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
+          - generic [ref=e83]:
+            - link [ref=e84] [cursor=pointer]:
               - /url: https://instagram.com/gt.clicks
+              - img [ref=e85]
+            - link [ref=e88] [cursor=pointer]:
+              - /url: https://youtube.com/@gtclicks
               - img [ref=e89]
             - link [ref=e92] [cursor=pointer]:
-              - /url: https://youtube.com/@gtclicks
-              - img [ref=e93]
-            - link [ref=e96] [cursor=pointer]:
               - /url: https://twitter.com/gtclicks
-              - img [ref=e97]
-            - link [ref=e99] [cursor=pointer]:
+              - img [ref=e93]
+            - link [ref=e95] [cursor=pointer]:
               - /url: https://tiktok.com/@gtclicks
-              - img [ref=e100]
-        - generic [ref=e102]:
-          - heading "Plataforma" [level=4] [ref=e103]
-          - list [ref=e104]:
-            - listitem [ref=e105]:
-              - link "Explorar Fotos" [ref=e106] [cursor=pointer]:
+              - img [ref=e96]
+        - generic [ref=e98]:
+          - heading "Plataforma" [level=4] [ref=e99]
+          - list [ref=e100]:
+            - listitem [ref=e101]:
+              - link "Explorar Fotos" [ref=e102] [cursor=pointer]:
                 - /url: /busca
-            - listitem [ref=e107]:
-              - link "Coleções" [ref=e108] [cursor=pointer]:
+            - listitem [ref=e103]:
+              - link "Coleções" [ref=e104] [cursor=pointer]:
                 - /url: /colecoes
-            - listitem [ref=e109]:
-              - link "Categorias" [ref=e110] [cursor=pointer]:
+            - listitem [ref=e105]:
+              - link "Categorias" [ref=e106] [cursor=pointer]:
                 - /url: /categorias
-            - listitem [ref=e111]:
-              - link "Meus Favoritos" [ref=e112] [cursor=pointer]:
+            - listitem [ref=e107]:
+              - link "Meus Favoritos" [ref=e108] [cursor=pointer]:
                 - /url: /meus-favoritos
-        - generic [ref=e113]:
-          - heading "Fotógrafos" [level=4] [ref=e114]
-          - list [ref=e115]:
-            - listitem [ref=e116]:
-              - link "Começar a Vender" [ref=e117] [cursor=pointer]:
+        - generic [ref=e109]:
+          - heading "Fotógrafos" [level=4] [ref=e110]
+          - list [ref=e111]:
+            - listitem [ref=e112]:
+              - link "Começar a Vender" [ref=e113] [cursor=pointer]:
                 - /url: /cadastro
-            - listitem [ref=e118]:
-              - link "Fazer Upload" [ref=e119] [cursor=pointer]:
+            - listitem [ref=e114]:
+              - link "Fazer Upload" [ref=e115] [cursor=pointer]:
                 - /url: /dashboard/fotografo/colecoes
-            - listitem [ref=e120]:
-              - link "Painel Financeiro" [ref=e121] [cursor=pointer]:
+            - listitem [ref=e116]:
+              - link "Painel Financeiro" [ref=e117] [cursor=pointer]:
                 - /url: /dashboard/fotografo/financeiro
-        - generic [ref=e122]:
-          - heading "Suporte" [level=4] [ref=e123]
-          - list [ref=e124]:
-            - listitem [ref=e125]:
-              - link "Perguntas Frequentes" [ref=e126] [cursor=pointer]:
+        - generic [ref=e118]:
+          - heading "Suporte" [level=4] [ref=e119]
+          - list [ref=e120]:
+            - listitem [ref=e121]:
+              - link "Perguntas Frequentes" [ref=e122] [cursor=pointer]:
                 - /url: /faq
-            - listitem [ref=e127]:
-              - link "Termos de Uso" [ref=e128] [cursor=pointer]:
+            - listitem [ref=e123]:
+              - link "Termos de Uso" [ref=e124] [cursor=pointer]:
                 - /url: /termos
-            - listitem [ref=e129]:
-              - link "Privacidade" [ref=e130] [cursor=pointer]:
+            - listitem [ref=e125]:
+              - link "Privacidade" [ref=e126] [cursor=pointer]:
                 - /url: /privacidade
-            - listitem [ref=e131]:
-              - link "Fale Conosco" [ref=e132] [cursor=pointer]:
+            - listitem [ref=e127]:
+              - link "Fale Conosco" [ref=e128] [cursor=pointer]:
                 - /url: /contato
-      - generic [ref=e133]:
-        - paragraph [ref=e134]: © 2026 GTClicks. Todos os direitos reservados.
-        - generic [ref=e136]: Feito com ❤️ para criadores
+      - generic [ref=e129]:
+        - paragraph [ref=e130]: © 2026 GTClicks. Todos os direitos reservados.
+        - generic [ref=e132]: Feito com ❤️ para criadores
   - region "Notifications alt+T"
 ```

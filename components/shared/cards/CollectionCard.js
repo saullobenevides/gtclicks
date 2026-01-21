@@ -54,6 +54,9 @@ export default function CollectionCard({
     : "text-xl";
   const padding = isCompact ? "p-4" : "p-6";
 
+  const coverUrl = collection.cover || collection.capaUrl;
+  const isGradient = coverUrl?.startsWith("linear-gradient");
+
   return (
     <Link href={`/colecoes/${collection.slug}`}>
       <Card
@@ -68,12 +71,17 @@ export default function CollectionCard({
       >
         {/* Cover Image */}
         <div className="absolute inset-0 z-0">
-          {collection.cover || collection.capaUrl ? (
+          {coverUrl && !isGradient ? (
             <ImageWithFallback
-              src={collection.cover || collection.capaUrl}
+              src={coverUrl}
               alt={collection.title || collection.name || "Coleção"}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          ) : isGradient ? (
+            <div
+              className="h-full w-full transition-transform duration-700 group-hover:scale-110"
+              style={{ background: coverUrl }}
             />
           ) : (
             <div className="h-full w-full bg-linear-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">

@@ -28,7 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { PlusCircle, ExternalLink, Edit } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils/formatters";
 
-function DashboardInner() {
+export default function DashboardContent() {
   const user = useUser({ or: "redirect" });
   const router = useRouter();
   const [fotografo, setFotografo] = useState(null);
@@ -56,13 +56,11 @@ function DashboardInner() {
   }
 
   if (!fotografo) {
+    router.replace("/dashboard/fotografo/onboarding");
     return (
-      <FotografoOnboarding
-        onSuccess={(data) => {
-          setFotografo(data);
-          router.push("/dashboard/fotografo/colecoes");
-        }}
-      />
+      <div className="flex justify-center p-8">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
     );
   }
 
@@ -242,19 +240,4 @@ function DashboardInner() {
       </div>
     </div>
   );
-}
-
-export default function DashboardContent() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) {
-    return (
-      <div className="flex justify-center p-8">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
-  }
-
-  return <DashboardInner />;
 }

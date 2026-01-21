@@ -42,11 +42,7 @@ export default async function MinhasColecoesPage() {
   });
 
   if (!fotografo) {
-    return (
-      <div className="container">
-        <p>Perfil de fotógrafo não encontrado.</p>
-      </div>
-    );
+    redirect("/dashboard/fotografo");
   }
 
   const colecoes = await prisma.colecao.findMany({

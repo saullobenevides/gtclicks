@@ -3,23 +3,18 @@
 ```yaml
 - generic [active] [ref=e1]:
   - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
-    - generic [ref=e10]:
-      - text: Compiling
-      - generic [ref=e11]:
-        - generic [ref=e12]: .
-        - generic [ref=e13]: .
-        - generic [ref=e14]: .
-  - alert [ref=e15]
-  - banner [ref=e16]:
-    - generic [ref=e17]:
-      - link "GTClicks Logo" [ref=e18] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]
+  - banner [ref=e12]:
+    - generic [ref=e13]:
+      - link "GTClicks Logo" [ref=e14] [cursor=pointer]:
         - /url: /
-        - img "GTClicks Logo" [ref=e20]
-      - generic [ref=e21]:
-        - button [ref=e22] [cursor=pointer]:
+        - img "GTClicks Logo" [ref=e16]
+      - generic [ref=e17]:
+        - button [ref=e18] [cursor=pointer]:
           - img
-        - button [ref=e23] [cursor=pointer]:
-          - img [ref=e24]
+        - button [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
   - generic:
     - generic:
       - generic:
@@ -44,136 +39,144 @@
               - /url: /login
             - link "Criar Conta":
               - /url: /login
-  - main [ref=e25]:
-    - generic [ref=e27]:
+  - main [ref=e21]:
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e25]: Coleções
+        - heading "Séries Exclusivas" [level=1] [ref=e26]
+        - paragraph [ref=e27]: Navegue por coleções completas com curadoria especial. Encontre a narrativa visual perfeita para sua marca ou projeto.
       - generic [ref=e28]:
-        - generic [ref=e29]: Coleções
-        - heading "Séries Exclusivas" [level=1] [ref=e30]
-        - paragraph [ref=e31]: Navegue por coleções completas com curadoria especial. Encontre a narrativa visual perfeita para sua marca ou projeto.
-      - generic [ref=e32]:
-        - link "Ver coleção Condomínio" [ref=e33] [cursor=pointer]:
+        - link "Ver coleção Nova Coleção (1)" [ref=e29] [cursor=pointer]:
+          - /url: /colecoes/nova-colecao-1
+          - generic "Ver coleção Nova Coleção (1)" [ref=e30]:
+            - generic [ref=e35]:
+              - heading "Nova Coleção (1)" [level=3] [ref=e36]
+              - generic [ref=e38]:
+                - img [ref=e39]
+                - text: 0 fotos
+        - link "Ver coleção Condomínio" [ref=e43] [cursor=pointer]:
           - /url: /colecoes/condominio
-          - generic "Ver coleção Condomínio" [ref=e34]:
-            - img "Condomínio" [ref=e37]
-            - generic [ref=e40]:
-              - heading "Condomínio" [level=3] [ref=e41]
-              - generic [ref=e43]:
-                - img [ref=e44]
+          - generic "Ver coleção Condomínio" [ref=e44]:
+            - img "Condomínio" [ref=e47]
+            - generic [ref=e50]:
+              - heading "Condomínio" [level=3] [ref=e51]
+              - generic [ref=e53]:
+                - img [ref=e54]
                 - text: 14 fotos
-        - link "Ver coleção Nova Coleção" [ref=e48] [cursor=pointer]:
+        - link "Ver coleção Nova Coleção" [ref=e58] [cursor=pointer]:
           - /url: /colecoes/nova-colecao
-          - generic "Ver coleção Nova Coleção" [ref=e49]:
-            - img "Nova Coleção" [ref=e52]
-            - generic [ref=e55]:
-              - heading "Nova Coleção" [level=3] [ref=e56]
-              - generic [ref=e58]:
-                - img [ref=e59]
+          - generic "Ver coleção Nova Coleção" [ref=e59]:
+            - img "Nova Coleção" [ref=e62]
+            - generic [ref=e65]:
+              - heading "Nova Coleção" [level=3] [ref=e66]
+              - generic [ref=e68]:
+                - img [ref=e69]
                 - text: 23 fotos
-        - link "Ver coleção Corrida" [ref=e63] [cursor=pointer]:
+        - link "Ver coleção Corrida" [ref=e73] [cursor=pointer]:
           - /url: /colecoes/corrida
-          - generic "Ver coleção Corrida" [ref=e64]:
-            - img "Corrida" [ref=e67]
-            - generic [ref=e70]:
-              - heading "Corrida" [level=3] [ref=e71]
-              - generic [ref=e73]:
-                - img [ref=e74]
+          - generic "Ver coleção Corrida" [ref=e74]:
+            - img "Corrida" [ref=e77]
+            - generic [ref=e80]:
+              - heading "Corrida" [level=3] [ref=e81]
+              - generic [ref=e83]:
+                - img [ref=e84]
                 - text: 1 foto
-        - link "Ver coleção Minha Primeira Coleção" [ref=e78] [cursor=pointer]:
+        - link "Ver coleção Minha Primeira Coleção" [ref=e88] [cursor=pointer]:
           - /url: /colecoes/minha-primeira-colecao
-          - generic "Ver coleção Minha Primeira Coleção" [ref=e79]:
-            - img "Minha Primeira Coleção" [ref=e82]
-            - generic [ref=e85]:
-              - heading "Minha Primeira Coleção" [level=3] [ref=e86]
-              - generic [ref=e88]:
-                - img [ref=e89]
+          - generic "Ver coleção Minha Primeira Coleção" [ref=e89]:
+            - img "Minha Primeira Coleção" [ref=e92]
+            - generic [ref=e95]:
+              - heading "Minha Primeira Coleção" [level=3] [ref=e96]
+              - generic [ref=e98]:
+                - img [ref=e99]
                 - text: 9 fotos
-  - contentinfo [ref=e93]:
-    - generic [ref=e94]:
-      - generic [ref=e95]:
-        - generic [ref=e96]:
-          - link "GTClicks Logo" [ref=e97] [cursor=pointer]:
+  - contentinfo [ref=e103]:
+    - generic [ref=e104]:
+      - generic [ref=e105]:
+        - generic [ref=e106]:
+          - link "GTClicks Logo" [ref=e107] [cursor=pointer]:
             - /url: /
-            - img "GTClicks Logo" [ref=e99]
-          - paragraph [ref=e100]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
-          - generic [ref=e101]:
-            - link [ref=e102] [cursor=pointer]:
+            - img "GTClicks Logo" [ref=e109]
+          - paragraph [ref=e110]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
+          - generic [ref=e111]:
+            - link [ref=e112] [cursor=pointer]:
               - /url: https://instagram.com/gt.clicks
-              - img [ref=e103]
-            - link [ref=e106] [cursor=pointer]:
+              - img [ref=e113]
+            - link [ref=e116] [cursor=pointer]:
               - /url: https://youtube.com/@gtclicks
-              - img [ref=e107]
-            - link [ref=e110] [cursor=pointer]:
+              - img [ref=e117]
+            - link [ref=e120] [cursor=pointer]:
               - /url: https://twitter.com/gtclicks
-              - img [ref=e111]
-            - link [ref=e113] [cursor=pointer]:
+              - img [ref=e121]
+            - link [ref=e123] [cursor=pointer]:
               - /url: https://tiktok.com/@gtclicks
-              - img [ref=e114]
-        - generic [ref=e116]:
-          - heading "Plataforma" [level=4] [ref=e117]
-          - list [ref=e118]:
-            - listitem [ref=e119]:
-              - link "Explorar Fotos" [ref=e120] [cursor=pointer]:
+              - img [ref=e124]
+        - generic [ref=e126]:
+          - heading "Plataforma" [level=4] [ref=e127]
+          - list [ref=e128]:
+            - listitem [ref=e129]:
+              - link "Explorar Fotos" [ref=e130] [cursor=pointer]:
                 - /url: /busca
-            - listitem [ref=e121]:
-              - link "Coleções" [ref=e122] [cursor=pointer]:
+            - listitem [ref=e131]:
+              - link "Coleções" [ref=e132] [cursor=pointer]:
                 - /url: /colecoes
-            - listitem [ref=e123]:
-              - link "Categorias" [ref=e124] [cursor=pointer]:
+            - listitem [ref=e133]:
+              - link "Categorias" [ref=e134] [cursor=pointer]:
                 - /url: /categorias
-            - listitem [ref=e125]:
-              - link "Meus Favoritos" [ref=e126] [cursor=pointer]:
+            - listitem [ref=e135]:
+              - link "Meus Favoritos" [ref=e136] [cursor=pointer]:
                 - /url: /meus-favoritos
-        - generic [ref=e127]:
-          - heading "Fotógrafos" [level=4] [ref=e128]
-          - list [ref=e129]:
-            - listitem [ref=e130]:
-              - link "Começar a Vender" [ref=e131] [cursor=pointer]:
+        - generic [ref=e137]:
+          - heading "Fotógrafos" [level=4] [ref=e138]
+          - list [ref=e139]:
+            - listitem [ref=e140]:
+              - link "Começar a Vender" [ref=e141] [cursor=pointer]:
                 - /url: /cadastro
-            - listitem [ref=e132]:
-              - link "Fazer Upload" [ref=e133] [cursor=pointer]:
+            - listitem [ref=e142]:
+              - link "Fazer Upload" [ref=e143] [cursor=pointer]:
                 - /url: /dashboard/fotografo/colecoes
-            - listitem [ref=e134]:
-              - link "Painel Financeiro" [ref=e135] [cursor=pointer]:
+            - listitem [ref=e144]:
+              - link "Painel Financeiro" [ref=e145] [cursor=pointer]:
                 - /url: /dashboard/fotografo/financeiro
-        - generic [ref=e136]:
-          - heading "Suporte" [level=4] [ref=e137]
-          - list [ref=e138]:
-            - listitem [ref=e139]:
-              - link "Perguntas Frequentes" [ref=e140] [cursor=pointer]:
+        - generic [ref=e146]:
+          - heading "Suporte" [level=4] [ref=e147]
+          - list [ref=e148]:
+            - listitem [ref=e149]:
+              - link "Perguntas Frequentes" [ref=e150] [cursor=pointer]:
                 - /url: /faq
-            - listitem [ref=e141]:
-              - link "Termos de Uso" [ref=e142] [cursor=pointer]:
+            - listitem [ref=e151]:
+              - link "Termos de Uso" [ref=e152] [cursor=pointer]:
                 - /url: /termos
-            - listitem [ref=e143]:
-              - link "Privacidade" [ref=e144] [cursor=pointer]:
+            - listitem [ref=e153]:
+              - link "Privacidade" [ref=e154] [cursor=pointer]:
                 - /url: /privacidade
-            - listitem [ref=e145]:
-              - link "Fale Conosco" [ref=e146] [cursor=pointer]:
+            - listitem [ref=e155]:
+              - link "Fale Conosco" [ref=e156] [cursor=pointer]:
                 - /url: /contato
-      - generic [ref=e147]:
-        - paragraph [ref=e148]: © 2026 GTClicks. Todos os direitos reservados.
-        - generic [ref=e150]: Feito com ❤️ para criadores
+      - generic [ref=e157]:
+        - paragraph [ref=e158]: © 2026 GTClicks. Todos os direitos reservados.
+        - generic [ref=e160]: Feito com ❤️ para criadores
   - region "Notifications alt+T"
-  - navigation [ref=e151]:
-    - generic [ref=e152]:
-      - link "Início" [ref=e153] [cursor=pointer]:
+  - navigation [ref=e161]:
+    - generic [ref=e162]:
+      - link "Início" [ref=e163] [cursor=pointer]:
         - /url: /
-        - img [ref=e155]
-        - generic [ref=e158]: Início
-      - link "Buscar" [ref=e159] [cursor=pointer]:
+        - img [ref=e165]
+        - generic [ref=e168]: Início
+      - link "Buscar" [ref=e169] [cursor=pointer]:
         - /url: /busca
-        - img [ref=e161]
-        - generic [ref=e164]: Buscar
-      - link "Carrinho" [ref=e165] [cursor=pointer]:
+        - img [ref=e171]
+        - generic [ref=e174]: Buscar
+      - link "Carrinho" [ref=e175] [cursor=pointer]:
         - /url: /carrinho
-        - img [ref=e167]
-        - generic [ref=e171]: Carrinho
-      - link "Favoritos" [ref=e172] [cursor=pointer]:
+        - img [ref=e177]
+        - generic [ref=e181]: Carrinho
+      - link "Favoritos" [ref=e182] [cursor=pointer]:
         - /url: /meus-favoritos
-        - img [ref=e174]
-        - generic [ref=e176]: Favoritos
-      - link "Perfil" [ref=e177] [cursor=pointer]:
+        - img [ref=e184]
+        - generic [ref=e186]: Favoritos
+      - link "Perfil" [ref=e187] [cursor=pointer]:
         - /url: /dashboard
-        - img [ref=e179]
-        - generic [ref=e182]: Perfil
+        - img [ref=e189]
+        - generic [ref=e192]: Perfil
 ```

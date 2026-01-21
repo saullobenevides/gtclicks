@@ -147,7 +147,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 32672,
+                      "duration": 33841,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -168,7 +168,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:55:17.434Z",
+                      "startTime": "2026-01-21T02:29:58.728Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -213,7 +213,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 32482,
+                      "duration": 33600,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -234,7 +234,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:55:17.568Z",
+                      "startTime": "2026-01-21T02:29:58.843Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -279,7 +279,7 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 13106,
+                      "duration": 11193,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Economia Progressiva/i)\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Economia Progressiva/i)\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Economia Progressiva/i)\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Economia Progressiva/i)\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\complete-purchase.spec.js:129:59",
@@ -303,7 +303,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:55:17.576Z",
+                      "startTime": "2026-01-21T02:29:58.777Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -353,7 +353,7 @@
                       "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "timedOut",
-                      "duration": 32281,
+                      "duration": 33650,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -374,7 +374,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:55:17.451Z",
+                      "startTime": "2026-01-21T02:29:58.731Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -419,12 +419,12 @@
                       "workerIndex": 4,
                       "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 1371,
+                      "duration": 1638,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:55:35.915Z",
+                      "startTime": "2026-01-21T02:30:12.061Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -453,7 +453,7 @@
                       "workerIndex": 4,
                       "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 30880,
+                      "duration": 32839,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -474,7 +474,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:55:37.514Z",
+                      "startTime": "2026-01-21T02:30:13.896Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -517,9 +517,9 @@
                   "results": [
                     {
                       "workerIndex": 11,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 30575,
+                      "duration": 30755,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -540,7 +540,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:56:29.061Z",
+                      "startTime": "2026-01-21T02:31:10.083Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -583,9 +583,9 @@
                   "results": [
                     {
                       "workerIndex": 12,
-                      "parallelIndex": 2,
+                      "parallelIndex": 3,
                       "status": "timedOut",
-                      "duration": 30322,
+                      "duration": 30479,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -606,7 +606,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:56:29.100Z",
+                      "startTime": "2026-01-21T02:31:11.477Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -649,9 +649,9 @@
                   "results": [
                     {
                       "workerIndex": 13,
-                      "parallelIndex": 1,
+                      "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8933,
+                      "duration": 8767,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Economia Progressiva/i)\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Economia Progressiva/i)\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Economia Progressiva/i)\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Economia Progressiva/i)\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\complete-purchase.spec.js:129:59",
@@ -675,7 +675,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:56:41.150Z",
+                      "startTime": "2026-01-21T02:31:22.048Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -723,9 +723,9 @@
                   "results": [
                     {
                       "workerIndex": 14,
-                      "parallelIndex": 3,
+                      "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 30232,
+                      "duration": 31047,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -746,7 +746,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:56:42.887Z",
+                      "startTime": "2026-01-21T02:31:30.668Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -789,14 +789,14 @@
                   "results": [
                     {
                       "workerIndex": 15,
-                      "parallelIndex": 1,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3454,
+                      "duration": 5988,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:56:54.594Z",
+                      "startTime": "2026-01-21T02:31:38.644Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -822,10 +822,10 @@
                   "projectName": "firefox",
                   "results": [
                     {
-                      "workerIndex": 15,
+                      "workerIndex": 16,
                       "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 30301,
+                      "duration": 31000,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -846,7 +846,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:56:59.090Z",
+                      "startTime": "2026-01-21T02:31:49.382Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -889,9 +889,9 @@
                   "results": [
                     {
                       "workerIndex": 22,
-                      "parallelIndex": 1,
+                      "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 33739,
+                      "duration": 33460,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -912,7 +912,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:51.208Z",
+                      "startTime": "2026-01-21T02:32:57.081Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -955,9 +955,9 @@
                   "results": [
                     {
                       "workerIndex": 23,
-                      "parallelIndex": 3,
+                      "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 30406,
+                      "duration": 33059,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -978,7 +978,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:56.309Z",
+                      "startTime": "2026-01-21T02:33:02.620Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1021,9 +1021,9 @@
                   "results": [
                     {
                       "workerIndex": 24,
-                      "parallelIndex": 0,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 8911,
+                      "duration": 8002,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Economia Progressiva/i)\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Economia Progressiva/i)\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Economia Progressiva/i)\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Economia Progressiva/i)\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\complete-purchase.spec.js:129:59",
@@ -1047,7 +1047,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:56.452Z",
+                      "startTime": "2026-01-21T02:33:05.269Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1095,9 +1095,9 @@
                   "results": [
                     {
                       "workerIndex": 25,
-                      "parallelIndex": 2,
+                      "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 31089,
+                      "duration": 32979,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1118,7 +1118,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:59.831Z",
+                      "startTime": "2026-01-21T02:33:11.972Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1161,14 +1161,14 @@
                   "results": [
                     {
                       "workerIndex": 26,
-                      "parallelIndex": 0,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 1841,
+                      "duration": 1820,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:58:08.135Z",
+                      "startTime": "2026-01-21T02:33:20.695Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1195,9 +1195,9 @@
                   "results": [
                     {
                       "workerIndex": 26,
-                      "parallelIndex": 0,
+                      "parallelIndex": 3,
                       "status": "timedOut",
-                      "duration": 31213,
+                      "duration": 32580,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1218,7 +1218,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:58:10.202Z",
+                      "startTime": "2026-01-21T02:33:22.781Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1261,9 +1261,9 @@
                   "results": [
                     {
                       "workerIndex": 33,
-                      "parallelIndex": 3,
+                      "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 31790,
+                      "duration": 30444,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1284,7 +1284,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:59:08.759Z",
+                      "startTime": "2026-01-21T02:34:14.048Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1329,7 +1329,7 @@
                       "workerIndex": 34,
                       "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 30691,
+                      "duration": 30415,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1350,7 +1350,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:59:13.324Z",
+                      "startTime": "2026-01-21T02:34:19.016Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1393,9 +1393,9 @@
                   "results": [
                     {
                       "workerIndex": 35,
-                      "parallelIndex": 1,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 10184,
+                      "duration": 6593,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Economia Progressiva/i)\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Economia Progressiva/i)\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Economia Progressiva/i)\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Economia Progressiva/i)\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\complete-purchase.spec.js:129:59",
@@ -1419,7 +1419,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:59:23.688Z",
+                      "startTime": "2026-01-21T02:34:23.691Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1469,7 +1469,7 @@
                       "workerIndex": 36,
                       "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 30484,
+                      "duration": 30384,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1490,7 +1490,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:59:40.692Z",
+                      "startTime": "2026-01-21T02:34:25.115Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1535,12 +1535,12 @@
                       "workerIndex": 37,
                       "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 4972,
+                      "duration": 2872,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:59:44.582Z",
+                      "startTime": "2026-01-21T02:34:32.165Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1566,10 +1566,10 @@
                   "projectName": "Mobile Safari",
                   "results": [
                     {
-                      "workerIndex": 38,
-                      "parallelIndex": 2,
+                      "workerIndex": 37,
+                      "parallelIndex": 3,
                       "status": "timedOut",
-                      "duration": 30448,
+                      "duration": 30929,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1590,7 +1590,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:59:48.069Z",
+                      "startTime": "2026-01-21T02:34:35.196Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1652,7 +1652,7 @@
                       "workerIndex": 5,
                       "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 9586,
+                      "duration": 17031,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Vamos criar sua identidade')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Vamos criar sua identidade')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Vamos criar sua identidade')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Vamos criar sua identidade')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:10:64",
@@ -1676,7 +1676,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:55:52.607Z",
+                      "startTime": "2026-01-21T02:30:35.041Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1724,9 +1724,9 @@
                   "results": [
                     {
                       "workerIndex": 6,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 32003,
+                      "duration": 31768,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1747,7 +1747,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:55:53.530Z",
+                      "startTime": "2026-01-21T02:30:35.157Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1790,9 +1790,9 @@
                   "results": [
                     {
                       "workerIndex": 7,
-                      "parallelIndex": 1,
+                      "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 32189,
+                      "duration": 31902,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1813,7 +1813,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:55:53.444Z",
+                      "startTime": "2026-01-21T02:30:35.181Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1856,9 +1856,9 @@
                   "results": [
                     {
                       "workerIndex": 8,
-                      "parallelIndex": 3,
+                      "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 32387,
+                      "duration": 34461,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -1879,7 +1879,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:56:04.672Z",
+                      "startTime": "2026-01-21T02:30:53.932Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1921,10 +1921,10 @@
                   "projectName": "firefox",
                   "results": [
                     {
-                      "workerIndex": 16,
-                      "parallelIndex": 2,
+                      "workerIndex": 15,
+                      "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8603,
+                      "duration": 9429,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Vamos criar sua identidade')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Vamos criar sua identidade')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Vamos criar sua identidade')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Vamos criar sua identidade')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:10:64",
@@ -1948,7 +1948,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:05.204Z",
+                      "startTime": "2026-01-21T02:31:46.633Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1996,9 +1996,9 @@
                   "results": [
                     {
                       "workerIndex": 17,
-                      "parallelIndex": 0,
+                      "parallelIndex": 3,
                       "status": "timedOut",
-                      "duration": 30412,
+                      "duration": 30407,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2019,7 +2019,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:05.687Z",
+                      "startTime": "2026-01-21T02:31:51.389Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2062,9 +2062,9 @@
                   "results": [
                     {
                       "workerIndex": 18,
-                      "parallelIndex": 3,
+                      "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 30394,
+                      "duration": 30515,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2085,7 +2085,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:17.968Z",
+                      "startTime": "2026-01-21T02:32:08.828Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2128,9 +2128,9 @@
                   "results": [
                     {
                       "workerIndex": 19,
-                      "parallelIndex": 2,
+                      "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 30417,
+                      "duration": 30762,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2151,7 +2151,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:18.238Z",
+                      "startTime": "2026-01-21T02:32:09.747Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2194,9 +2194,9 @@
                   "results": [
                     {
                       "workerIndex": 27,
-                      "parallelIndex": 1,
+                      "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 7448,
+                      "duration": 7153,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Vamos criar sua identidade')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Vamos criar sua identidade')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Vamos criar sua identidade')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Vamos criar sua identidade')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:10:64",
@@ -2220,7 +2220,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:58:27.959Z",
+                      "startTime": "2026-01-21T02:33:32.889Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2268,9 +2268,9 @@
                   "results": [
                     {
                       "workerIndex": 28,
-                      "parallelIndex": 3,
+                      "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 32174,
+                      "duration": 33188,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2291,7 +2291,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:58:30.227Z",
+                      "startTime": "2026-01-21T02:33:37.925Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2336,7 +2336,7 @@
                       "workerIndex": 29,
                       "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 31429,
+                      "duration": 34243,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2357,7 +2357,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:58:34.515Z",
+                      "startTime": "2026-01-21T02:33:41.913Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2402,7 +2402,7 @@
                       "workerIndex": 30,
                       "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 31315,
+                      "duration": 34775,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2423,7 +2423,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:58:39.612Z",
+                      "startTime": "2026-01-21T02:33:47.407Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2465,10 +2465,10 @@
                   "projectName": "Mobile Safari",
                   "results": [
                     {
-                      "workerIndex": 37,
-                      "parallelIndex": 3,
+                      "workerIndex": 38,
+                      "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8165,
+                      "duration": 7035,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Vamos criar sua identidade')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Vamos criar sua identidade')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Vamos criar sua identidade')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Vamos criar sua identidade')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:10:64",
@@ -2492,7 +2492,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:59:49.968Z",
+                      "startTime": "2026-01-21T02:34:46.821Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2540,9 +2540,9 @@
                   "results": [
                     {
                       "workerIndex": 39,
-                      "parallelIndex": 0,
+                      "parallelIndex": 2,
                       "status": "timedOut",
-                      "duration": 30754,
+                      "duration": 30940,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2563,7 +2563,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:59:56.755Z",
+                      "startTime": "2026-01-21T02:34:51.793Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2606,9 +2606,9 @@
                   "results": [
                     {
                       "workerIndex": 40,
-                      "parallelIndex": 3,
+                      "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 30592,
+                      "duration": 30950,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2629,7 +2629,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T02:00:02.008Z",
+                      "startTime": "2026-01-21T02:34:57.124Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2674,7 +2674,7 @@
                       "workerIndex": 41,
                       "parallelIndex": 1,
                       "status": "timedOut",
-                      "duration": 30489,
+                      "duration": 31006,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -2695,7 +2695,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T02:00:15.126Z",
+                      "startTime": "2026-01-21T02:34:59.016Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2746,9 +2746,9 @@
                   "results": [
                     {
                       "workerIndex": 9,
-                      "parallelIndex": 2,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 14097,
+                      "duration": 13268,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:130:49",
@@ -2772,7 +2772,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:56:11.102Z",
+                      "startTime": "2026-01-21T02:30:54.946Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2820,9 +2820,9 @@
                   "results": [
                     {
                       "workerIndex": 10,
-                      "parallelIndex": 1,
+                      "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8412,
+                      "duration": 7480,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:173:32",
@@ -2846,7 +2846,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:56:28.634Z",
+                      "startTime": "2026-01-21T02:31:10.028Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2894,9 +2894,9 @@
                   "results": [
                     {
                       "workerIndex": 20,
-                      "parallelIndex": 1,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 13730,
+                      "duration": 15566,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:130:49",
@@ -2920,7 +2920,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:32.437Z",
+                      "startTime": "2026-01-21T02:32:39.092Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2968,9 +2968,9 @@
                   "results": [
                     {
                       "workerIndex": 21,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 8852,
+                      "duration": 11334,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:173:32",
@@ -2994,7 +2994,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:57:41.077Z",
+                      "startTime": "2026-01-21T02:32:39.808Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -3042,9 +3042,9 @@
                   "results": [
                     {
                       "workerIndex": 31,
-                      "parallelIndex": 0,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 14072,
+                      "duration": 12528,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:130:49",
@@ -3068,7 +3068,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:58:44.993Z",
+                      "startTime": "2026-01-21T02:33:57.018Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -3116,9 +3116,9 @@
                   "results": [
                     {
                       "workerIndex": 32,
-                      "parallelIndex": 0,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 13383,
+                      "duration": 7691,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:173:32",
@@ -3142,7 +3142,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T01:59:08.644Z",
+                      "startTime": "2026-01-21T02:34:12.681Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -3190,9 +3190,9 @@
                   "results": [
                     {
                       "workerIndex": 42,
-                      "parallelIndex": 2,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 13225,
+                      "duration": 15039,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:130:49",
@@ -3216,7 +3216,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T02:00:22.093Z",
+                      "startTime": "2026-01-21T02:35:11.651Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -3264,9 +3264,9 @@
                   "results": [
                     {
                       "workerIndex": 43,
-                      "parallelIndex": 0,
+                      "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 7875,
+                      "duration": 8508,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Visão Geral')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Visão Geral')\u001b[22m\n\n    at C:\\Users\\saull\\gtclicks\\e2e\\critical-flows\\photographer-onboarding.spec.js:173:32",
@@ -3290,7 +3290,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-21T02:00:31.720Z",
+                      "startTime": "2026-01-21T02:35:27.862Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -3331,8 +3331,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-01-21T01:55:14.383Z",
-    "duration": 331542.358,
+    "startTime": "2026-01-21T02:29:44.319Z",
+    "duration": 353552.464,
     "expected": 4,
     "skipped": 0,
     "unexpected": 44,

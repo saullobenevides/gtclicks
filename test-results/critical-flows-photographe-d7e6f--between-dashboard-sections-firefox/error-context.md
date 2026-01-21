@@ -4,7 +4,7 @@
 - generic [active] [ref=e1]:
   - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
     - img [ref=e8]
-  - alert [ref=e12]: GTClicks | Marketplace de Fotos
+  - alert [ref=e12]
   - banner [ref=e13]:
     - generic [ref=e14]:
       - link "GTClicks Logo" [ref=e15] [cursor=pointer]:

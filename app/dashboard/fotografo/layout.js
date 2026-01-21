@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useUser } from '@stackframe/stack';
-import { useRouter, usePathname } from 'next/navigation';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useEffect, useState } from "react";
+import { useUser } from "@stackframe/stack";
+import { useRouter, usePathname } from "next/navigation";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 export default function PhotographerLayout({ children }) {
   const user = useUser();
@@ -12,22 +12,22 @@ export default function PhotographerLayout({ children }) {
   const [checking, setChecking] = useState(true);
 
   const navItems = [
-    { href: '/dashboard/fotografo', label: 'Início' },
-    { href: '/dashboard/fotografo/colecoes', label: 'Minhas Coleções' },
-    { href: '/dashboard/fotografo/financeiro', label: 'Financeiro' },
-    { href: '/dashboard/fotografo/perfil', label: 'Meu Perfil' },
+    { href: "/dashboard/fotografo", label: "Início" },
+    { href: "/dashboard/fotografo/colecoes", label: "Minhas Coleções" },
+    { href: "/dashboard/fotografo/financeiro", label: "Financeiro" },
+    { href: "/dashboard/fotografo/perfil", label: "Meu Perfil" },
   ];
 
   useEffect(() => {
     if (user === null) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
     if (!user) return;
 
     const checkProfile = async () => {
       try {
-        if (pathname === '/dashboard/fotografo/onboarding') {
+        if (pathname === "/dashboard/fotografo/onboarding") {
           setChecking(false);
           return;
         }
@@ -36,7 +36,7 @@ export default function PhotographerLayout({ children }) {
         if (res.ok) {
           const data = await res.json();
           if (!data.data) {
-            router.push('/dashboard/fotografo/onboarding');
+            router.push("/dashboard/fotografo/onboarding");
           } else {
             setChecking(false);
           }
@@ -44,7 +44,7 @@ export default function PhotographerLayout({ children }) {
           setChecking(false);
         }
       } catch (error) {
-        console.error('Error checking profile:', error);
+        console.error("Error checking profile:", error);
         setChecking(false);
       }
     };
@@ -53,17 +53,15 @@ export default function PhotographerLayout({ children }) {
   }, [user, pathname, router]);
 
   // Onboarding page has a different, simpler layout
-  if (pathname === '/dashboard/fotografo/onboarding') {
+  if (pathname === "/dashboard/fotografo/onboarding") {
     return <>{children}</>;
   }
 
   if (checking) {
     return (
-      <DashboardLayout navItems={navItems}>
-        <div className="flex w-full flex-1 items-center justify-center">
-          <p>Verificando perfil...</p>
-        </div>
-      </DashboardLayout>
+      <div className="flex w-full flex-1 items-center justify-center min-h-screen">
+        <p>Verificando perfil...</p>
+      </div>
     );
   }
 
