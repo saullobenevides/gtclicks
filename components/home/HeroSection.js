@@ -19,8 +19,8 @@ export default function HeroSection() {
       </div>
       <div className="absolute inset-0 -z-10 bg-linear-to-b from-black/70 via-black/60 to-black" />
 
-      <div className="z-10 flex max-w-5xl flex-col items-center gap-8 animate-in fade-in zoom-in duration-700 pt-96">
-        <h1 className="heading-display font-display text-5xl xs:text-6xl font-black text-white sm:text-7xl md:text-8xl lg:text-8xl">
+      <div className="z-10 flex max-w-5xl flex-col items-center gap-8 animate-in fade-in zoom-in duration-700 pt-32 md:pt-96">
+        <h1 className="heading-display font-display text-4xl xs:text-5xl font-black text-white sm:text-7xl md:text-8xl lg:text-8xl">
           CAPTURE MOMENTOS,
           <br />
           <span style={{ color: "#FF0000" }}>VENDA ARTE!</span>

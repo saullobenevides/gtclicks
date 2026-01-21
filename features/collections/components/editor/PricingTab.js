@@ -80,7 +80,7 @@ export default function PricingTab({
               <div className="col-span-full text-center py-8 border-2 border-dashed rounded-lg text-muted-foreground bg-muted/30">
                 <p>Nenhuma regra de desconto ativa.</p>
                 <p className="text-xs mt-1">
-                  Clique em "Novo Pacote" para criar uma.
+                  Clique em &quot;Novo Pacote&quot; para criar uma.
                 </p>
               </div>
             )}
@@ -101,14 +101,14 @@ export default function PricingTab({
                 </Button>
 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-2 mt-4 sm:mt-0">
-                  <div className="space-y-1 flex-1 w-full">
+                  <div className="space-y-1 flex-1 w-full min-w-0">
                     <Label className="text-xs text-muted-foreground uppercase tracking-wide">
                       Quantidade Mínima
                     </Label>
                     <div className="flex items-center gap-2">
                       <Input
                         type="number"
-                        className="h-9 font-medium"
+                        className="h-9 font-medium w-full min-w-0"
                         value={discount.min}
                         onChange={(e) =>
                           updateDiscount(index, "min", e.target.value)
@@ -122,13 +122,13 @@ export default function PricingTab({
                     <Label className="text-xs text-muted-foreground uppercase tracking-wide text-green-600">
                       Novo Preço Unitário
                     </Label>
-                    <div className="relative">
+                    <div className="relative w-full min-w-0">
                       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
                         R$
                       </span>
                       <Input
                         type="number"
-                        className="h-9 pl-7 font-bold text-green-600 text-right"
+                        className="h-9 pl-7 font-bold text-green-600 text-right w-full min-w-0"
                         value={discount.price}
                         onChange={(e) =>
                           updateDiscount(index, "price", e.target.value)

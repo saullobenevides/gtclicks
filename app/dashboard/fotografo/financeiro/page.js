@@ -267,7 +267,7 @@ export default function FinanceiroPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <Input
               type="number"
               value={valorSaque}

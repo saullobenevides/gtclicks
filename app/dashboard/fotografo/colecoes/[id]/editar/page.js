@@ -5,12 +5,16 @@ import CollectionEditor from "@/features/collections/components/CollectionEditor
 export default async function EditCollectionPage(props) {
   const params = await props.params;
   const { id } = params;
-  
+
   const collection = await getCollectionByIdForEdit(id);
 
   if (!collection) {
     notFound();
   }
 
-  return <CollectionEditor collection={collection} />;
+  return (
+    <div className="max-w-[100vw] overflow-x-hidden w-full">
+      <CollectionEditor collection={collection} />
+    </div>
+  );
 }

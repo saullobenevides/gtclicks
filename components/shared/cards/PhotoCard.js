@@ -160,7 +160,7 @@ export default function PhotoCard({
                 <Button
                   size="icon"
                   className={cn(
-                    "h-9 w-9 rounded-full backdrop-blur-md border transition-all duration-200 shadow-md",
+                    "h-11 w-11 rounded-full backdrop-blur-md border transition-all duration-200 shadow-md",
                     isSelected
                       ? "bg-[#480000] border-[#480000] text-white shadow-[#480000]/30"
                       : "bg-white/20 border-[#480000]/20 text-white"
@@ -233,7 +233,7 @@ export default function PhotoCard({
               "font-bold text-white line-clamp-1 shadow-black/80 drop-shadow-md",
               textSize,
               variant === "centered-hover"
-                ? "opacity-0 group-hover:opacity-100 transition-opacity"
+                ? "opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                 : ""
             )}
           >

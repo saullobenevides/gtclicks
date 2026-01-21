@@ -37,9 +37,9 @@ export default function PhotoManagerTab({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Breadcrumbs */}
-        <div className="flex items-center justify-between border-b pb-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">
+        <div className="flex items-center justify-between border-b pb-4 overflow-hidden">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full mask-linear-fade">
+            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
               Pasta atual:
             </span>
             <Breadcrumbs path={folderPath} onNavigate={onNavigate} />
@@ -74,7 +74,7 @@ export default function PhotoManagerTab({
             </div>
 
             {/* Bulk Upload Area */}
-            <div className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl p-4 sm:p-8 transition-colors text-center cursor-pointer relative h-32 flex flex-col items-center justify-center">
+            <div className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl p-4 transition-colors text-center cursor-pointer relative h-28 sm:h-32 flex flex-col items-center justify-center w-full max-w-full min-w-0">
               <input
                 type="file"
                 multiple
@@ -82,9 +82,9 @@ export default function PhotoManagerTab({
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 onChange={onBulkUpload}
               />
-              <div className="flex flex-col items-center gap-1">
-                <UploadCloud className="h-6 w-6 sm:h-8 sm:w-8 text-primary mb-1" />
-                <h4 className="font-bold text-base sm:text-lg">
+              <div className="flex flex-col items-center gap-1 w-full max-w-full overflow-hidden">
+                <UploadCloud className="h-6 w-6 sm:h-8 sm:w-8 text-primary mb-1 shrink-0" />
+                <h4 className="font-bold text-sm sm:text-lg truncate max-w-full">
                   Solte suas fotos aqui
                 </h4>
               </div>

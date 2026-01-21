@@ -39,7 +39,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
               id="collection-name"
               value={collectionData.nome}
               onChange={(e) => onDataChange("nome", e.target.value)}
-              placeholder="Ex: Corrida 5k Santos / Ensaio Fotográfico"
+              placeholder="Adicione um título para a coleção"
             />
           </div>
           <div className="space-y-1.5">
@@ -60,6 +60,17 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="collection-description">Descrição</Label>
+          <Textarea
+            id="collection-description"
+            value={collectionData.descricao}
+            onChange={(e) => onDataChange("descricao", e.target.value)}
+            placeholder="Conte mais sobre como foi o evento..."
+            className="h-24"
+          />
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -92,6 +103,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
           />
         </div>
 
+        {/* 
         <div className="space-y-1.5 w-full max-w-full min-w-0">
           <PlaceSelector
             value={collectionData.local}
@@ -105,17 +117,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
             }}
           />
         </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="collection-description">Descrição</Label>
-          <Textarea
-            id="collection-description"
-            value={collectionData.descricao}
-            onChange={(e) => onDataChange("descricao", e.target.value)}
-            placeholder="Conte mais sobre como foi o evento..."
-            className="h-24"
-          />
-        </div>
+        */}
       </CardContent>
     </Card>
   );

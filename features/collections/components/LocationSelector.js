@@ -94,7 +94,7 @@ export default function LocationSelector({
               variant="outline"
               role="combobox"
               aria-expanded={openState}
-              className="w-full justify-between"
+              className="w-full max-w-full min-w-0 justify-between"
               disabled={loadingStates}
             >
               {selectedState
@@ -149,7 +149,7 @@ export default function LocationSelector({
               variant="outline"
               role="combobox"
               aria-expanded={openCity}
-              className="w-full justify-between"
+              className="w-full max-w-full min-w-0 justify-between"
               disabled={!selectedState || loadingCities}
             >
               {selectedCity

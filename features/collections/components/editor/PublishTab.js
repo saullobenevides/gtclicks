@@ -49,26 +49,31 @@ export default function PublishTab({
             value={collectionData.status}
             onValueChange={(value) => onDataChange("status", value)}
           >
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px] min-w-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="RASCUNHO">Rascunho (Privado)</SelectItem>
-              <SelectItem value="PUBLICADA">✨ Publicada (Visível)</SelectItem>
+              <SelectItem value="PUBLICADA">Publicada (Visível)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {initialCollection.slug && (
-          <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+          <div className="bg-muted/50 rounded-lg space-y-2">
             <Label>Link Público</Label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full max-w-full min-w-0">
               <Input
                 readOnly
                 value={getPublicUrl()}
-                className="font-mono text-sm flex-1 min-w-0"
+                className="font-mono text-sm flex-1 min-w-0 w-full"
               />
-              <Button size="icon" variant="outline" onClick={copyToClipboard}>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={copyToClipboard}
+                className="shrink-0"
+              >
                 <Share2 className="h-4 w-4" />
               </Button>
             </div>
@@ -79,10 +84,10 @@ export default function PublishTab({
           <Button
             type="button"
             variant="outline"
-            className="text-red-500 border-red-200 hover:bg-red-50"
+            className="text-red-500 border-red-200 hover:bg-red-50 h-auto whitespace-normal text-left"
             onClick={() => setDeleteOpen(true)}
           >
-            <Trash2 className="mr-2 h-4 w-4" />
+            <Trash2 className="mr-2 h-4 w-4 shrink-0" />
             Excluir Coleção Permanentemente
           </Button>
         </div>

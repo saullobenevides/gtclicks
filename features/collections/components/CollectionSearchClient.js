@@ -230,7 +230,7 @@ export default function CollectionSearchClient({
         {typeof document !== "undefined" &&
           createPortal(
             <div
-              className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 w-[95%] md:w-auto ${
+              className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 w-[95%] md:w-auto ${
                 selectedIds.size > 0
                   ? "translate-y-0 opacity-100"
                   : "translate-y-24 opacity-0 pointer-events-none"

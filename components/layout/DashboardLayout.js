@@ -62,7 +62,7 @@ export function DashboardLayout({ children, navItems }) {
           </div>
         </div>
 
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 w-full max-w-full overflow-x-hidden">
+        <main className="flex flex-1 flex-col gap-4 py-8 px-2 sm:px-4 lg:gap-6 lg:py-10 lg:px-6 w-full max-w-full overflow-x-hidden">
           {children}
         </main>
       </div>

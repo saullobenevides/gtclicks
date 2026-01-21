@@ -378,7 +378,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-24 md:pb-0 overflow-x-hidden w-full">
+    <div className="flex flex-col gap-8 pb-32 md:pb-8 overflow-x-hidden w-full max-w-full px-0 sm:px-0">
       <EditorHeader submitting={submitting} onSave={handleSaveChanges} />
 
       <Tabs defaultValue="detalhes" className="w-full">
@@ -386,25 +386,25 @@ export default function CollectionEditor({ collection: initialCollection }) {
           <TabsList className="flex w-full md:grid md:grid-cols-4 lg:w-[600px] overflow-x-auto md:overflow-visible h-auto p-1 bg-zinc-900 rounded-lg border border-zinc-800 gap-1 md:gap-0 no-scrollbar select-none">
             <TabsTrigger
               value="detalhes"
-              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-[80px] md:min-w-0 flex-1 md:flex-none"
+              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-0 flex-1 md:flex-none"
             >
               Detalhes
             </TabsTrigger>
             <TabsTrigger
               value="fotos"
-              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-[80px] md:min-w-0 flex-1 md:flex-none"
+              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-0 flex-1 md:flex-none"
             >
               Fotos ({currentPhotos.length})
             </TabsTrigger>
             <TabsTrigger
               value="precos"
-              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-[80px] md:min-w-0 flex-1 md:flex-none"
+              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-0 flex-1 md:flex-none"
             >
               Preços
             </TabsTrigger>
             <TabsTrigger
               value="publicacao"
-              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-[80px] md:min-w-0 flex-1 md:flex-none"
+              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-0 flex-1 md:flex-none"
             >
               Publicação
             </TabsTrigger>
