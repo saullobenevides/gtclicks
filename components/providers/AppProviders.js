@@ -6,10 +6,11 @@ import { stackClientApp } from "@/stack/client";
 import { CartProvider } from "@/features/cart/context/CartContext";
 import { PhotoModalProvider } from "@/components/providers/PhotoModalProvider";
 import UserSync from "@/components/UserSync";
+import { ptBRTranslations } from "@/lib/stack-translations";
 
 export default function AppProviders({ children }) {
   return (
-    <StackProvider app={stackClientApp}>
+    <StackProvider app={stackClientApp} translationOverrides={ptBRTranslations}>
       <StackTheme appearance="dark">
         <Suspense fallback={<div />}>
           <UserSync />

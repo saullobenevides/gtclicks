@@ -42,19 +42,19 @@ export async function GET(request) {
         },
         saldo: true,
         colecoes: {
-            take: 5,
-            orderBy: { createdAt: 'desc' },
-            select: {
-                id: true,
-                nome: true,
-                status: true,
-                views: true,
-                vendas: true,
-                downloads: true,
-                carrinhoCount: true,
-                createdAt: true,
-                capaUrl: true,
-            }
+          take: 5,
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            nome: true,
+            status: true,
+            views: true,
+            vendas: true,
+            downloads: true,
+            carrinhoCount: true,
+            createdAt: true,
+            capaUrl: true,
+          },
         },
         _count: {
           select: {
@@ -66,62 +66,53 @@ export async function GET(request) {
     });
 
     if (!fotografo) {
-      return NextResponse.json(
-        { error: "Fotografo nao encontrado para este usuario." },
-        { status: 404 }
-      );
+      return NextResponse.json({ data: null }, { status: 200 });
     }
 
     // Calcular estatísticas agregadas reais
-    const [revenueData, salesCount, viewsData, downloadsData, ordersCount] = await prisma.$transaction([
+    const [revenueData, salesCount, viewsData, downloadsData, ordersCount] =
+      await prisma.$transaction([
         // Receita Total (Soma dos itens vendidos deste fotógrafo)
         prisma.itemPedido.aggregate({
-            _sum: { precoPago: true },
-            where: {
-                foto: { fotografoId: fotografo.id },
-                pedido: { status: 'PAGO' }
-            }
+          _sum: { precoPago: true },
+          where: {
+            foto: { fotografoId: fotografo.id },
+            pedido: { status: "PAGO" },
+          },
         }),
         // Total de Itens Vendidos
         prisma.itemPedido.count({
-            where: {
-                foto: { fotografoId: fotografo.id },
-                pedido: { status: 'PAGO' }
-            }
+          where: {
+            foto: { fotografoId: fotografo.id },
+            pedido: { status: "PAGO" },
+          },
         }),
         // Total de Visualizações (Soma das views de todas as fotos)
         prisma.foto.aggregate({
-            _sum: { views: true },
-            where: { fotografoId: fotografo.id }
+          _sum: { views: true },
+          where: { fotografoId: fotografo.id },
         }),
         // Total de Downloads
         prisma.foto.aggregate({
-            _sum: { downloads: true },
-            where: { fotografoId: fotografo.id }
+          _sum: { downloads: true },
+          where: { fotografoId: fotografo.id },
         }),
         // Total de Pedidos Únicos (Para Ticket Médio)
         prisma.pedido.count({
-            where: {
-                status: 'PAGO',
-                itens: { some: { foto: { fotografoId: fotografo.id } } }
-            }
-        })
-    ]);
+          where: {
+            status: "PAGO",
+            itens: { some: { foto: { fotografoId: fotografo.id } } },
+          },
+        }),
+      ]);
 
     const stats = {
-        revenue: Number(revenueData._sum.precoPago || 0),
-        sales: salesCount,
-        views: viewsData._sum.views || 0,
-        downloads: downloadsData._sum.downloads || 0,
-        orders: ordersCount
+      revenue: Number(revenueData._sum.precoPago || 0),
+      sales: salesCount,
+      views: viewsData._sum.views || 0,
+      downloads: downloadsData._sum.downloads || 0,
+      orders: ordersCount,
     };
-
-    if (!fotografo) {
-      return NextResponse.json(
-        { error: "Fotografo nao encontrado para este usuario." },
-        { status: 404 }
-      );
-    }
 
     return NextResponse.json({
       data: {
@@ -138,7 +129,10 @@ export async function GET(request) {
     });
   } catch (error) {
     return NextResponse.json(
-      { error: "Nao foi possivel localizar o fotografo.", details: error.message },
+      {
+        error: "Nao foi possivel localizar o fotografo.",
+        details: error.message,
+      },
       { status: 500 }
     );
   }

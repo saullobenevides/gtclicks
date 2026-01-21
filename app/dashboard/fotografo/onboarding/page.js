@@ -21,7 +21,7 @@ export default async function OnboardingPage() {
     where: { userId: user.id },
   });
 
-  if (!fotografo) redirect("/dashboard/fotografo"); // Should be a photographer to be here
+  if (fotografo) redirect("/dashboard/fotografo"); // Already onboarded, go to dashboard
 
   // If already has key info, maybe redirect to dashboard?
   // For now let's allow editing by visiting this page manually or via initial flow.

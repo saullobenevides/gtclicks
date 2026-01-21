@@ -1,7 +1,8 @@
 import { StackClientApp } from "@stackframe/stack";
 
 const projectId = process.env.NEXT_PUBLIC_STACK_PROJECT_ID;
-const publishableClientKey = process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY;
+const publishableClientKey =
+  process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY;
 
 if (!projectId || !publishableClientKey) {
   throw new Error(
@@ -11,12 +12,14 @@ if (!projectId || !publishableClientKey) {
 
 const globalForStack = global;
 
-export const stackClientApp = globalForStack.stackClientApp || new StackClientApp({
-  projectId,
-  publishableClientKey,
-  tokenStore: "cookie",
-});
+export const stackClientApp =
+  globalForStack.stackClientApp ||
+  new StackClientApp({
+    projectId,
+    publishableClientKey,
+    tokenStore: "cookie",
+  });
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   globalForStack.stackClientApp = stackClientApp;
 }

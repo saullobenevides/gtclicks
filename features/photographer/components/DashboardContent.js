@@ -40,23 +40,18 @@ export default function DashboardContent() {
         .then(async (res) => {
           const payload = await res.json();
           if (res.ok) {
-            setFotografo(payload.data);
+            if (payload.data) {
+              setFotografo(payload.data);
+            } else {
+              router.replace("/dashboard/fotografo/onboarding");
+            }
           }
         })
         .finally(() => setLoading(false));
     }
-  }, [user]);
+  }, [user, router]); // Adicionado router como dependência
 
-  if (loading) {
-    return (
-      <div className="flex justify-center p-8">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!fotografo) {
-    router.replace("/dashboard/fotografo/onboarding");
+  if (loading || !fotografo) {
     return (
       <div className="flex justify-center p-8">
         <Loader2 className="w-8 h-8 animate-spin" />
