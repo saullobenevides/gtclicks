@@ -3,6 +3,8 @@ import ClientDashboard from "@/components/dashboard/ClientDashboard";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Dashboard | GTClicks",
 };
