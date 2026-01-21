@@ -1,31 +1,16 @@
 
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/auth';
 
-export async function POST(request) {
+export async function POST() {
   try {
-    const body = await request.json();
-    const { id, name, email, image } = body;
+    // Rely on server-side session (Stack Auth) via getAuthenticatedUser
+    // This helper already performs the Prisma upsert/sync logic.
+    const user = await getAuthenticatedUser();
 
-    if (!id || !email) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!user) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
-
-    const user = await prisma.user.upsert({
-      where: { id },
-      update: {
-        name,
-        email, 
-        image,
-      },
-      create: {
-        id,
-        name,
-        email,
-        image,
-        role: 'CLIENTE',
-      },
-    });
 
     return NextResponse.json({ success: true, data: user });
   } catch (error) {
@@ -33,3 +18,4 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Failed to sync user' }, { status: 500 });
   }
 }
+

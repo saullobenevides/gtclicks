@@ -1,13 +1,19 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { UploadCloud, Trash2 } from 'lucide-react';
-import FolderManager from '../FolderManager';
-import Breadcrumbs from '@/components/shared/Breadcrumbs';
-import PhotoEditorCard from './PhotoEditorCard';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { UploadCloud, Trash2 } from "lucide-react";
+import FolderManager from "../FolderManager";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
+import PhotoEditorCard from "./PhotoEditorCard";
 
-export default function PhotoManagerTab({ 
+export default function PhotoManagerTab({
   collectionId,
   currentFolder,
   folderPath,
@@ -19,7 +25,7 @@ export default function PhotoManagerTab({
   onBulkUpload,
   onSetCover,
   onRemovePhoto,
-  onUpdatePhoto
+  onUpdatePhoto,
 }) {
   return (
     <Card>
@@ -32,44 +38,55 @@ export default function PhotoManagerTab({
       <CardContent className="space-y-6">
         {/* Breadcrumbs */}
         <div className="flex items-center justify-between border-b pb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">Pasta atual:</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              Pasta atual:
+            </span>
             <Breadcrumbs path={folderPath} onNavigate={onNavigate} />
           </div>
         </div>
 
         {/* Folder Manager */}
-        <FolderManager 
-          collectionId={collectionId} 
-          currentFolder={currentFolder} 
+        <FolderManager
+          collectionId={collectionId}
+          currentFolder={currentFolder}
           onNavigate={onNavigate}
         />
 
         <div className="border-t pt-6">
           <div className="flex flex-col gap-4 mb-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Fotos nesta pasta ({currentPhotos.length})</h3>
-              <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <h3 className="text-lg font-medium">
+                Fotos nesta pasta ({currentPhotos.length})
+              </h3>
+              <div className="flex gap-2 w-full sm:w-auto">
                 {currentPhotos.length > 0 && (
-                  <Button variant="outline" size="sm" onClick={onDeleteAllInFolder} className="text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onDeleteAllInFolder}
+                    className="flex-1 sm:flex-none text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200"
+                  >
                     <Trash2 className="mr-2 h-3 w-3" /> Limpar Pasta
                   </Button>
                 )}
               </div>
             </div>
-            
+
             {/* Bulk Upload Area */}
-            <div className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl p-8 transition-colors text-center cursor-pointer relative h-32 flex flex-col items-center justify-center">
-              <input 
-                type="file" 
-                multiple 
+            <div className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-xl p-4 sm:p-8 transition-colors text-center cursor-pointer relative h-32 flex flex-col items-center justify-center">
+              <input
+                type="file"
+                multiple
                 accept="image/jpeg,image/png,image/webp"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 onChange={onBulkUpload}
               />
               <div className="flex flex-col items-center gap-1">
-                <UploadCloud className="h-8 w-8 text-primary mb-1" />
-                <h4 className="font-bold text-lg">Solte suas fotos aqui</h4>
+                <UploadCloud className="h-6 w-6 sm:h-8 sm:w-8 text-primary mb-1" />
+                <h4 className="font-bold text-base sm:text-lg">
+                  Solte suas fotos aqui
+                </h4>
               </div>
             </div>
           </div>
@@ -80,9 +97,9 @@ export default function PhotoManagerTab({
               <p>Nenhuma foto nesta pasta.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
               {currentPhotos.map((photo) => (
-                <PhotoEditorCard 
+                <PhotoEditorCard
                   key={photo.tempId}
                   photo={photo}
                   isCover={collectionData.capaUrl === photo.previewUrl}

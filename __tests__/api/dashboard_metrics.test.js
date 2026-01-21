@@ -73,6 +73,7 @@ describe("API Dashboard Fotógrafo", () => {
     expect(json.data.stats.revenue).toBe(1000);
 
     // Verifica se os campos novos de analytics estão presentes
+    const colecao = json.data.colecoes[0];
     expect(colecao).toHaveProperty("vendas", 5);
     expect(colecao).toHaveProperty("carrinhoCount", 12);
   });

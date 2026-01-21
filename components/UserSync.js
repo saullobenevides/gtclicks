@@ -15,13 +15,6 @@ function UserSyncInner() {
         try {
           await fetch("/api/users/sync", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id: user.id,
-              name: user.displayName,
-              email: user.primaryEmail,
-              image: user.profileImageUrl,
-            }),
           });
           console.log("User synced with DB");
         } catch (error) {

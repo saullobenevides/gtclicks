@@ -127,7 +127,96 @@ export default function DashboardContent() {
           </Link>
         </div>
 
-        <Card className="overflow-hidden border-white/10 bg-black/20">
+        {/* Mobile View: Cards */}
+        <div className="md:hidden space-y-4">
+          {(fotografo.colecoes || []).length === 0 ? (
+            <Card className="bg-black/20 border-white/10">
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Nenhuma coleção encontrada.
+              </CardContent>
+            </Card>
+          ) : (
+            fotografo.colecoes.map((col) => (
+              <Card key={col.id} className="bg-black/20 border-white/10">
+                <CardContent className="p-4 flex flex-col gap-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium text-white">{col.nome}</h3>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDate(col.createdAt)}
+                      </p>
+                    </div>
+                    <Badge
+                      variant={
+                        col.status === "PUBLICADA" ? "default" : "secondary"
+                      }
+                      className={
+                        col.status === "PUBLICADA"
+                          ? "bg-green-500/10 text-green-500"
+                          : ""
+                      }
+                    >
+                      {col.status === "PUBLICADA" ? "Ativo" : "Rascunho"}
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-sm">
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground text-xs">
+                        Views
+                      </span>
+                      <span>{col.views}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground text-xs">
+                        Carrinho
+                      </span>
+                      <span>{col.carrinhoCount}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground text-xs">
+                        Vendas
+                      </span>
+                      <span className="text-green-400 font-bold">
+                        {col.vendas}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8"
+                    >
+                      <Link
+                        href={`/dashboard/fotografo/colecoes/${col.id}/editar`}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    {col.status === "PUBLICADA" && (
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8"
+                      >
+                        <Link href={`/colecoes/${col.slug}`} target="_blank">
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+
+        {/* Desktop View: Table */}
+        <Card className="hidden md:block overflow-hidden border-white/10 bg-black/20">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>

@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Images, PlusCircle, Edit, ExternalLink } from "lucide-react";
 import CreateCollectionButton from "@/features/collections/components/CreateCollectionButton";
@@ -67,7 +67,81 @@ export default async function MinhasColecoesPage() {
         <CreateCollectionButton />
       </div>
 
-      <Card className="overflow-hidden border-white/10 bg-black/20">
+      {/* Mobile View */}
+      <div className="md:hidden space-y-4">
+        {colecoes.length === 0 ? (
+          <Card className="bg-black/20 border-white/10">
+            <CardContent className="py-8 text-center text-muted-foreground">
+              <div className="flex flex-col items-center gap-2">
+                <Images className="h-8 w-8 opacity-20" />
+                <p>Nenhuma coleção encontrada.</p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          colecoes.map((colecao) => (
+            <Card key={colecao.id} className="bg-black/20 border-white/10">
+              <CardContent className="p-4 flex flex-col gap-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium text-white">{colecao.nome}</h3>
+                    {colecao.descricao && (
+                      <p className="text-xs text-muted-foreground line-clamp-1">
+                        {colecao.descricao}
+                      </p>
+                    )}
+                  </div>
+                  <Badge
+                    variant={
+                      colecao.status === "PUBLICADA" ? "default" : "secondary"
+                    }
+                    className={
+                      colecao.status === "PUBLICADA"
+                        ? "bg-green-500/10 text-green-500"
+                        : ""
+                    }
+                  >
+                    {colecao.status === "PUBLICADA" ? "Ativo" : "Rascunho"}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center gap-4 text-sm text-muted-foreground border-t border-white/10 pt-2">
+                  <div className="flex items-center gap-1">
+                    <Images className="h-4 w-4" />
+                    <span>{colecao._count.fotos} fotos</span>
+                  </div>
+                  <span>{formatDate(colecao.createdAt)}</span>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+                  <Button asChild variant="ghost" size="sm" className="h-8 w-8">
+                    <Link
+                      href={`/dashboard/fotografo/colecoes/${colecao.id}/editar`}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  {colecao.status === "PUBLICADA" && (
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8"
+                    >
+                      <Link href={`/colecoes/${colecao.slug}`} target="_blank">
+                        <ExternalLink className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+
+      {/* Desktop View */}
+      <Card className="hidden md:block overflow-hidden border-white/10 bg-black/20">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>

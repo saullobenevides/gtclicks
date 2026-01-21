@@ -21,6 +21,7 @@ import BasicDetailsTab from "./editor/BasicDetailsTab";
 import PhotoManagerTab from "./editor/PhotoManagerTab";
 import PricingTab from "./editor/PricingTab";
 import PublishTab from "./editor/PublishTab";
+import EditorBottomBar from "./editor/EditorBottomBar";
 
 import { extractMetadata } from "../utils/metadata";
 import { usePhotoUpload } from "../hooks/usePhotoUpload";
@@ -56,8 +57,8 @@ export default function CollectionEditor({ collection: initialCollection }) {
     dataInicio: initialCollection.dataInicio
       ? new Date(initialCollection.dataInicio).toISOString().split("T")[0]
       : initialCollection.createdAt
-      ? new Date(initialCollection.createdAt).toISOString().split("T")[0]
-      : "",
+        ? new Date(initialCollection.createdAt).toISOString().split("T")[0]
+        : "",
     dataFim: initialCollection.dataFim
       ? new Date(initialCollection.dataFim).toISOString().split("T")[0]
       : "",
@@ -71,14 +72,14 @@ export default function CollectionEditor({ collection: initialCollection }) {
     (initialCollection.fotos || []).map((p) => ({
       ...p,
       tempId: p.id || Math.random().toString(36).substr(2, 9),
-    }))
+    })),
   );
   const [submitting, setSubmitting] = useState(false);
   const [deletedPhotoIds, setDeletedPhotoIds] = useState([]);
 
   const { uploadState, handleFileSelect } = usePhotoUpload(
     initialCollection.id,
-    currentFolder
+    currentFolder,
   );
 
   const currentPhotos = useMemo(() => {
@@ -121,7 +122,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
       setDeletedPhotoIds((prev) => [...prev, photoToRemove.id]);
     }
     setAllPhotos((prev) =>
-      prev.filter((p) => p.tempId !== photoToRemove.tempId)
+      prev.filter((p) => p.tempId !== photoToRemove.tempId),
     );
     if (collectionData.capaUrl === photoToRemove.previewUrl) {
       setCollectionData((prev) => ({ ...prev, capaUrl: "" }));
@@ -132,8 +133,8 @@ export default function CollectionEditor({ collection: initialCollection }) {
   const updatePhoto = (photoToUpdate, field, value) => {
     setAllPhotos((prev) =>
       prev.map((p) =>
-        p.tempId === photoToUpdate.tempId ? { ...p, [field]: value } : p
-      )
+        p.tempId === photoToUpdate.tempId ? { ...p, [field]: value } : p,
+      ),
     );
   };
 
@@ -160,13 +161,13 @@ export default function CollectionEditor({ collection: initialCollection }) {
         const updatedPhoto = await handleFileSelect(
           photoPlaceholder,
           file,
-          updatePhoto
+          updatePhoto,
         );
         if (updatedPhoto) {
           setAllPhotos((prev) =>
             prev.map((p) =>
-              p.tempId === photoPlaceholder.tempId ? updatedPhoto : p
-            )
+              p.tempId === photoPlaceholder.tempId ? updatedPhoto : p,
+            ),
           );
         }
         completed++;
@@ -243,7 +244,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
               : aiData.tags || p.tags,
             corPredominante: aiData.primaryColor,
           };
-        })
+        }),
       );
       toast.success("Foto preenchida com magia IA! ✨");
     } catch (error) {
@@ -260,7 +261,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
       let finalCapaUrl = collectionData.capaUrl;
       if (!finalCapaUrl) {
         const validPhotos = allPhotos.filter(
-          (p) => p.previewUrl && !deletedPhotoIds.includes(p.id)
+          (p) => p.previewUrl && !deletedPhotoIds.includes(p.id),
         );
         if (validPhotos.length > 0) {
           finalCapaUrl = validPhotos[validPhotos.length - 1].previewUrl;
@@ -337,7 +338,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
   const handleDeleteAllInFolder = () => {
     if (
       !confirm(
-        "Tem certeza? Isso removerá todas as fotos VISÍVEIS nesta pasta."
+        "Tem certeza? Isso removerá todas as fotos VISÍVEIS nesta pasta.",
       )
     )
       return;
@@ -345,7 +346,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
     setDeletedPhotoIds((prev) => [...prev, ...idsToRemove]);
     const tempIdsToRemove = currentPhotos.map((p) => p.tempId);
     setAllPhotos((prev) =>
-      prev.filter((p) => !tempIdsToRemove.includes(p.tempId))
+      prev.filter((p) => !tempIdsToRemove.includes(p.tempId)),
     );
     toast.success("Pasta limpa com sucesso.");
   };
@@ -371,42 +372,44 @@ export default function CollectionEditor({ collection: initialCollection }) {
     setCollectionData((prev) => ({
       ...prev,
       descontos: prev.descontos.map((d, i) =>
-        i === index ? { ...d, [field]: parseFloat(value) } : d
+        i === index ? { ...d, [field]: parseFloat(value) } : d,
       ),
     }));
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 pb-24 md:pb-0">
       <EditorHeader submitting={submitting} onSave={handleSaveChanges} />
 
       <Tabs defaultValue="detalhes" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:w-[600px] h-auto p-1 bg-zinc-900 rounded-lg border border-zinc-800">
-          <TabsTrigger
-            value="detalhes"
-            className="data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:font-bold py-2"
-          >
-            Detalhes
-          </TabsTrigger>
-          <TabsTrigger
-            value="fotos"
-            className="data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:font-bold py-2"
-          >
-            Fotos ({currentPhotos.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="precos"
-            className="data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:font-bold py-2"
-          >
-            Preços
-          </TabsTrigger>
-          <TabsTrigger
-            value="publicacao"
-            className="data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:font-bold py-2"
-          >
-            Publicação
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full max-w-full overflow-hidden px-1">
+          <TabsList className="flex w-full md:grid md:grid-cols-4 lg:w-[600px] overflow-x-auto md:overflow-visible h-auto p-1 bg-zinc-900 rounded-lg border border-zinc-800 gap-1 md:gap-0 no-scrollbar select-none">
+            <TabsTrigger
+              value="detalhes"
+              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-[80px] md:min-w-0 flex-1 md:flex-none"
+            >
+              Detalhes
+            </TabsTrigger>
+            <TabsTrigger
+              value="fotos"
+              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-[80px] md:min-w-0 flex-1 md:flex-none"
+            >
+              Fotos ({currentPhotos.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="precos"
+              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-[80px] md:min-w-0 flex-1 md:flex-none"
+            >
+              Preços
+            </TabsTrigger>
+            <TabsTrigger
+              value="publicacao"
+              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-[80px] md:min-w-0 flex-1 md:flex-none"
+            >
+              Publicação
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="detalhes" className="mt-6">
           <BasicDetailsTab
@@ -455,6 +458,12 @@ export default function CollectionEditor({ collection: initialCollection }) {
           />
         </TabsContent>
       </Tabs>
+
+      <EditorBottomBar
+        onSave={handleSaveChanges}
+        onBack={() => router.back()}
+        submitting={submitting}
+      />
 
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
