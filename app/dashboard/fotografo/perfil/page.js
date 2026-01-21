@@ -1,4 +1,5 @@
 import { stackServerApp } from "@/stack/server";
+export const dynamic = "force-dynamic";
 import prisma from "@/lib/prisma";
 import PhotographerProfileForm from "@/components/dashboard/PhotographerProfileForm";
 import { redirect } from "next/navigation";

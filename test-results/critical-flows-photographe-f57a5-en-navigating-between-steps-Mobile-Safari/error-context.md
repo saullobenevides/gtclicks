@@ -1,0 +1,165 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e13]: GTClicks | Marketplace de Fotos
+  - banner [ref=e14]:
+    - generic [ref=e15]:
+      - link "GTClicks Logo" [ref=e16]:
+        - /url: /
+        - img "GTClicks Logo" [ref=e18]
+      - generic [ref=e19]:
+        - button [ref=e20] [cursor=pointer]:
+          - img
+        - button [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+  - generic:
+    - generic:
+      - generic:
+        - generic: Menu
+        - button:
+          - img
+      - generic:
+        - link "Explorar":
+          - /url: /busca
+        - link "Categorias":
+          - /url: /categorias
+        - link "Coleções":
+          - /url: /colecoes
+        - separator
+        - link "Meus Favoritos":
+          - /url: /meus-favoritos
+          - img
+          - text: Meus Favoritos
+        - generic:
+          - generic:
+            - link "Entrar":
+              - /url: /login
+            - link "Criar Conta":
+              - /url: /login
+  - main [ref=e23]:
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - generic [ref=e26]: Login
+        - heading "Acesse sua conta" [level=1] [ref=e27]
+        - paragraph [ref=e28]:
+          - strong [ref=e29]: "Participante:"
+          - text: acesse e baixe suas fotos compradas.
+          - strong [ref=e30]: "Fotógrafo:"
+          - text: gerencie seus eventos, uploads e acompanhe suas vendas.
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - heading "Sign in to your account" [level=2] [ref=e34]
+          - paragraph [ref=e35]:
+            - text: Don't have an account?
+            - link "Sign up" [ref=e36]:
+              - /url: /handler/sign-up
+        - button "Sign in with Google" [ref=e40] [cursor=pointer]:
+          - generic [ref=e41]:
+            - img [ref=e42]
+            - generic [ref=e48]: Sign in with Google
+        - generic [ref=e51]: Or continue with
+        - generic [ref=e53]:
+          - generic [ref=e54]: Email
+          - textbox "Email" [ref=e56]
+          - generic [ref=e57]: Password
+          - generic [ref=e58]:
+            - textbox "Password" [ref=e60]
+            - button "Show password" [ref=e61] [cursor=pointer]:
+              - img [ref=e62]
+          - link "Forgot password?" [ref=e67]:
+            - /url: /handler/forgot-password
+          - button "Sign In" [ref=e68] [cursor=pointer]:
+            - generic [ref=e69]: Sign In
+  - contentinfo [ref=e70]:
+    - generic [ref=e71]:
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - link "GTClicks Logo" [ref=e74]:
+            - /url: /
+            - img "GTClicks Logo" [ref=e76]
+          - paragraph [ref=e77]: Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.
+          - generic [ref=e78]:
+            - link [ref=e79]:
+              - /url: https://instagram.com/gt.clicks
+              - img [ref=e80]
+            - link [ref=e83]:
+              - /url: https://youtube.com/@gtclicks
+              - img [ref=e84]
+            - link [ref=e87]:
+              - /url: https://twitter.com/gtclicks
+              - img [ref=e88]
+            - link [ref=e90]:
+              - /url: https://tiktok.com/@gtclicks
+              - img [ref=e91]
+        - generic [ref=e93]:
+          - heading "Plataforma" [level=4] [ref=e94]
+          - list [ref=e95]:
+            - listitem [ref=e96]:
+              - link "Explorar Fotos" [ref=e97]:
+                - /url: /busca
+            - listitem [ref=e98]:
+              - link "Coleções" [ref=e99]:
+                - /url: /colecoes
+            - listitem [ref=e100]:
+              - link "Categorias" [ref=e101]:
+                - /url: /categorias
+            - listitem [ref=e102]:
+              - link "Meus Favoritos" [ref=e103]:
+                - /url: /meus-favoritos
+        - generic [ref=e104]:
+          - heading "Fotógrafos" [level=4] [ref=e105]
+          - list [ref=e106]:
+            - listitem [ref=e107]:
+              - link "Começar a Vender" [ref=e108]:
+                - /url: /cadastro
+            - listitem [ref=e109]:
+              - link "Fazer Upload" [ref=e110]:
+                - /url: /dashboard/fotografo/colecoes
+            - listitem [ref=e111]:
+              - link "Painel Financeiro" [ref=e112]:
+                - /url: /dashboard/fotografo/financeiro
+        - generic [ref=e113]:
+          - heading "Suporte" [level=4] [ref=e114]
+          - list [ref=e115]:
+            - listitem [ref=e116]:
+              - link "Perguntas Frequentes" [ref=e117]:
+                - /url: /faq
+            - listitem [ref=e118]:
+              - link "Termos de Uso" [ref=e119]:
+                - /url: /termos
+            - listitem [ref=e120]:
+              - link "Privacidade" [ref=e121]:
+                - /url: /privacidade
+            - listitem [ref=e122]:
+              - link "Fale Conosco" [ref=e123]:
+                - /url: /contato
+      - generic [ref=e124]:
+        - paragraph [ref=e125]: © 2026 GTClicks. Todos os direitos reservados.
+        - generic [ref=e127]: Feito com ❤️ para criadores
+  - region "Notifications alt+T"
+  - navigation [ref=e128]:
+    - generic [ref=e129]:
+      - link "Início" [ref=e130]:
+        - /url: /
+        - img [ref=e132]
+        - generic [ref=e135]: Início
+      - link "Buscar" [ref=e136]:
+        - /url: /busca
+        - img [ref=e138]
+        - generic [ref=e141]: Buscar
+      - link "Carrinho" [ref=e142]:
+        - /url: /carrinho
+        - img [ref=e144]
+        - generic [ref=e148]: Carrinho
+      - link "Favoritos" [ref=e149]:
+        - /url: /meus-favoritos
+        - img [ref=e151]
+        - generic [ref=e153]: Favoritos
+      - link "Perfil" [ref=e154]:
+        - /url: /dashboard
+        - img [ref=e156]
+        - generic [ref=e159]: Perfil
+```

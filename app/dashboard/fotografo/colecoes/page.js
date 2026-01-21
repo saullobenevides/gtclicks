@@ -1,5 +1,7 @@
 import Link from "next/link";
+export const dynamic = "force-dynamic";
 import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 import { stackServerApp } from "@/stack/server";
 import prisma from "@/lib/prisma";
 import {

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+export const dynamic = "force-dynamic";
 import { getAuthenticatedUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import OnboardingWizard from "@/features/photographer/components/FotografoOnboarding";
