@@ -28,7 +28,7 @@ export default function PricingTab({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-8">
-        <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 flex flex-col items-center justify-center text-center gap-4">
+        <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4">
           <Label
             htmlFor="price-base"
             className="text-lg font-medium text-primary"
@@ -88,7 +88,7 @@ export default function PricingTab({
             {collectionData.descontos?.map((discount, index) => (
               <div
                 key={index}
-                className="relative group border rounded-xl p-4 bg-card shadow-sm hover:shadow-md transition-all flex flex-col gap-3"
+                className="relative group border rounded-xl p-3 md:p-4 bg-card shadow-sm hover:shadow-md transition-all flex flex-col gap-3"
               >
                 <Button
                   type="button"

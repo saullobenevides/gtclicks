@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
 import NavUserActions from "./NavUserActions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
-import { Menu, X, ShoppingCart, Heart, Search } from "lucide-react";
+import { Menu, ShoppingCart, Heart, Search } from "lucide-react";
 import { useCart } from "@/features/cart/context/CartContext";
+
+// Lazy load Mobile Menu to reduce initial bundle size
+const MobileMenu = dynamic(() => import("./MobileMenu"), { ssr: false });
 
 export default function Header() {
   const pathname = usePathname();
@@ -153,69 +156,12 @@ export default function Header() {
         </div>
       </header>
 
-      {/* MOBILE MENU OVERLAY (Full Screen Glass) */}
-      <div
-        className={cn(
-          "fixed inset-0 z-[60] bg-black/60 backdrop-blur-xl transition-all duration-300 md:hidden",
-          isMobileMenuOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        )}
-      >
-        <div
-          className={cn(
-            "absolute right-0 top-0 h-full w-[80%] max-w-sm bg-zinc-950 border-l border-white/10 shadow-2xl transition-transform duration-300 flex flex-col",
-            isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
-          )}
-        >
-          <div className="p-6 flex items-center justify-between border-b border-white/10">
-            <span className="font-syne font-bold text-xl tracking-tight text-white">
-              Menu
-            </span>
-            <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="p-2 text-zinc-400 hover:text-white"
-            >
-              <X size={24} />
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-2">
-            {mainNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={cn(
-                  "flex items-center justify-between px-4 py-4 rounded-xl text-lg font-medium transition-all border border-transparent",
-                  pathname === item.href
-                    ? "bg-white/10 text-white border-white/5"
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
-
-            <hr className="my-4 border-white/10" />
-
-            <Link
-              href="/meus-favoritos"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 text-zinc-400 hover:text-white rounded-xl hover:bg-white/5"
-            >
-              <Heart className="h-5 w-5" />
-              Meus Favoritos
-            </Link>
-
-            <div className="mt-auto pt-8 pb-4">
-              <Suspense>
-                <NavUserActions mobile />
-              </Suspense>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* MOBILE MENU (Lazy Loaded) */}
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
     </>
   );
 }
+

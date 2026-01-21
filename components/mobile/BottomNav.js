@@ -18,18 +18,21 @@ export default function BottomNav() {
   const pathname = usePathname();
   const { itemCount } = useCart();
 
+  if (pathname?.includes("/editar")) return null;
+
   return (
-    <nav 
+    <nav
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10"
       style={{
-        height: '4.5rem',
-        paddingBottom: 'env(safe-area-inset-bottom)',
+        height: "4.5rem",
+        paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
       <div className="grid grid-cols-5 h-full items-center px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || 
+          const isActive =
+            pathname === item.href ||
             (item.href !== "/" && pathname?.startsWith(item.href));
           const isCart = item.label === "Carrinho";
 
@@ -39,28 +42,28 @@ export default function BottomNav() {
               href={item.href}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg transition-all active:scale-95",
-                isActive 
-                  ? "text-primary" 
-                  : "text-muted-foreground active:text-white"
+                isActive
+                  ? "text-primary"
+                  : "text-muted-foreground active:text-white",
               )}
             >
               <div className="relative">
-                <Icon 
+                <Icon
                   className={cn(
                     "h-6 w-6 transition-transform",
-                    isActive && "scale-110"
-                  )} 
+                    isActive && "scale-110",
+                  )}
                 />
                 {isCart && itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[9px] font-bold flex items-center justify-center text-white border border-black">
-                    {itemCount > 9 ? '9+' : itemCount}
+                    {itemCount > 9 ? "9+" : itemCount}
                   </span>
                 )}
               </div>
-              <span 
+              <span
                 className={cn(
                   "text-[10px] font-medium transition-all",
-                  isActive ? "font-bold" : "font-normal"
+                  isActive ? "font-bold" : "font-normal",
                 )}
               >
                 {item.label}

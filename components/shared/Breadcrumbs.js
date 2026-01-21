@@ -19,7 +19,13 @@ export default function Breadcrumbs({ path, onNavigate }) {
               className={`px-2 h-8 ${isLast ? "font-semibold text-foreground pointer-events-none" : ""}`}
               onClick={() => !isLast && onNavigate(folder)}
             >
-              {folder.id === null ? <Home className="h-4 w-4" /> : folder.nome}
+              <span className="truncate max-w-[100px] sm:max-w-[200px] block">
+                {folder.id === null ? (
+                  <Home className="h-4 w-4" />
+                ) : (
+                  folder.nome
+                )}
+              </span>
             </Button>
           </div>
         );

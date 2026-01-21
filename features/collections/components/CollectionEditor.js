@@ -378,7 +378,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-24 md:pb-0">
+    <div className="flex flex-col gap-8 pb-24 md:pb-0 overflow-x-hidden w-full">
       <EditorHeader submitting={submitting} onSave={handleSaveChanges} />
 
       <Tabs defaultValue="detalhes" className="w-full">
@@ -411,14 +411,20 @@ export default function CollectionEditor({ collection: initialCollection }) {
           </TabsList>
         </div>
 
-        <TabsContent value="detalhes" className="mt-6">
+        <TabsContent
+          value="detalhes"
+          className="mt-6 w-full max-w-full overflow-x-hidden"
+        >
           <BasicDetailsTab
             collectionData={collectionData}
             onDataChange={handleCollectionDataChange}
           />
         </TabsContent>
 
-        <TabsContent value="fotos" className="mt-6">
+        <TabsContent
+          value="fotos"
+          className="mt-6 w-full max-w-full overflow-x-hidden"
+        >
           <PhotoManagerTab
             collectionId={initialCollection.id}
             currentFolder={currentFolder}
@@ -439,7 +445,10 @@ export default function CollectionEditor({ collection: initialCollection }) {
           />
         </TabsContent>
 
-        <TabsContent value="precos" className="mt-6">
+        <TabsContent
+          value="precos"
+          className="mt-6 w-full max-w-full overflow-x-hidden"
+        >
           <PricingTab
             collectionData={collectionData}
             onDataChange={handleCollectionDataChange}
@@ -449,7 +458,10 @@ export default function CollectionEditor({ collection: initialCollection }) {
           />
         </TabsContent>
 
-        <TabsContent value="publicacao" className="mt-6">
+        <TabsContent
+          value="publicacao"
+          className="mt-6 w-full max-w-full overflow-x-hidden"
+        >
           <PublishTab
             collectionData={collectionData}
             initialCollection={initialCollection}
