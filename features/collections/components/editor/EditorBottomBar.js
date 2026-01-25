@@ -18,7 +18,7 @@ export default function EditorBottomBar({ onSave, onBack, submitting }) {
         type="button"
         onClick={onSave}
         disabled={submitting}
-        className="flex-2"
+        className="flex-[2] grow-[2]"
       >
         {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         <Save className="mr-2 h-4 w-4" />

@@ -1,27 +1,15 @@
 import { NextResponse } from "next/server";
-import { stackServerApp } from "@/stack/server";
 import prisma from "@/lib/prisma";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function GET() {
   // Verify admin access
-  const user = await stackServerApp.getUser();
-  
-  if (!user) {
-    return NextResponse.json(
-      { error: "Não autenticado" },
-      { status: 401 }
-    );
-  }
+  const user = await getAuthenticatedUser();
 
-  // Check if user is admin (you can customize this check)
-  // For now, we'll check if user has a specific role or email
-  const isAdmin = user.serverMetadata?.role === "ADMIN" || 
-                  user.primaryEmail?.endsWith("@gtclicks.com");
-
-  if (!isAdmin) {
+  if (!user || user.role !== "ADMIN") {
     return NextResponse.json(
       { error: "Acesso não autorizado" },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -36,8 +24,8 @@ export async function GET() {
         },
       },
       orderBy: [
-        { status: 'asc' }, // PENDENTE first
-        { createdAt: 'desc' },
+        { status: "asc" }, // PENDENTE first
+        { createdAt: "desc" },
       ],
     });
 
@@ -46,7 +34,7 @@ export async function GET() {
     console.error("Error fetching withdrawals:", error);
     return NextResponse.json(
       { error: "Erro ao buscar saques" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

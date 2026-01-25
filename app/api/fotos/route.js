@@ -1,6 +1,7 @@
 import { OrientacaoFoto } from "@prisma/client";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function GET() {
   try {
@@ -29,13 +30,31 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { error: "Nao foi possivel listar as fotos.", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function POST(request) {
   try {
+    // 1. Security: Authenticate User
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
+    }
+
+    // 2. Security: Verify Photographer Role
+    const fotografo = await prisma.fotografo.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!fotografo) {
+      return NextResponse.json(
+        { error: "Perfil de fotografo nao encontrado" },
+        { status: 403 },
+      );
+    }
+
     const payload = await request.json();
     const {
       titulo,
@@ -46,20 +65,24 @@ export async function POST(request) {
       corPredominante,
       previewUrl,
       originalUrl,
-      fotografoId,
+      // fotografoId, // IGNORE Client provided ID
       colecaoId,
     } = payload;
 
-    if (!titulo || !slug || !fotografoId || !previewUrl || !originalUrl) {
+    if (!titulo || !slug || !previewUrl || !originalUrl) {
       return NextResponse.json(
-        { error: "Campos obrigatorios: titulo, slug, fotografoId, previewUrl, originalUrl." },
-        { status: 400 }
+        {
+          error: "Campos obrigatorios: titulo, slug, previewUrl, originalUrl.",
+        },
+        { status: 400 },
       );
     }
 
     const normalizedOrientation =
       typeof orientacao === "string" ? orientacao.toUpperCase() : orientacao;
-    const orientationValue = Object.values(OrientacaoFoto).includes(normalizedOrientation)
+    const orientationValue = Object.values(OrientacaoFoto).includes(
+      normalizedOrientation,
+    )
       ? normalizedOrientation
       : OrientacaoFoto.HORIZONTAL;
 
@@ -74,7 +97,7 @@ export async function POST(request) {
         previewUrl,
         originalUrl,
         fotografo: {
-          connect: { id: fotografoId },
+          connect: { id: fotografo.id }, // Connect to Authenticated Photographer
         },
         ...(colecaoId
           ? {
@@ -90,7 +113,7 @@ export async function POST(request) {
   } catch (error) {
     return NextResponse.json(
       { error: "Erro ao salvar a foto.", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

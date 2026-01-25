@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
+  const user = await getAuthenticatedUser();
 
-  if (!userId) {
-    return NextResponse.json(
-      { error: "userId is required" },
-      { status: 400 }
-    );
+  if (!user) {
+    return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
+
+  const userId = user.id; // STRICTLY use authenticated ID
 
   try {
     // Get photographer
@@ -21,7 +20,7 @@ export async function GET(request) {
     if (!fotografo) {
       return NextResponse.json(
         { error: "Fotografo não encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -39,7 +38,7 @@ export async function GET(request) {
     // Get transactions
     const transacoes = await prisma.transacao.findMany({
       where: { fotografoId: fotografo.id },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 50,
     });
 
@@ -51,7 +50,7 @@ export async function GET(request) {
     console.error("Error fetching financial data:", error);
     return NextResponse.json(
       { error: "Erro ao buscar dados financeiros" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

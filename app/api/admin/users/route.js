@@ -1,25 +1,58 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { getAuthenticatedUser } from "@/lib/auth";
+import { z } from "zod";
+
+const querySchema = z.object({
+  role: z.enum(["CLIENTE", "FOTOGRAFO", "ADMIN"]).optional(),
+  search: z.string().optional(),
+});
 
 export async function GET(request) {
   try {
+    // 1. Security Check: Authentication & Authorization
+    const user = await getAuthenticatedUser();
+
+    if (!user || user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Unauthorized: Admin access required" },
+        { status: 401 },
+      );
+    }
+
+    // 2. Input Validation
     const { searchParams } = new URL(request.url);
-    const role = searchParams.get('role');
-    const search = searchParams.get('search');
-    
+    const rawRole = searchParams.get("role");
+    const rawSearch = searchParams.get("search");
+
+    const validationResult = querySchema.safeParse({
+      role: rawRole || undefined,
+      search: rawSearch || undefined,
+    });
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: "Invalid query parameters" },
+        { status: 400 },
+      );
+    }
+
+    const { role, search } = validationResult.data;
+
+    // 3. Data Fetching
     const where = {};
-    
+
     if (role) {
       where.role = role;
     }
-    
+
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } }
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
       ];
     }
-    
+
     const users = await prisma.user.findMany({
       where,
       select: {
@@ -31,26 +64,25 @@ export async function GET(request) {
         fotografo: {
           select: {
             id: true,
-            username: true
-          }
+            username: true,
+          },
         },
         _count: {
           select: {
-            pedidos: true
-          }
-        }
+            pedidos: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' },
-      take: 100
+      orderBy: { createdAt: "desc" },
+      take: 100,
     });
-    
+
     return NextResponse.json(users);
-    
   } catch (error) {
-    console.error('[API /admin/users] Error:', error);
+    console.error("[API /admin/users] Error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

@@ -61,11 +61,11 @@ export default async function CollectionDetail({ params, searchParams }) {
 
   // Filter content based on current folder level
   const currentLevelFolders = (collection.folders || []).filter(
-    (f) => f.parentId === (folderId || null)
+    (f) => f.parentId === (folderId || null),
   );
 
   const currentLevelPhotos = (collection.photos || []).filter(
-    (p) => p.folderId === (folderId || null)
+    (p) => p.folderId === (folderId || null),
   );
 
   const currentFolder = folderId
@@ -162,6 +162,39 @@ export default async function CollectionDetail({ params, searchParams }) {
           subtitle="Explore mais trabalhos incríveis"
         />
       </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: collection.title,
+            description:
+              collection.description ||
+              `Coleção de fotos por ${collection.photographer?.name || "GTClicks"}`,
+            image: collection.photos?.[0]?.previewUrl
+              ? [collection.photos[0].previewUrl]
+              : [],
+            brand: {
+              "@type": "Brand",
+              name: "GTClicks",
+            },
+            offers: {
+              "@type": "AggregateOffer",
+              priceCurrency: "BRL",
+              lowPrice: "15.00", // Generic floor price or dynamic if available
+              highPrice: "150.00",
+              offerCount: collection.photos?.length || 0,
+              availability: "https://schema.org/InStock",
+            },
+            merchant: {
+              "@type": "Organization",
+              name: collection.photographer?.name || "GTClicks",
+            },
+          }),
+        }}
+      />
     </div>
   );
 }

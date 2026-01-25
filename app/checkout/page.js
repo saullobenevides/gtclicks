@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@stackframe/stack';
-import { useCart } from '@/features/cart/context/CartContext';
-import { useCheckout } from '@/features/cart/hooks/useCheckout';
-import { Button } from '@/components/ui/button';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@stackframe/stack";
+import { useCart } from "@/features/cart/context/CartContext";
+import { useCheckout } from "@/features/cart/hooks/useCheckout";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,19 +13,19 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Loader2 } from 'lucide-react';
+} from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const user = useUser();
-  const { items, getTotalPrice, getItemPrice } = useCart();
+  const { items, getTotalPrice, getItemPrice, getSavings } = useCart();
   const { processCheckout, loading, error } = useCheckout();
 
   useEffect(() => {
     if (items.length === 0) {
-      router.push('/carrinho');
+      router.push("/carrinho");
     }
   }, [items, router]);
 
@@ -70,6 +70,12 @@ export default function CheckoutPage() {
               <span>Total</span>
               <span>R$ {getTotalPrice().toFixed(2)}</span>
             </div>
+            {getSavings() > 0 && (
+              <div className="flex w-full justify-between text-sm font-medium text-green-600 mt-2">
+                <span>Economia aplicada</span>
+                <span>- R$ {getSavings().toFixed(2)}</span>
+              </div>
+            )}
           </CardFooter>
         </Card>
 
@@ -99,14 +105,14 @@ export default function CheckoutPage() {
               size="lg"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? 'Processando...' : 'Ir para Pagamento'}
+              {loading ? "Processando..." : "Ir para Pagamento"}
             </Button>
 
             {!user && (
               <p className="mt-4 text-center text-sm text-muted-foreground">
                 <a href="/login?redirect=/checkout" className="underline">
                   Faça login
-                </a>{' '}
+                </a>{" "}
                 para finalizar a compra.
               </p>
             )}
@@ -116,4 +122,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-

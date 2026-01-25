@@ -28,7 +28,7 @@ export default function CollectionHero({ collection }) {
       {/* Content */}
       <div className="relative z-10 container-wide w-full flex flex-col items-center justify-center text-center gap-4 px-4">
         {/* Title */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white tracking-wide mb-2">
+        <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl mb-2">
           {collection.title}
         </h1>
 

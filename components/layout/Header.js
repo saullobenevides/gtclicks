@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
@@ -30,7 +31,7 @@ export default function Header() {
 
   // Simplified Nav Items (Removed Search/Collections if they are redundant or secondary)
   const mainNavItems = siteConfig.navItems.filter(
-    (item) => !["/meus-favoritos", "/carrinho"].includes(item.href)
+    (item) => !["/meus-favoritos", "/carrinho"].includes(item.href),
   );
 
   return (
@@ -40,7 +41,7 @@ export default function Header() {
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out border-b border-transparent bg-white",
           scrolled
             ? "bg-black/60 backdrop-blur-xl border-white/5 py-3 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-            : "bg-transparent py-5"
+            : "bg-transparent py-5",
         )}
       >
         <div className="container-wide flex items-center justify-between px-6 md:px-8">
@@ -50,27 +51,16 @@ export default function Header() {
             className="relative z-10 flex items-center gap-2 group"
           >
             <div className="relative h-10 w-32 transition-transform duration-300 group-hover:scale-105">
-              <img
+              <Image
                 src="/logo.png"
                 alt="GTClicks Logo"
-                className="h-full w-full object-contain object-left"
+                fill
+                sizes="(max-width: 768px) 128px, 128px"
+                className="object-contain object-left"
+                priority
               />
             </div>
           </Link>
-
-          {/* CENTER: PILL NAVIGATION (Desktop Only) */}
-          <nav
-            className={cn(
-              "absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-1 px-2 py-1.5 rounded-full border border-white/5 bg-white/5 backdrop-blur-md transition-all duration-500",
-              scrolled
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-4 pointer-events-none" // Hide nav when at top (optional, or keep always visible)
-            )}
-          >
-            {/* Note: I decided to keep it always visible but styled differently if preferred. 
-                 For now, let's make it always visible but sleeker. 
-                 Reverting opacity change for usability. */}
-          </nav>
 
           {/* Re-doing Nav to be always visible but floating */}
           <nav className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-1 px-3 py-2 rounded-full border border-white/5 bg-black/20 backdrop-blur-lg shadow-lg">
@@ -82,7 +72,7 @@ export default function Header() {
                   "text-sm font-medium px-5 py-2 rounded-full transition-all duration-300",
                   pathname === item.href
                     ? "bg-white text-black shadow-md font-bold"
-                    : "text-zinc-400 hover:text-white hover:bg-white/10"
+                    : "text-zinc-400 hover:text-white hover:bg-white/10",
                 )}
               >
                 {item.label}
@@ -164,4 +154,3 @@ export default function Header() {
     </>
   );
 }
-

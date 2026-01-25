@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { stackServerApp } from '@/stack/server';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function DELETE(request) {
   try {
-    const user = await stackServerApp.getUser();
+    const user = await getAuthenticatedUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if user has a cart
@@ -24,7 +24,10 @@ export async function DELETE(request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error clearing cart:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error("Error clearing cart:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

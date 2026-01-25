@@ -1,15 +1,23 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { userId, valor, chavePix } = body;
+    const user = await getAuthenticatedUser();
 
-    if (!userId || !valor || !chavePix) {
+    if (!user) {
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { valor, chavePix } = body;
+    const userId = user.id; // STRICTLY use authenticated ID
+
+    if (!valor || !chavePix) {
       return NextResponse.json(
-        { error: "userId, valor e chavePix são obrigatórios" },
-        { status: 400 }
+        { error: "Valor e chavePix são obrigatórios" },
+        { status: 400 },
       );
     }
 
@@ -18,7 +26,7 @@ export async function POST(request) {
     if (valorDecimal < 50) {
       return NextResponse.json(
         { error: "Valor mínimo para saque é R$ 50,00" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -31,14 +39,14 @@ export async function POST(request) {
     if (!fotografo) {
       return NextResponse.json(
         { error: "Fotógrafo não encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (!fotografo.saldo) {
       return NextResponse.json(
         { error: "Você ainda não tem saldo" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -47,7 +55,7 @@ export async function POST(request) {
     if (valorDecimal > saldoDisponivel) {
       return NextResponse.json(
         { error: "Saldo insuficiente" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -91,7 +99,7 @@ export async function POST(request) {
     console.error("Error creating withdrawal:", error);
     return NextResponse.json(
       { error: "Erro ao solicitar saque" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

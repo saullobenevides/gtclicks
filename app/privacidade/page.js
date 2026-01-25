@@ -11,26 +11,39 @@ export default function PrivacidadePage() {
     <div className="container-wide py-12 md:py-24">
       <div className="mx-auto max-w-3xl space-y-8">
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight text-white">Política de Privacidade</h1>
-          <p className="text-xl text-muted-foreground">Compromisso com a LGPD e sua segurança.</p>
+          <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl md:text-5xl">
+            Política de Privacidade
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Compromisso com a LGPD e sua segurança.
+          </p>
         </div>
 
         <div className="prose prose-invert max-w-none text-gray-300">
           <p>
-            No GTClicks, levamos sua privacidade a sério. Esta política descreve como coletamos, usamos e protegemos seus dados pessoais.
+            No GTClicks, levamos sua privacidade a sério. Esta política descreve
+            como coletamos, usamos e protegemos seus dados pessoais.
           </p>
 
           <h3>1. Dados Coletados</h3>
           <ul>
-            <li><strong>Cadastro:</strong> Nome, e-mail e foto de perfil (via autenticação).</li>
-            <li><strong>Fotógrafos:</strong> Dados bancários ou Chave PIX para repasse de valores (processados de forma segura).</li>
-            <li><strong>Transações:</strong> Histórico de compras e vendas. Não armazenamos números completos de cartão de crédito; isso é gerido integralmente pelo nosso processador de pagamentos (Mercado Pago).</li>
+            <li>
+              <strong>Cadastro:</strong> Nome, e-mail e foto de perfil (via
+              autenticação).
+            </li>
+            <li>
+              <strong>Fotógrafos:</strong> Dados bancários ou Chave PIX para
+              repasse de valores (processados de forma segura).
+            </li>
+            <li>
+              <strong>Transações:</strong> Histórico de compras e vendas. Não
+              armazenamos números completos de cartão de crédito; isso é gerido
+              integralmente pelo nosso processador de pagamentos (Mercado Pago).
+            </li>
           </ul>
 
           <h3>2. Finalidade do Uso</h3>
-          <p>
-            Utilizamos seus dados para:
-          </p>
+          <p>Utilizamos seus dados para:</p>
           <ul>
             <li>Processar pedidos e entregar os downloads digitais.</li>
             <li>Gerenciar pagamentos e comissões de fotógrafos.</li>
@@ -40,16 +53,26 @@ export default function PrivacidadePage() {
 
           <h3>3. Compartilhamento de Dados</h3>
           <p>
-            Não vendemos seus dados para terceiros. Compartilhamos informações apenas com parceiros essenciais para a operação, como:
+            Não vendemos seus dados para terceiros. Compartilhamos informações
+            apenas com parceiros essenciais para a operação, como:
           </p>
           <ul>
-            <li><strong>Processadores de Pagamento:</strong> Para efetuar cobranças e repasses.</li>
-            <li><strong>Infraestrutura:</strong> Servidores de hospedagem e banco de dados seguros.</li>
+            <li>
+              <strong>Processadores de Pagamento:</strong> Para efetuar
+              cobranças e repasses.
+            </li>
+            <li>
+              <strong>Infraestrutura:</strong> Servidores de hospedagem e banco
+              de dados seguros.
+            </li>
           </ul>
 
           <h3>4. Seus Direitos</h3>
           <p>
-            Você pode solicitar a exclusão da sua conta e de seus dados pessoais a qualquer momento através do nosso canal de suporte, ressalvada a guarda obrigatória de registros fiscais e de transações financeiras exigida por lei.
+            Você pode solicitar a exclusão da sua conta e de seus dados pessoais
+            a qualquer momento através do nosso canal de suporte, ressalvada a
+            guarda obrigatória de registros fiscais e de transações financeiras
+            exigida por lei.
           </p>
         </div>
 

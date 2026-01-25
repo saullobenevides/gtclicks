@@ -19,8 +19,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-geist-sans)"], // Note: 'inter' variable is unused in this config but used in layout? keeping original
-        mono: ["var(--font-geist-mono)"],
+        sans: ["var(--font-inter)", "sans-serif"],
+        mono: ["var(--font-geist-mono)"], // Keeping if used elsewhere, otherwise could be removed
         display: ["var(--font-syne)", "sans-serif"],
       },
       colors: {

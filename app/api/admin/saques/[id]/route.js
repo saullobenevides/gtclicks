@@ -1,25 +1,15 @@
 import { NextResponse } from "next/server";
-import { stackServerApp } from "@/stack/server";
 import prisma from "@/lib/prisma";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function PATCH(request, { params }) {
   // Verify admin access
-  const user = await stackServerApp.getUser();
-  
-  if (!user) {
-    return NextResponse.json(
-      { error: "Não autenticado" },
-      { status: 401 }
-    );
-  }
+  const user = await getAuthenticatedUser();
 
-  const isAdmin = user.serverMetadata?.role === "ADMIN" || 
-                  user.primaryEmail?.endsWith("@gtclicks.com");
-
-  if (!isAdmin) {
+  if (!user || user.role !== "ADMIN") {
     return NextResponse.json(
       { error: "Acesso não autorizado" },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -30,10 +20,7 @@ export async function PATCH(request, { params }) {
     const { action } = body; // "aprovar" or "cancelar"
 
     if (!["aprovar", "cancelar"].includes(action)) {
-      return NextResponse.json(
-        { error: "Ação inválida" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Ação inválida" }, { status: 400 });
     }
 
     const saque = await prisma.solicitacaoSaque.findUnique({
@@ -43,14 +30,14 @@ export async function PATCH(request, { params }) {
     if (!saque) {
       return NextResponse.json(
         { error: "Saque não encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (saque.status !== "PENDENTE") {
       return NextResponse.json(
         { error: "Saque já foi processado" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -81,12 +68,12 @@ export async function PATCH(request, { params }) {
         where: { fotografoId: saque.fotografoId },
         data: {
           bloqueado: {
-            decrement: parseFloat(saque.valor),
+            decrement: Number(saque.valor), // Ensure number
           },
         },
       });
 
-      console.log(`✅ Saque ${id} aprovado: R$ ${saque.valor} enviado para ${saque.chavePix}`);
+      console.log(`✅ Saque ${id} aprovado: R$ ${saque.valor} processado`);
     } else {
       // Cancel withdrawal - return money to available balance
       await prisma.solicitacaoSaque.update({
@@ -114,15 +101,17 @@ export async function PATCH(request, { params }) {
         where: { fotografoId: saque.fotografoId },
         data: {
           bloqueado: {
-            decrement: parseFloat(saque.valor),
+            decrement: Number(saque.valor),
           },
           disponivel: {
-            increment: parseFloat(saque.valor),
+            increment: Number(saque.valor),
           },
         },
       });
 
-      console.log(`❌ Saque ${id} cancelado: R$ ${saque.valor} devolvido ao saldo`);
+      console.log(
+        `❌ Saque ${id} cancelado: R$ ${saque.valor} devolvido ao saldo`,
+      );
     }
 
     return NextResponse.json({ success: true });
@@ -130,7 +119,7 @@ export async function PATCH(request, { params }) {
     console.error("Error processing withdrawal:", error);
     return NextResponse.json(
       { error: "Erro ao processar saque" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,28 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import prisma from "@/lib/prisma";
 import { uploadRequestSchema } from "@/lib/validations";
 import { getAuthenticatedUser } from "@/lib/auth";
-
-const bucket = process.env.S3_UPLOAD_BUCKET;
-const region = process.env.S3_UPLOAD_REGION;
-const accessKeyId = process.env.S3_UPLOAD_ACCESS_KEY_ID;
-const secretAccessKey = process.env.S3_UPLOAD_SECRET_ACCESS_KEY;
-
-const s3Client =
-  bucket && region && accessKeyId && secretAccessKey
-    ? new S3Client({
-        region,
-        credentials: {
-          accessKeyId,
-          secretAccessKey,
-        },
-      })
-    : null;
+import { getS3Client, s3Config } from "@/lib/s3-client";
 
 export async function POST(request) {
+  const s3Client = getS3Client();
   const user = await getAuthenticatedUser();
   if (!user) {
     return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
@@ -33,14 +19,14 @@ export async function POST(request) {
   });
 
   if (!fotografo) {
-    return NextResponse.json({ error: "Perfil de fotografo nao encontrado ou nao autorizado" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Perfil de fotografo nao encontrado ou nao autorizado" },
+      { status: 403 },
+    );
   }
 
   if (!s3Client) {
-    return NextResponse.json(
-      { error: "S3 nao configurado." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "S3 nao configurado." }, { status: 500 });
   }
 
   try {
@@ -50,7 +36,7 @@ export async function POST(request) {
     if (!validation.success) {
       return NextResponse.json(
         { error: "Dados inválidos", details: validation.error.format() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -61,7 +47,7 @@ export async function POST(request) {
     const s3Key = `${folder}/${uniqueId}.${fileExtension}`;
 
     const command = new PutObjectCommand({
-      Bucket: bucket,
+      Bucket: s3Config.bucket,
       Key: s3Key,
       ContentType: contentType || "application/octet-stream",
     });
@@ -76,7 +62,7 @@ export async function POST(request) {
     console.error("Error generating signed URL:", error);
     return NextResponse.json(
       { error: "Erro ao gerar URL de upload" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
@@ -12,9 +11,9 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { 
-      s3Key, 
-      colecaoId, 
+    const {
+      s3Key,
+      colecaoId,
       folderId,
       titulo,
       width,
@@ -24,11 +23,14 @@ export async function POST(request) {
       focalLength,
       iso,
       shutterSpeed,
-      aperture
+      aperture,
     } = body;
 
     if (!s3Key || !colecaoId) {
-        return NextResponse.json({ error: "Dados incompletos (s3Key e colecaoId obrigatórios)" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Dados incompletos (s3Key e colecaoId obrigatórios)" },
+        { status: 400 },
+      );
     }
 
     const fotografo = await prisma.fotografo.findUnique({
@@ -36,7 +38,10 @@ export async function POST(request) {
     });
 
     if (!fotografo) {
-      return NextResponse.json({ error: "Fotógrafo não encontrado" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Fotógrafo não encontrado" },
+        { status: 403 },
+      );
     }
 
     // 1. Create Initial Record (Pending)
@@ -50,7 +55,7 @@ export async function POST(request) {
         formato: "jpg", // Default, will be validated if needed.
         tamanhoBytes: 0, // We could get this from S3 head object but optional for now
         previewUrl: "", // Placeholder until processed
-        
+
         camera,
         lens,
         focalLength,
@@ -58,51 +63,76 @@ export async function POST(request) {
         shutterSpeed,
         aperture,
 
-        orientacao: (width && height && width > height) ? "HORIZONTAL" : "VERTICAL",
+        orientacao:
+          width && height && width > height ? "HORIZONTAL" : "VERTICAL",
 
         colecaoId,
         folderId,
         fotografoId: fotografo.id,
         status: "PENDENTE",
-        indexingStatus: "PENDENTE"
-      }
+        indexingStatus: "PENDENTE",
+      },
     });
 
-    console.log(`[Process API] Created photo ${foto.id}, starting processing...`);
+    console.log(
+      `[Process API] Created photo ${foto.id}, starting processing...`,
+    );
 
     // 2. Trigger async processing
     // Note: Vercel serverless has timeout limits (10s-60s). Processing might take 2-5s, so it should be fine.
     // For production with large files, we might want to decouple this (background job), but for MVP sync is okay.
-    
+
     let processResult;
     try {
-        processResult = await processUploadedImage(s3Key, foto.id);
+      processResult = await processUploadedImage(s3Key, foto.id);
     } catch (procError) {
-        console.error("Processing failed, rolling back photo creation", procError);
-        // Optional: Delete the phantom record or mark as error
+      console.error(
+        "Processing failed, rolling back photo creation",
+        procError,
+      );
+
+      // 🚨 ARCHITECTURE NOTE:
+      // We create the record BEFORE processing to get an ID.
+      // If processing fails, we must manually delete (rollback).
+      // If this delete fails, we might have a "phantom" record.
+      // TODO: Implement a background cleanup job for PENDING photos older than X hours.
+      try {
         await prisma.foto.delete({ where: { id: foto.id } });
-        return NextResponse.json({ error: "Erro no processamento da imagem", details: procError.message }, { status: 500 });
+        console.log(`[Process API] Rollback successful for photo ${foto.id}`);
+      } catch (rollbackError) {
+        console.error(
+          `[Process API] CRITICAL: Rollback failed for photo ${foto.id}`,
+          rollbackError,
+        );
+      }
+
+      return NextResponse.json(
+        {
+          error: "Erro no processamento da imagem",
+          details: procError.message,
+        },
+        { status: 500 },
+      );
     }
 
     // 3. Update Record with Processed Data
     const updatedFoto = await prisma.foto.update({
-        where: { id: foto.id },
-        data: {
-            previewUrl: processResult.previewUrl,
-            status: "PUBLICADA"
-        }
+      where: { id: foto.id },
+      data: {
+        previewUrl: processResult.previewUrl,
+        status: "PUBLICADA",
+      },
     });
 
     return NextResponse.json({
       message: "Processamento concluído",
-      foto: updatedFoto
+      foto: updatedFoto,
     });
-
   } catch (error) {
     console.error("Critical error in process route:", error);
     return NextResponse.json(
       { error: "Erro interno no servidor", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

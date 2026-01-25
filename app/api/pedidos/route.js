@@ -17,13 +17,13 @@ export async function POST(request) {
     if (!itens.length) {
       return NextResponse.json(
         { error: "Informe ao menos um item." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const total = itens.reduce(
       (acc, item) => acc + Number(item.precoPago ?? 0),
-      0
+      0,
     );
 
     const pedido = await prisma.pedido.create({
@@ -41,7 +41,9 @@ export async function POST(request) {
 
             return {
               foto: { connect: { id: item.fotoId } },
-              licenca: item.licencaId ? { connect: { id: item.licencaId } } : undefined,
+              licenca: item.licencaId
+                ? { connect: { id: item.licencaId } }
+                : undefined,
               precoPago: item.precoPago ?? 0,
             };
           }),
@@ -56,7 +58,7 @@ export async function POST(request) {
   } catch (error) {
     return NextResponse.json(
       { error: "Erro ao criar pedido.", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -64,7 +66,7 @@ export async function POST(request) {
 export async function GET(request) {
   const user = await getAuthenticatedUser();
   if (!user) {
-      return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
+    return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
   }
 
   try {
@@ -78,7 +80,7 @@ export async function GET(request) {
       },
       orderBy: { createdAt: "desc" },
       include: {
-        cliente: { select: { name: true, email: true } },
+        user: { select: { name: true, email: true } },
         itens: {
           include: {
             foto: { select: { titulo: true } },
@@ -90,8 +92,11 @@ export async function GET(request) {
     return NextResponse.json({ data: pedidos });
   } catch (error) {
     return NextResponse.json(
-      { error: "Nao foi possivel carregar os pedidos.", details: error.message },
-      { status: 500 }
+      {
+        error: "Nao foi possivel carregar os pedidos.",
+        details: error.message,
+      },
+      { status: 500 },
     );
   }
 }

@@ -14,10 +14,12 @@ export default async function CollectionsPage() {
       <section className="py-16">
         <div className="text-center mb-16">
           <Badge>Coleções</Badge>
-          <h1 className="text-5xl font-bold mb-4 text-heading">Séries Exclusivas</h1>
+          <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl mb-4">
+            Séries Exclusivas
+          </h1>
           <p className="text-xl text-body">
-            Navegue por coleções completas com curadoria especial. Encontre a narrativa
-            visual perfeita para sua marca ou projeto.
+            Navegue por coleções completas com curadoria especial. Encontre a
+            narrativa visual perfeita para sua marca ou projeto.
           </p>
         </div>
 
@@ -35,4 +37,3 @@ export default async function CollectionsPage() {
     </div>
   );
 }
-

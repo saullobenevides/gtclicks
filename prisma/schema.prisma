@@ -318,6 +318,11 @@ model Transacao {
   valor          Decimal   @db.Decimal(10, 2)
   tipo           String    // VENDA, COMISSAO, SAQUE
   descricao      String?
+  status         String?   // PENDENTE, PROCESSADO, FALHOU
+  
+  saqueId        String?
+  saque          SolicitacaoSaque? @relation(fields: [saqueId], references: [id])
+  
   createdAt      DateTime  @default(now())
 }
 
@@ -327,7 +332,12 @@ model SolicitacaoSaque {
   fotografo      Fotografo @relation(fields: [fotografoId], references: [id])
   
   valor          Decimal
-  status         String    // PENDENTE, PAGO
+  status         String    // PENDENTE, PAGO, CANCELADO, PROCESSADO
+  processadoEm   DateTime?
+  observacao     String?
+  
+  transacoes     Transacao[]
+  
   createdAt      DateTime  @default(now())
 }
 

@@ -1,4 +1,5 @@
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Inter, Syne } from "next/font/google"; // [NEW] Added Syne
 import AppProviders from "@/components/providers/AppProviders";
 import Header from "@/components/layout/Header";
@@ -22,41 +23,46 @@ const syne = Syne({
 
 export const metadata = {
   title: {
-    default: "GTClicks | Marketplace de Fotos",
+    default: "GTClicks | Marketplace de Fotos Esportivas e Eventos",
     template: "%s | GTClicks",
   },
   description:
-    "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
+    "Compre e venda fotos de surf, eventos e esportes em alta resolução. O marketplace oficial para fotógrafos profissionais monetizarem suas coleções.",
   keywords: [
-    "fotografia",
-    "marketplace",
-    "fotos",
+    "fotografia de surf",
+    "fotos de eventos",
     "venda de fotos",
-    "coleções",
-    "fotógrafos",
+    "marketplace de fotografia",
+    "fotógrafo esportivo",
+    "banco de imagens",
+    "licenciamento de fotos",
+    "gtclicks",
   ],
-  authors: [{ name: "GTClicks" }],
+  authors: [{ name: "GTClicks Team" }],
   creator: "GTClicks",
   publisher: "GTClicks",
   metadataBase: new URL("https://www.gtclicks.com"),
   manifest: "/manifest.json",
   alternates: {
-    canonical: "./",
+    canonical: "https://www.gtclicks.com",
+    languages: {
+      "pt-BR": "https://www.gtclicks.com",
+    },
   },
   openGraph: {
     type: "website",
     locale: "pt_BR",
     url: "https://www.gtclicks.com",
-    title: "GTClicks | Marketplace de Fotos",
+    title: "GTClicks | O Marketplace do Fotógrafo Esportivo",
     description:
-      "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
+      "A plataforma onde fotógrafos vendem suas melhores fotos e clientes encontram registros únicos. Segurança, rapidez e qualidade.",
     siteName: "GTClicks",
     images: [
       {
-        url: "/og-image.jpg", // We assume this exists or will exist
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "GTClicks Marketplace",
+        alt: "GTClicks Marketplace de Fotos",
       },
     ],
   },
@@ -64,8 +70,19 @@ export const metadata = {
     card: "summary_large_image",
     title: "GTClicks | Marketplace de Fotos",
     description:
-      "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
+      "Venda suas fotos com segurança e receba via PIX. A casa do fotógrafo profissional.",
     creator: "@gtclicks",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
@@ -76,6 +93,22 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "GTClicks",
+    url: "https://www.gtclicks.com",
+    logo: "https://www.gtclicks.com/logo.png",
+    description:
+      "Marketplace líder para fotógrafos esportivos e de eventos venderem suas fotos diretamente.",
+    sameAs: ["https://instagram.com/gtclicks", "https://www.gtclicks.com"],
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+55-11-99999-9999",
+      contactType: "customer service",
+    },
+  };
+
   return (
     <html
       lang="pt-BR"
@@ -86,12 +119,17 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.className} ${syne.variable} font-sans antialiased min-h-screen flex flex-col bg-black text-foreground`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <AppProviders>
           <Header />
           <main className="flex-1 w-full pt-20">{children}</main>
           <Footer />
           <LazyClientComponents />
           <BottomNav />
+          <SpeedInsights />
         </AppProviders>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>

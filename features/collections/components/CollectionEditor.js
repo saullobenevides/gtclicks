@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -95,12 +95,12 @@ export default function CollectionEditor({ collection: initialCollection }) {
     setCollectionData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSetCover = (photo) => {
+  const handleSetCover = useCallback((photo) => {
     if (photo.previewUrl) {
       setCollectionData((prev) => ({ ...prev, capaUrl: photo.previewUrl }));
       toast.success("Capa definida com sucesso!");
     }
-  };
+  }, []);
 
   const handleNavigate = (folder) => {
     if (folder.id === null) {
@@ -117,26 +117,29 @@ export default function CollectionEditor({ collection: initialCollection }) {
     }
   };
 
-  const removePhoto = (photoToRemove) => {
-    if (photoToRemove.id) {
-      setDeletedPhotoIds((prev) => [...prev, photoToRemove.id]);
-    }
-    setAllPhotos((prev) =>
-      prev.filter((p) => p.tempId !== photoToRemove.tempId),
-    );
-    if (collectionData.capaUrl === photoToRemove.previewUrl) {
-      setCollectionData((prev) => ({ ...prev, capaUrl: "" }));
-    }
-    toast.success("Foto removida.");
-  };
+  const removePhoto = useCallback(
+    (photoToRemove) => {
+      if (photoToRemove.id) {
+        setDeletedPhotoIds((prev) => [...prev, photoToRemove.id]);
+      }
+      setAllPhotos((prev) =>
+        prev.filter((p) => p.tempId !== photoToRemove.tempId),
+      );
+      if (collectionData.capaUrl === photoToRemove.previewUrl) {
+        setCollectionData((prev) => ({ ...prev, capaUrl: "" }));
+      }
+      toast.success("Foto removida.");
+    },
+    [collectionData.capaUrl],
+  );
 
-  const updatePhoto = (photoToUpdate, field, value) => {
+  const updatePhoto = useCallback((photoToUpdate, field, value) => {
     setAllPhotos((prev) =>
       prev.map((p) =>
         p.tempId === photoToUpdate.tempId ? { ...p, [field]: value } : p,
       ),
     );
-  };
+  }, []);
 
   const handleBulkUpload = async (e) => {
     const files = Array.from(e.target.files || []);
@@ -269,11 +272,16 @@ export default function CollectionEditor({ collection: initialCollection }) {
         }
       }
 
-      await fetch(`/api/colecoes/${initialCollection.id}`, {
+      const updateRes = await fetch(`/api/colecoes/${initialCollection.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...collectionData, capaUrl: finalCapaUrl }),
       });
+
+      if (!updateRes.ok) {
+        const err = await updateRes.json();
+        throw new Error(err.error || "Erro ao salvar coleção.");
+      }
 
       const payload = {
         fotografoId: initialCollection.fotografoId,
@@ -297,11 +305,16 @@ export default function CollectionEditor({ collection: initialCollection }) {
       };
 
       if (payload.fotos.length > 0 || payload.deletedPhotoIds.length > 0) {
-        await fetch("/api/fotos/batch", {
+        const batchRes = await fetch("/api/fotos/batch", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+
+        if (!batchRes.ok) {
+          const err = await batchRes.json();
+          throw new Error(err.error || "Erro ao salvar fotos em massa.");
+        }
       }
 
       toast.success("Alterações salvas com sucesso!");

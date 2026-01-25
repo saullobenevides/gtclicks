@@ -28,7 +28,7 @@ export default async function CadastroPage() {
             Nova Plataforma para Fotógrafos
           </div>
 
-          <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-6 heading-display animate-slide-up">
+          <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-7xl animate-slide-up">
             Transforme seus <br />
             <span className="text-gradient-primary">clicks em lucro</span>
           </h1>
@@ -142,7 +142,7 @@ export default async function CadastroPage() {
       <section className="py-16 md:py-24 bg-white/5 border-y border-white/5">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            <h2 className="heading-section font-display text-3xl font-black text-white sm:text-4xl mb-6">
               Como funciona
             </h2>
             <p className="text-muted-foreground text-lg">
@@ -192,7 +192,7 @@ export default async function CadastroPage() {
       {/* FAQ Section */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h2 className="text-3xl font-bold mb-12 text-center">
+          <h2 className="heading-section font-display text-3xl font-black text-white sm:text-4xl mb-12 text-center">
             Dúvidas Frequentes
           </h2>
 
