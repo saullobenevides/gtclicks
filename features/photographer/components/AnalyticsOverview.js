@@ -39,25 +39,33 @@ export default function AnalyticsOverview({ stats }) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Desempenho</h2>
+      <span className="heading-display font-display font-black text-2xl text-white">
+        Desempenho
+      </span>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Vendas Totais */}
-        <Card>
+        <Card className="bg-black/20 border-white/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Vendas Totais</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Vendas Totais
+            </CardTitle>
             <Images className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.sales || 0}</div>
+            <div className="text-2xl font-bold text-white">
+              {stats.sales || 0}
+            </div>
             <p className="text-xs text-muted-foreground">fotos vendidas</p>
           </CardContent>
         </Card>
 
         {/* Receita Total */}
-        <Card>
+        <Card className="bg-black/20 border-white/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Receita Total
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -71,9 +79,11 @@ export default function AnalyticsOverview({ stats }) {
         </Card>
 
         {/* Ticket Médio */}
-        <Card>
+        <Card className="bg-black/20 border-white/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ticket Médio</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Ticket Médio
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
@@ -85,9 +95,9 @@ export default function AnalyticsOverview({ stats }) {
         </Card>
 
         {/* Conversão */}
-        <Card>
+        <Card className="bg-black/20 border-white/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Taxa de Conversão
             </CardTitle>
             <Activity className="h-4 w-4 text-purple-500" />
@@ -104,9 +114,9 @@ export default function AnalyticsOverview({ stats }) {
       </div>
 
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
-        <Card className="col-span-4">
+        <Card className="col-span-4 bg-black/20 border-white/10">
           <CardHeader>
-            <CardTitle>Vendas Recentes</CardTitle>
+            <CardTitle className="text-white">Vendas Recentes</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <div className="h-[200px] w-full">
@@ -132,6 +142,8 @@ export default function AnalyticsOverview({ stats }) {
                       backgroundColor: "#1f2937",
                       border: "none",
                       color: "#fff",
+                      borderRadius: "8px",
+                      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                     }}
                     itemStyle={{ color: "#fff" }}
                   />
@@ -147,16 +159,16 @@ export default function AnalyticsOverview({ stats }) {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3">
+        <Card className="col-span-3 bg-black/20 border-white/10">
           <CardHeader>
-            <CardTitle>Fotos Populares</CardTitle>
+            <CardTitle className="text-white">Fotos Populares</CardTitle>
             <p className="text-sm text-muted-foreground">
               Suas fotos com mais visualizações.
             </p>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-center h-[150px] text-muted-foreground border-2 border-dashed rounded-md">
+              <div className="flex items-center justify-center h-[150px] text-muted-foreground border-2 border-dashed border-white/10 rounded-md">
                 Ainda não há dados suficientes
               </div>
             </div>

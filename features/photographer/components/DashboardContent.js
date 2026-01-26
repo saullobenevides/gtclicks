@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,6 @@ import { Images, DollarSign, Upload, ArrowRight, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import FotografoOnboarding from "@/features/photographer/components/FotografoOnboarding";
 import FinancialSummary from "./FinancialSummary";
-import AnalyticsOverview from "./AnalyticsOverview";
 import {
   Table,
   TableBody,
@@ -27,6 +27,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { PlusCircle, ExternalLink, Edit } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils/formatters";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const AnalyticsOverview = dynamic(() => import("./AnalyticsOverview"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[400px] w-full bg-white/5" />,
+});
 
 export default function DashboardContent() {
   const user = useUser({ or: "redirect" });
@@ -76,7 +82,7 @@ export default function DashboardContent() {
     downloads: backendStats.downloads || 0,
     cartAdds: (fotografo.colecoes || []).reduce(
       (acc, col) => acc + (col.carrinhoCount || 0),
-      0
+      0,
     ), // Cart count is still per collection for now
     revenue: backendStats.revenue || 0,
     ordersCount: backendStats.orders || 0,
@@ -91,11 +97,13 @@ export default function DashboardContent() {
       : formatCurrency(0);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 p-4 md:p-0">
       {/* Header & Main Action */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Visão Geral</h1>
+          <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl">
+            Visão Geral
+          </h1>
           <p className="text-muted-foreground">
             Acompanhe o desempenho das suas coleções e vendas.
           </p>
@@ -183,28 +191,28 @@ export default function DashboardContent() {
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+                  <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
                     <Button
                       asChild
                       variant="ghost"
-                      size="sm"
-                      className="h-8 w-8"
+                      size="icon"
+                      className="h-11 w-11 text-muted-foreground hover:text-white bg-white/5"
                     >
                       <Link
                         href={`/dashboard/fotografo/colecoes/${col.id}/editar`}
                       >
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-5 w-5" />
                       </Link>
                     </Button>
                     {col.status === "PUBLICADA" && (
                       <Button
                         asChild
                         variant="ghost"
-                        size="sm"
-                        className="h-8 w-8"
+                        size="icon"
+                        className="h-11 w-11 text-muted-foreground hover:text-white bg-white/5"
                       >
                         <Link href={`/colecoes/${col.slug}`} target="_blank">
-                          <ExternalLink className="h-4 w-4" />
+                          <ExternalLink className="h-5 w-5" />
                         </Link>
                       </Button>
                     )}

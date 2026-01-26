@@ -37,12 +37,12 @@ export default function PublishTab({
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-0 shadow-none bg-transparent md:border md:shadow-sm md:bg-card">
+      <CardHeader className="px-0 pl-4 md:px-6 py-4 md:py-6">
         <CardTitle>Publicar Coleção</CardTitle>
         <CardDescription>Revise e coloque sua coleção no ar.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
           <Label className="font-medium">Status Atual:</Label>
           <Select
@@ -83,11 +83,11 @@ export default function PublishTab({
         <div className="pt-8 border-t">
           <Button
             type="button"
-            variant="outline"
-            className="text-red-500 border-red-200 hover:bg-red-50 h-auto whitespace-normal text-left"
+            variant="danger"
+            className="h-auto py-3 px-5 whitespace-normal text-left gap-3"
             onClick={() => setDeleteOpen(true)}
           >
-            <Trash2 className="mr-2 h-4 w-4 shrink-0" />
+            <Trash2 className="h-5 w-5 shrink-0" />
             Excluir Coleção Permanentemente
           </Button>
         </div>

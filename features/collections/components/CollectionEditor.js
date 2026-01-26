@@ -391,129 +391,141 @@ export default function CollectionEditor({ collection: initialCollection }) {
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-32 md:pb-8 overflow-x-hidden w-full max-w-full px-0 sm:px-0">
-      <EditorHeader submitting={submitting} onSave={handleSaveChanges} />
-
-      <Tabs defaultValue="detalhes" className="w-full">
-        <div className="w-full max-w-full overflow-hidden px-1">
-          <TabsList className="flex w-full md:grid md:grid-cols-4 lg:w-[600px] overflow-x-auto md:overflow-visible h-auto p-1 bg-zinc-900 rounded-lg border border-zinc-800 gap-1 md:gap-0 no-scrollbar select-none">
-            <TabsTrigger
-              value="detalhes"
-              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-0 flex-1 md:flex-none"
-            >
-              Detalhes
-            </TabsTrigger>
-            <TabsTrigger
-              value="fotos"
-              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-0 flex-1 md:flex-none"
-            >
-              Fotos ({currentPhotos.length})
-            </TabsTrigger>
-            <TabsTrigger
-              value="precos"
-              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-0 flex-1 md:flex-none"
-            >
-              Preços
-            </TabsTrigger>
-            <TabsTrigger
-              value="publicacao"
-              className="data-[state=active]:bg-white! data-[state=active]:text-black! data-[state=active]:font-bold py-2 min-w-0 flex-1 md:flex-none"
-            >
-              Publicação
-            </TabsTrigger>
-          </TabsList>
+    <div className="w-full max-w-full overflow-x-hidden">
+      <div className="block space-y-8 pb-64 md:pb-8 w-full px-0 sm:px-0">
+        <div className="px-4 md:px-0 w-full min-w-0">
+          <EditorHeader submitting={submitting} onSave={handleSaveChanges} />
         </div>
 
-        <TabsContent
-          value="detalhes"
-          className="mt-6 w-full max-w-full overflow-x-hidden"
-        >
-          <BasicDetailsTab
-            collectionData={collectionData}
-            onDataChange={handleCollectionDataChange}
-          />
-        </TabsContent>
+        <Tabs defaultValue="detalhes" className="w-full">
+          <div className="w-full h-14 overflow-x-auto overflow-y-hidden sticky top-14 md:static z-40 bg-black/95 backdrop-blur-md md:bg-transparent border-b border-white/5 md:border-none pl-0 md:pl-0 mb-6 md:mb-8">
+            <TabsList className="inline-flex w-auto md:grid md:grid-cols-4 lg:w-[600px] overflow-visible h-14 p-0 bg-transparent rounded-none gap-0 no-scrollbar select-none pr-4 md:pr-0">
+              <TabsTrigger
+                value="detalhes"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1"
+              >
+                Detalhes
+              </TabsTrigger>
+              <TabsTrigger
+                value="fotos"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1"
+              >
+                Fotos ({currentPhotos.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="precos"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1"
+              >
+                Preços
+              </TabsTrigger>
+              <TabsTrigger
+                value="publicacao"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1"
+              >
+                Publicação
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-        <TabsContent
-          value="fotos"
-          className="mt-6 w-full max-w-full overflow-x-hidden"
-        >
-          <PhotoManagerTab
-            collectionId={initialCollection.id}
-            currentFolder={currentFolder}
-            folderPath={folderPath}
-            currentPhotos={currentPhotos}
-            collectionData={collectionData}
-            uploadState={uploadState}
-            analyzingId={analyzingId}
-            analyzingCollection={analyzingCollection}
-            onNavigate={handleNavigate}
-            onAnalyzeCollection={handleAnalyzeCollection}
-            onDeleteAllInFolder={handleDeleteAllInFolder}
-            onBulkUpload={handleBulkUpload}
-            onSetCover={handleSetCover}
-            onRemovePhoto={removePhoto}
-            onUpdatePhoto={updatePhoto}
-            onAnalyzePhoto={handleAnalyzePhoto}
-          />
-        </TabsContent>
-
-        <TabsContent
-          value="precos"
-          className="mt-6 w-full max-w-full overflow-x-hidden"
-        >
-          <PricingTab
-            collectionData={collectionData}
-            onDataChange={handleCollectionDataChange}
-            addDiscount={addDiscount}
-            removeDiscount={removeDiscount}
-            updateDiscount={updateDiscount}
-          />
-        </TabsContent>
-
-        <TabsContent
-          value="publicacao"
-          className="mt-6 w-full max-w-full overflow-x-hidden"
-        >
-          <PublishTab
-            collectionData={collectionData}
-            initialCollection={initialCollection}
-            onDataChange={handleCollectionDataChange}
-            setDeleteOpen={setDeleteOpen}
-          />
-        </TabsContent>
-      </Tabs>
-
-      <EditorBottomBar
-        onSave={handleSaveChanges}
-        onBack={() => router.back()}
-        submitting={submitting}
-      />
-
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Excluir Coleção</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir esta coleção? Esta ação não pode
-              ser desfeita e todas as fotos serão perdidas.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
-              Cancelar
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteCollection}
-              disabled={deleting}
+          <div className="px-2 md:px-0 w-full min-w-0">
+            <TabsContent
+              value="detalhes"
+              className="mt-6 w-full overflow-x-hidden"
             >
-              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Excluir
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <BasicDetailsTab
+                collectionData={collectionData}
+                onDataChange={handleCollectionDataChange}
+              />
+            </TabsContent>
+          </div>
+
+          <div className="px-0 md:px-0">
+            <TabsContent
+              value="fotos"
+              className="mt-6 w-full overflow-x-hidden"
+            >
+              <PhotoManagerTab
+                collectionId={initialCollection.id}
+                currentFolder={currentFolder}
+                folderPath={folderPath}
+                currentPhotos={currentPhotos}
+                collectionData={collectionData}
+                uploadState={uploadState}
+                analyzingId={analyzingId}
+                analyzingCollection={analyzingCollection}
+                onNavigate={handleNavigate}
+                onAnalyzeCollection={handleAnalyzeCollection}
+                onDeleteAllInFolder={handleDeleteAllInFolder}
+                onBulkUpload={handleBulkUpload}
+                onSetCover={handleSetCover}
+                onRemovePhoto={removePhoto}
+                onUpdatePhoto={updatePhoto}
+                onAnalyzePhoto={handleAnalyzePhoto}
+              />
+            </TabsContent>
+          </div>
+
+          <div className="px-2 md:px-0">
+            <TabsContent
+              value="precos"
+              className="mt-6 w-full overflow-x-hidden"
+            >
+              <PricingTab
+                collectionData={collectionData}
+                onDataChange={handleCollectionDataChange}
+                addDiscount={addDiscount}
+                removeDiscount={removeDiscount}
+                updateDiscount={updateDiscount}
+              />
+            </TabsContent>
+          </div>
+
+          <div className="px-2 md:px-0 w-full min-w-0">
+            <TabsContent
+              value="publicacao"
+              className="mt-6 w-full overflow-x-hidden"
+            >
+              <PublishTab
+                collectionData={collectionData}
+                initialCollection={initialCollection}
+                onDataChange={handleCollectionDataChange}
+                setDeleteOpen={setDeleteOpen}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
+
+        <EditorBottomBar
+          onSave={handleSaveChanges}
+          onBack={() => router.back()}
+          submitting={submitting}
+        />
+
+        <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Excluir Coleção</DialogTitle>
+              <DialogDescription>
+                Tem certeza que deseja excluir esta coleção? Esta ação não pode
+                ser desfeita e todas as fotos serão perdidas.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteCollection}
+                disabled={deleting}
+              >
+                {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Excluir
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

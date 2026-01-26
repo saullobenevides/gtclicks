@@ -180,34 +180,34 @@ export default function FolderManager({
           <p>Nenhuma pasta aqui.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
           {folders.map((folder) => (
             <Card
               key={folder.id}
               className="group hover:border-primary transition-colors cursor-pointer"
               onClick={() => onNavigate(folder)}
             >
-              <CardContent className="p-4 flex flex-col items-center text-center space-y-2 relative">
-                <Folder className="h-12 w-12 text-blue-500 fill-blue-100" />
+              <CardContent className="p-3 md:p-4 flex flex-col items-center text-center space-y-2 relative">
+                <Folder className="h-10 w-10 md:h-12 md:w-12 text-blue-500 fill-blue-100" />
                 <span
-                  className="font-medium truncate w-full min-w-0"
+                  className="font-medium truncate w-full min-w-0 text-sm md:text-base"
                   title={folder.nome}
                 >
                   {folder.nome}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[10px] md:text-xs text-muted-foreground">
                   {folder._count?.children || 0} pastas,{" "}
                   {folder._count?.fotos || 0} fotos
                 </span>
 
                 <div
-                  className="absolute top-2 right-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 md:top-2 md:right-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-6 w-6">
-                        <MoreVertical className="h-4 w-4" />
+                        <MoreVertical className="h-3 w-3 md:h-4 md:w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">

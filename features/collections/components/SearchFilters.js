@@ -113,7 +113,7 @@ export default function SearchFilters({ filters }) {
                   type="date"
                   placeholder="dd/mm/aaaa"
                   defaultValue={filters.date}
-                  className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 rounded-lg focus:border-primary/50 focus:ring-primary/20 h-9 w-full text-sm [color-scheme:dark] date-icon-right"
+                  className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 rounded-lg focus:border-primary/50 focus:ring-primary/20 h-9 w-full text-sm scheme-dark date-icon-right"
                   suppressHydrationWarning
                 />
               </div>

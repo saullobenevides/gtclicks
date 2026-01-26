@@ -56,10 +56,12 @@ export default async function MinhasColecoesPage() {
   });
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 p-4 md:p-0">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Minhas Coleções</h1>
+          <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl">
+            Minhas Coleções
+          </h1>
           <p className="text-muted-foreground">
             Gerencie todas as suas coleções de fotos.
           </p>
@@ -113,23 +115,28 @@ export default async function MinhasColecoesPage() {
                   <span>{formatDate(colecao.createdAt)}</span>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
-                  <Button asChild variant="ghost" size="sm" className="h-8 w-8">
+                <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="icon"
+                    className="h-11 w-11 text-muted-foreground hover:text-white bg-white/5"
+                  >
                     <Link
                       href={`/dashboard/fotografo/colecoes/${colecao.id}/editar`}
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-5 w-5" />
                     </Link>
                   </Button>
                   {colecao.status === "PUBLICADA" && (
                     <Button
                       asChild
                       variant="ghost"
-                      size="sm"
-                      className="h-8 w-8"
+                      size="icon"
+                      className="h-11 w-11 text-muted-foreground hover:text-white bg-white/5"
                     >
                       <Link href={`/colecoes/${colecao.slug}`} target="_blank">
-                        <ExternalLink className="h-4 w-4" />
+                        <ExternalLink className="h-5 w-5" />
                       </Link>
                     </Button>
                   )}

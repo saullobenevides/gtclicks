@@ -5,12 +5,12 @@ import { Instagram, Youtube, Twitter, MessageCircle } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-white/5 bg-gradient-to-b from-black to-zinc-950 pt-20 pb-8">
+    <footer className="w-full border-t border-white/5 bg-linear-to-b from-black to-zinc-950 pt-20 pb-8">
       <div className="container-wide">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-20 mb-16">
           <div className="flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="relative h-10 w-auto aspect-[3/1]">
+              <div className="relative h-10 w-auto aspect-3/1">
                 <Image
                   src="/logo.png"
                   alt="GTClicks Logo"

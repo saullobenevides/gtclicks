@@ -24,31 +24,35 @@ import { toast } from "sonner";
 
 export default function BasicDetailsTab({ collectionData, onDataChange }) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-0 shadow-none bg-transparent md:border md:shadow-sm md:bg-card">
+      <CardHeader className="px-0 md:px-6 py-4 pl-4 md:py-6">
         <CardTitle>Sobre a Coleção</CardTitle>
         <CardDescription>
           Informações básicas para identificar o evento.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+      <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6 w-full max-w-full min-w-0 overflow-hidden">
+        <div className="grid md:grid-cols-2 gap-4 w-full min-w-0">
+          <div className="space-y-1.5 w-full min-w-0">
             <Label htmlFor="collection-name">Título da Coleção</Label>
             <Input
               id="collection-name"
+              className="w-full min-w-0"
               value={collectionData.nome}
               onChange={(e) => onDataChange("nome", e.target.value)}
               placeholder="Adicione um título para a coleção"
             />
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 w-full min-w-0">
             <Label htmlFor="collection-category">Categoria</Label>
             <Select
               value={collectionData.categoria}
               onValueChange={(value) => onDataChange("categoria", value)}
             >
-              <SelectTrigger id="collection-category">
+              <SelectTrigger
+                id="collection-category"
+                className="w-full min-w-0"
+              >
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
               <SelectContent>
@@ -62,31 +66,33 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
           </div>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 w-full min-w-0">
           <Label htmlFor="collection-description">Descrição</Label>
           <Textarea
             id="collection-description"
             value={collectionData.descricao}
             onChange={(e) => onDataChange("descricao", e.target.value)}
             placeholder="Conte mais sobre como foi o evento..."
-            className="h-24"
+            className="h-24 w-full min-w-0"
           />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="grid md:grid-cols-2 gap-4 w-full min-w-0">
+          <div className="space-y-1.5 w-full min-w-0">
             <Label htmlFor="collection-date-start">Início do Evento</Label>
             <Input
               id="collection-date-start"
+              className="w-full min-w-0"
               type="date"
               value={collectionData.dataInicio}
               onChange={(e) => onDataChange("dataInicio", e.target.value)}
             />
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 w-full min-w-0">
             <Label htmlFor="collection-date-end">Fim do Evento</Label>
             <Input
               id="collection-date-end"
+              className="w-full min-w-0"
               type="date"
               value={collectionData.dataFim}
               onChange={(e) => onDataChange("dataFim", e.target.value)}
@@ -94,7 +100,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-4 w-full min-w-0">
           <LocationSelector
             selectedState={collectionData.estado}
             selectedCity={collectionData.cidade}

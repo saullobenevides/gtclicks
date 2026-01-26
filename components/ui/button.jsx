@@ -18,6 +18,8 @@ const buttonVariants = cva(
         ghost: "hover:bg-white/10 hover:text-white",
         danger:
           "bg-red-600 text-white shadow-lg shadow-red-600/20 hover:bg-red-700 hover:shadow-red-600/30",
+        destructive:
+          "bg-red-600 text-white shadow-lg shadow-red-600/20 hover:bg-red-700 hover:shadow-red-600/30",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

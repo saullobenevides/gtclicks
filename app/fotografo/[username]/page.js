@@ -78,7 +78,7 @@ export default async function PhotographerProfilePage(props) {
         >
           <div className="flex flex-col items-start gap-4 md:flex-row md:items-end md:gap-6">
             <div className="relative">
-              <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-orange-500 opacity-75 blur-sm" />
+              <div className="absolute -inset-1 rounded-full bg-linear-to-r from-primary to-orange-500 opacity-75 blur-sm" />
               <Avatar className="h-32 w-32 border-4 border-black md:h-40 md:w-40 relative z-10">
                 <AvatarImage
                   src={photographer.avatarUrl}

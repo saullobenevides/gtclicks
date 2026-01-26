@@ -90,7 +90,7 @@ export default function FinanceiroPage() {
   const fetchData = async (userId) => {
     try {
       const response = await fetch(
-        `/api/fotografos/financeiro?userId=${userId}`
+        `/api/fotografos/financeiro?userId=${userId}`,
       );
       if (response.ok) {
         const data = await response.json();
@@ -185,9 +185,11 @@ export default function FinanceiroPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 p-4 md:p-0">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Financeiro</h1>
+        <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl">
+          Financeiro
+        </h1>
         <p className="text-muted-foreground">Gerencie seus ganhos e saques.</p>
       </div>
 
@@ -305,18 +307,18 @@ export default function FinanceiroPage() {
               transacoes.map((t) => (
                 <div
                   key={t.id}
-                  className="flex justify-between items-center py-3 border-b border-white/10 last:border-0"
+                  className="flex justify-between items-center py-4 border-b border-white/10 last:border-0"
                 >
-                  <div className="flex flex-col gap-1">
-                    <span className="font-medium text-sm text-white">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="font-semibold text-sm text-white">
                       {t.descricao || t.tipo}
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground/60">
                       {new Date(t.createdAt).toLocaleDateString("pt-BR")}
                     </span>
                   </div>
                   <span
-                    className={`font-bold text-sm ${
+                    className={`font-black text-sm tracking-tight ${
                       Number(t.valor) > 0
                         ? "text-green-500"
                         : "text-muted-foreground"

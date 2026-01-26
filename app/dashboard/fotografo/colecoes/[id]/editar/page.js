@@ -13,7 +13,7 @@ export default async function EditCollectionPage(props) {
   }
 
   return (
-    <div className="max-w-[100vw] overflow-x-hidden w-full">
+    <div className="w-full">
       <CollectionEditor collection={collection} />
     </div>
   );

@@ -8,8 +8,8 @@ export default function EditorHeader({ submitting, onSave }) {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0">
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight px-1">
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 min-w-0">
+      <h1 className="heading-display font-display font-black text-2xl md:text-4xl text-white tracking-tight px-1 wrap-break-word w-full">
         Editar Coleção
       </h1>
       <div className="hidden md:flex flex-row gap-2 w-auto mt-0 px-1">
@@ -17,7 +17,7 @@ export default function EditorHeader({ submitting, onSave }) {
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          className="w-auto"
+          className="w-auto border-white/20"
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
         </Button>
@@ -25,7 +25,7 @@ export default function EditorHeader({ submitting, onSave }) {
           type="button"
           onClick={onSave}
           disabled={submitting}
-          className="w-auto"
+          className="w-auto bg-primary hover:bg-primary/90"
         >
           {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           <Save className="mr-2 h-4 w-4" />

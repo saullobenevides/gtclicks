@@ -160,7 +160,7 @@ export default function LocationSelector({
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-(--radix-popover-trigger-width) p-0 bg-zinc-950 text-white border-zinc-800">
+          <PopoverContent className="w-[280px] sm:w-(--radix-popover-trigger-width) p-0 bg-zinc-950 text-white border-zinc-800">
             <Command>
               <CommandInput placeholder="Buscar cidade..." />
               <CommandList>
