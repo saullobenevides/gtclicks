@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Folder,
   FolderPlus,
@@ -48,9 +48,9 @@ export default function FolderManager({
 
   useEffect(() => {
     fetchFolders();
-  }, [collectionId, currentFolder]);
+  }, [fetchFolders]);
 
-  const fetchFolders = async () => {
+  const fetchFolders = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -76,7 +76,7 @@ export default function FolderManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [collectionId, currentFolder]);
 
   const handleCreateFolder = async () => {
     if (!folderName.trim()) return;
