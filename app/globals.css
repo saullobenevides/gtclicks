@@ -234,6 +234,13 @@ html {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
 
+  @media (max-width: 374px) {
+    .container-wide {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+  }
+
   @media (min-width: 640px) {
     .container-wide {
       padding-left: 1.5rem;

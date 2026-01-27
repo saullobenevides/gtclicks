@@ -14,7 +14,7 @@ export default function MobileMenu({ isOpen, onClose }) {
 
   // Simplified Nav Items
   const mainNavItems = siteConfig.navItems.filter(
-    (item) => !["/meus-favoritos", "/carrinho"].includes(item.href)
+    (item) => !["/meus-favoritos", "/carrinho"].includes(item.href),
   );
 
   return (
@@ -23,14 +23,15 @@ export default function MobileMenu({ isOpen, onClose }) {
         "fixed inset-0 z-[60] bg-black/60 backdrop-blur-xl transition-all duration-300 md:hidden",
         isOpen
           ? "opacity-100 pointer-events-auto"
-          : "opacity-0 pointer-events-none"
+          : "opacity-0 pointer-events-none",
       )}
     >
       <div
         className={cn(
           "absolute right-0 top-0 h-full w-[80%] max-w-sm bg-zinc-950 border-l border-white/10 shadow-2xl transition-transform duration-300 flex flex-col",
-          isOpen ? "translate-x-0" : "translate-x-full"
+          isOpen ? "translate-x-0" : "translate-x-full",
         )}
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="p-6 flex items-center justify-between border-b border-white/10">
           <span className="font-syne font-bold text-xl tracking-tight text-white">
@@ -54,7 +55,7 @@ export default function MobileMenu({ isOpen, onClose }) {
                 "flex items-center justify-between px-4 py-4 rounded-xl text-lg font-medium transition-all border border-transparent",
                 pathname === item.href
                   ? "bg-white/10 text-white border-white/5"
-                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5",
               )}
             >
               {item.label}

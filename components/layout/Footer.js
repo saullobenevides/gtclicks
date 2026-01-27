@@ -25,44 +25,44 @@ export default function Footer() {
             </p>
 
             {/* Social Icons */}
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-2 mt-2">
               <a
                 href="https://instagram.com/gt.clicks"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-white/5"
               >
-                <Instagram className="h-5 w-5" />
+                <Instagram className="h-6 w-6" />
               </a>
               <a
                 href="https://youtube.com/@gtclicks"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-white/5"
               >
-                <Youtube className="h-5 w-5" />
+                <Youtube className="h-6 w-6" />
               </a>
               <a
                 href="https://twitter.com/gtclicks"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-white/5"
               >
-                <Twitter className="h-5 w-5" />
+                <Twitter className="h-6 w-6" />
               </a>
               <a
                 href="https://tiktok.com/@gtclicks"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-white/5"
               >
-                <MessageCircle className="h-5 w-5" />
+                <MessageCircle className="h-6 w-6" />
               </a>
             </div>
           </div>
 
           <div className="flex flex-col gap-6">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground/60">
+            <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
               Plataforma
             </h4>
             <ul className="flex flex-col gap-3 text-sm text-muted-foreground">

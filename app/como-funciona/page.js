@@ -57,18 +57,18 @@ export default function ComoFuncionaPage() {
           </p>
 
           <Tabs defaultValue="fotografo" className="w-full max-w-5xl mx-auto">
-            <div className="flex justify-center mb-16">
-              <TabsList className="bg-white/5 border border-white/10 p-1 rounded-full h-auto">
+            <div className="flex justify-center mb-16 overflow-x-auto pb-2">
+              <TabsList className="bg-white/5 border border-white/10 p-1 rounded-full h-auto flex-shrink-0">
                 <TabsTrigger
                   value="fotografo"
-                  className="rounded-full px-8 py-3 text-lg font-bold data-[state=active]:bg-primary! data-[state=active]:text-white! transition-all flex items-center gap-2"
+                  className="rounded-full px-4 sm:px-8 py-3 text-base sm:text-lg font-bold data-[state=active]:bg-primary! data-[state=active]:text-white! transition-all flex items-center gap-2 whitespace-nowrap"
                 >
                   <Camera className="h-5 w-5" />
                   Sou Fotógrafo
                 </TabsTrigger>
                 <TabsTrigger
                   value="atleta"
-                  className="rounded-full px-8 py-3 text-lg font-bold data-[state=active]:bg-primary! data-[state=active]:text-white! transition-all flex items-center gap-2"
+                  className="rounded-full px-4 sm:px-8 py-3 text-base sm:text-lg font-bold data-[state=active]:bg-primary! data-[state=active]:text-white! transition-all flex items-center gap-2 whitespace-nowrap"
                 >
                   <Search className="h-5 w-5" />
                   Sou Atleta

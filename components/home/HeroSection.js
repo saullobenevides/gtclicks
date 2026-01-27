@@ -19,8 +19,8 @@ export default function HeroSection() {
       </div>
       <div className="absolute inset-0 -z-10 bg-linear-to-b from-black/70 via-black/60 to-black" />
 
-      <div className="z-10 flex max-w-5xl flex-col items-center gap-8 animate-in fade-in zoom-in duration-700 pt-32 md:pt-96">
-        <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-[0.85]">
+      <div className="z-10 flex max-w-5xl flex-col items-center gap-8 animate-in fade-in zoom-in duration-700 pt-32 md:pt-96 px-4">
+        <h1 className="heading-display font-display text-2xl font-black text-white sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-[0.85]">
           FOTOS DE ESPORTES,
           <br />
           <span className="text-primary">JOGOS E CAMPEONATOS</span>
