@@ -35,12 +35,12 @@ export default async function sitemap() {
 
   // Dynamic Photographers
   const photographers = await prisma.fotografo.findMany({
-    select: { username: true, user: { select: { updatedAt: true } } },
+    select: { username: true, user: { select: { createdAt: true } } },
   });
 
   const photographerRoutes = photographers.map((p) => ({
     url: `${BASE_URL}/fotografo/${p.username}`,
-    lastModified: p.user?.updatedAt || new Date(),
+    lastModified: p.user?.createdAt || new Date(),
     changeFrequency: "monthly",
     priority: 0.6,
   }));

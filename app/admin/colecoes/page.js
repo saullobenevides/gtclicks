@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trash2, Ban } from "lucide-react";
@@ -187,12 +188,14 @@ export default function CollectionsModeration() {
               <div key={collection.id} className="glass-panel p-6">
                 <div className="flex gap-6">
                   {/* Thumbnail */}
-                  <div className="w-48 h-32 bg-zinc-800 rounded-lg overflow-hidden shrink-0">
+                  <div className="relative w-48 h-32 bg-zinc-800 rounded-lg overflow-hidden shrink-0">
                     {collection.imagemCapa ? (
-                      <img
+                      <Image
                         src={collection.imagemCapa}
                         alt={collection.nome}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="192px"
+                        className="object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-zinc-600">
