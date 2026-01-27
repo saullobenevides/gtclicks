@@ -1,11 +1,18 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { stackServerApp } from "@/stack/server";
 import prisma from "@/lib/prisma";
 import { Camera, DollarSign, Shield, ChevronRight, Check } from "lucide-react";
+import StandardFaq from "@/components/shared/StandardFaq";
+import { getConfigNumber, CONFIG_KEYS } from "@/lib/config";
 
 export default async function CadastroPage() {
   const user = await stackServerApp.getUser();
+
+  // Fetch dynamic commission rates
+  const taxaPlataforma = await getConfigNumber(CONFIG_KEYS.TAXA_PLATAFORMA);
+  const comissaoFotografo = 100 - taxaPlataforma;
 
   let hasProfile = false;
   if (user) {
@@ -20,17 +27,16 @@ export default async function CadastroPage() {
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 md:pt-32 md:pb-20 overflow-hidden">
         {/* Background Gradients */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/20 blur-[120px] rounded-full opacity-20 pointer-events-none" />
 
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium mb-8 animate-fade-in">
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+          <Badge variant="secondary" className="mb-8 animate-fade-in">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse mr-2"></span>
             Nova Plataforma para Fotógrafos
-          </div>
+          </Badge>
 
-          <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-7xl animate-slide-up">
+          <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-[0.85] animate-slide-up">
             Transforme seus <br />
-            <span className="text-gradient-primary">clicks em lucro</span>
+            <span className="text-primary">clicks em lucro</span>
           </h1>
 
           <p
@@ -51,7 +57,7 @@ export default async function CadastroPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="w-full sm:w-auto h-14 px-8 text-lg rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25"
+                  className="w-full sm:w-auto h-14 px-8 text-lg rounded-full shadow-lg"
                 >
                   <Link href="/dashboard/fotografo/colecoes">
                     Acessar Dashboard
@@ -62,7 +68,7 @@ export default async function CadastroPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="w-full sm:w-auto h-14 px-8 text-lg rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25"
+                  className="w-full sm:w-auto h-14 px-8 text-lg rounded-full shadow-lg"
                 >
                   <Link href="/dashboard/fotografo/onboarding">
                     Criar Perfil de Fotógrafo
@@ -75,7 +81,7 @@ export default async function CadastroPage() {
                 <Button
                   asChild
                   size="lg"
-                  className="w-full sm:w-auto h-14 px-8 text-lg rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25"
+                  className="w-full sm:w-auto h-14 px-8 text-lg rounded-full shadow-lg"
                 >
                   <Link href="/registrar?callbackUrl=/dashboard/fotografo/onboarding">
                     Começar Gratuitamente
@@ -99,14 +105,16 @@ export default async function CadastroPage() {
       </section>
 
       {/* Benefits Grid */}
-      <section className="py-16 md:py-24 relative">
+      <section id="beneficios" className="py-16 md:py-24 relative">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="glass-card p-8 rounded-2xl md:col-span-1 group hover:border-primary/50 transition-colors duration-300">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
                 <DollarSign className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-bold mb-3">80% de Lucro</h3>
+              <h3 className="text-xl font-bold mb-3">
+                {comissaoFotografo}% de Lucro
+              </h3>
               <p className="text-muted-foreground leading-relaxed">
                 A maior taxa do mercado. Você fica com a maior parte do valor de
                 cada venda, com transparência total.
@@ -139,7 +147,10 @@ export default async function CadastroPage() {
       </section>
 
       {/* How it works */}
-      <section className="py-16 md:py-24 bg-white/5 border-y border-white/5">
+      <section
+        id="como-funciona"
+        className="py-16 md:py-24 bg-white/5 border-y border-white/5"
+      >
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="heading-section font-display text-3xl font-black text-white sm:text-4xl mb-6">
@@ -190,45 +201,35 @@ export default async function CadastroPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 md:py-24">
+      <section id="faq" className="py-16 md:py-24">
         <div className="container mx-auto px-4 max-w-4xl">
           <h2 className="heading-section font-display text-3xl font-black text-white sm:text-4xl mb-12 text-center">
             Dúvidas Frequentes
           </h2>
 
-          <div className="space-y-4">
-            {[
+          <StandardFaq
+            items={[
               {
-                q: "Quanto custa para começar?",
-                a: "Absolutamente nada. Não cobramos mensalidade nem taxa de adesão. Você só paga uma comissão quando realiza uma venda.",
+                question: "Quanto custa para começar?",
+                answer:
+                  "Absolutamente nada. Não cobramos mensalidade nem taxa de adesão. Você só paga uma comissão quando realiza uma venda.",
               },
               {
-                q: "Qual a taxa da plataforma?",
-                a: "Cobramos apenas 20% de taxa administrativa sobre as vendas. Você fica com 80% do valor total.",
+                question: "Qual a taxa da plataforma?",
+                answer: `Cobramos apenas ${taxaPlataforma}% de taxa administrativa sobre as vendas. Você fica com ${comissaoFotografo}% do valor total.`,
               },
               {
-                q: "Quando posso sacar?",
-                a: "Assim que tiver R$ 50,00 de saldo liberado, você pode solicitar o saque via Pix que cai na hora.",
+                question: "Quando posso sacar?",
+                answer:
+                  "Assim que tiver R$ 50,00 de saldo liberado, você pode solicitar o saque via Pix que cai na hora.",
               },
               {
-                q: "Preciso de CNPJ?",
-                a: "Não! Você pode se cadastrar e receber como Pessoa Física (CPF) sem problemas.",
+                question: "Preciso de CNPJ?",
+                answer:
+                  "Não! Você pode se cadastrar e receber como Pessoa Física (CPF) sem problemas.",
               },
-            ].map((faq, i) => (
-              <div
-                key={i}
-                className="glass-card rounded-xl p-6 hover:bg-white/5 transition-colors"
-              >
-                <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                  <div className="bg-primary/20 p-1 rounded-full">
-                    <Check className="w-3 h-3 text-primary" />
-                  </div>
-                  {faq.q}
-                </h3>
-                <p className="text-muted-foreground pl-8">{faq.a}</p>
-              </div>
-            ))}
-          </div>
+            ]}
+          />
         </div>
       </section>
     </div>

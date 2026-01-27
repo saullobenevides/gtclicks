@@ -3,48 +3,75 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
-import { Calendar, Package, ChevronRight, Clock, CheckCircle, XCircle } from "lucide-react";
+import {
+  Calendar,
+  Package,
+  ChevronRight,
+  Clock,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import RetryPaymentButton from "@/components/pedidos/RetryPaymentButton";
+import AppPagination from "@/components/shared/AppPagination";
 
 export const metadata = {
-  title: "Meus Pedidos | GTClicks",
+  title: "Meus Pedidos",
   description: "Acompanhe seus pedidos e downloads",
 };
 
-export default async function PedidosPage() {
+export default async function PedidosPage(props) {
   const user = await getAuthenticatedUser();
 
   if (!user) {
     redirect("/login?callbackUrl=/pedidos");
   }
 
-  const pedidos = await prisma.pedido.findMany({
-    where: {
-      userId: user.id,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      itens: {
-        take: 4,
-        include: {
-          foto: {
-            select: {
-              previewUrl: true,
-              titulo: true,
+  const searchParams = await props.searchParams;
+  const page = searchParams?.page ? parseInt(searchParams.page) : 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
+
+  const [total, pedidos] = await Promise.all([
+    prisma.pedido.count({
+      where: {
+        userId: user.id,
+      },
+    }),
+    prisma.pedido.findMany({
+      where: {
+        userId: user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit,
+      skip: skip,
+      include: {
+        itens: {
+          include: {
+            foto: {
+              select: {
+                id: true,
+                previewUrl: true,
+                titulo: true,
+              },
+            },
+            licenca: {
+              select: { id: true },
             },
           },
         },
+        _count: {
+          select: { itens: true },
+        },
       },
-      _count: {
-        select: { itens: true },
-      },
-    },
-  });
+    }),
+  ]);
 
+  const totalPages = Math.ceil(total / limit);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -74,18 +101,24 @@ export default async function PedidosPage() {
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case "PAGO": return "Pago";
-      case "PENDENTE": return "Pendente";
-      case "CANCELADO": return "Cancelado";
-      default: return status;
+      case "PAGO":
+        return "Pago";
+      case "PENDENTE":
+        return "Pendente";
+      case "CANCELADO":
+        return "Cancelado";
+      default:
+        return status;
     }
-  }
+  };
 
   return (
     <div className="container-wide py-12 md:py-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight mb-2">Meus Pedidos</h1>
+          <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2">
+            Meus Pedidos
+          </h1>
           <p className="text-muted-foreground">
             Gerencie suas compras e baixe suas fotos.
           </p>
@@ -97,9 +130,12 @@ export default async function PedidosPage() {
           <div className="h-16 w-16 bg-white/5 rounded-full flex items-center justify-center mb-6">
             <Package className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">Nenhum pedido encontrado</h2>
+          <h2 className="text-xl font-bold text-white mb-2">
+            Nenhum pedido encontrado
+          </h2>
           <p className="text-muted-foreground max-w-md mb-8">
-            Você ainda não realizou nenhuma compra. Explore as coleções e encontre suas melhores fotos!
+            Você ainda não realizou nenhuma compra. Explore as coleções e
+            encontre suas melhores fotos!
           </p>
           <Button asChild>
             <Link href="/busca">Explorar Fotos</Link>
@@ -121,17 +157,23 @@ export default async function PedidosPage() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
-                        {new Date(pedido.createdAt).toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: 'long',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                        {new Date(pedido.createdAt).toLocaleDateString(
+                          "pt-BR",
+                          {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          },
+                        )}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                       <Badge variant="outline" className={`${getStatusColor(pedido.status)} font-medium`}>
+                      <Badge
+                        variant="outline"
+                        className={`${getStatusColor(pedido.status)} font-medium`}
+                      >
                         {getStatusIcon(pedido.status)}
                         {getStatusLabel(pedido.status)}
                       </Badge>
@@ -140,21 +182,44 @@ export default async function PedidosPage() {
                       </span>
                     </div>
                   </div>
-                  
-                  <Button asChild variant="secondary" className="w-full md:w-auto">
-                    <Link href={`/pedidos/${pedido.id}`}>
-                      Ver Detalhes
-                      <ChevronRight className="h-4 w-4 ml-2" />
-                    </Link>
-                  </Button>
+
+                  <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                    {pedido.status === "PENDENTE" && (
+                      <div className="w-full sm:w-48">
+                        <RetryPaymentButton
+                          orderId={pedido.id}
+                          items={pedido.itens.map((item) => ({
+                            fotoId: item.fotoId,
+                            licencaId: item.licencaId,
+                            titulo: item.foto.titulo,
+                            precoPaid: Number(item.precoPago),
+                          }))}
+                          user={user}
+                        />
+                      </div>
+                    )}
+                    <Button
+                      asChild
+                      variant="secondary"
+                      className="w-full md:w-auto"
+                    >
+                      <Link href={`/pedidos/${pedido.id}`}>
+                        Ver Detalhes
+                        <ChevronRight className="h-4 w-4 ml-2" />
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="h-px bg-white/5 w-full mb-6" />
 
                 <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                  {pedido.itens.map((item) => (
-                    <div key={item.foto.titulo + Math.random()} className="relative h-20 w-20 flex-shrink-0 bg-black/40 rounded-lg overflow-hidden border border-white/5">
-                       <ImageWithFallback
+                  {pedido.itens.slice(0, 4).map((item) => (
+                    <div
+                      key={item.fotoId}
+                      className="relative h-20 w-20 shrink-0 bg-black/40 rounded-lg overflow-hidden border border-white/5"
+                    >
+                      <ImageWithFallback
                         src={item.foto.previewUrl}
                         alt={item.foto.titulo}
                         fill
@@ -163,7 +228,7 @@ export default async function PedidosPage() {
                     </div>
                   ))}
                   {pedido._count.itens > 4 && (
-                    <div className="h-20 w-20 flex-shrink-0 bg-white/5 rounded-lg flex items-center justify-center border border-white/5 text-xs text-muted-foreground font-medium">
+                    <div className="h-20 w-20 shrink-0 bg-white/5 rounded-lg flex items-center justify-center border border-white/5 text-xs text-muted-foreground font-medium">
                       +{pedido._count.itens - 4} fotos
                     </div>
                   )}
@@ -171,6 +236,12 @@ export default async function PedidosPage() {
               </div>
             </div>
           ))}
+          <AppPagination
+            currentPage={page}
+            totalPages={totalPages}
+            baseUrl="/pedidos"
+            searchParams={searchParams}
+          />
         </div>
       )}
     </div>

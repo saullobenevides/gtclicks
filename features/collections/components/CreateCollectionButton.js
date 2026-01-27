@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { PlusCircle, Loader2 } from 'lucide-react';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { PlusCircle, Loader2 } from "lucide-react";
+import { createCollection } from "@/actions/collections";
 
 export default function CreateCollectionButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,20 +13,21 @@ export default function CreateCollectionButton() {
   const handleCreateCollection = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/colecoes/create-draft', {
-        method: 'POST',
-      });
-      const result = await response.json();
+      const formData = new FormData();
+      formData.append("nome", "Nova Coleção (Rascunho)");
+      formData.append("status", "RASCUNHO");
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Falha ao criar coleção');
+      const result = await createCollection(formData);
+
+      if (result.error) {
+        throw new Error(result.error);
       }
 
       const newCollectionId = result.data.id;
       router.push(`/dashboard/fotografo/colecoes/${newCollectionId}/editar`);
     } catch (error) {
       console.error(error);
-      alert(error.message); // Or show a toast notification
+      alert(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +40,7 @@ export default function CreateCollectionButton() {
       ) : (
         <PlusCircle className="mr-2 h-4 w-4" />
       )}
-      {isLoading ? 'Criando...' : 'Criar Nova Coleção'}
+      {isLoading ? "Criando..." : "Criar Nova Coleção"}
     </Button>
   );
 }

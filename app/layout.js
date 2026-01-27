@@ -29,33 +29,36 @@ export const metadata = {
   description:
     "Compre e venda fotos de surf, eventos e esportes em alta resolução. O marketplace oficial para fotógrafos profissionais monetizarem suas coleções.",
   keywords: [
-    "fotografia de surf",
+    "fotos de esportes",
     "fotos de eventos",
     "venda de fotos",
     "marketplace de fotografia",
     "fotógrafo esportivo",
-    "banco de imagens",
-    "licenciamento de fotos",
+    "comprar fotos",
+    "fotos de jogos",
+    "fotos de campeonatos",
+    "busca por selfie",
+    "IA para fotos",
     "gtclicks",
   ],
   authors: [{ name: "GTClicks Team" }],
   creator: "GTClicks",
   publisher: "GTClicks",
-  metadataBase: new URL("https://www.gtclicks.com"),
+  metadataBase: new URL("https://gtclicks.com.br"),
   manifest: "/manifest.json",
   alternates: {
-    canonical: "https://www.gtclicks.com",
+    canonical: "https://gtclicks.com.br",
     languages: {
-      "pt-BR": "https://www.gtclicks.com",
+      "pt-BR": "https://gtclicks.com.br",
     },
   },
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    url: "https://www.gtclicks.com",
+    url: "https://gtclicks.com.br",
     title: "GTClicks | O Marketplace do Fotógrafo Esportivo",
     description:
-      "A plataforma onde fotógrafos vendem suas melhores fotos e clientes encontram registros únicos. Segurança, rapidez e qualidade.",
+      "A plataforma onde fotógrafos vendem suas fotos de eventos e esportes. Encontre seus registros em jogos e campeonatos.",
     siteName: "GTClicks",
     images: [
       {
@@ -97,11 +100,11 @@ export default function RootLayout({ children }) {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "GTClicks",
-    url: "https://www.gtclicks.com",
-    logo: "https://www.gtclicks.com/logo.png",
+    url: "https://gtclicks.com.br",
+    logo: "https://gtclicks.com.br/logo.png",
     description:
       "Marketplace líder para fotógrafos esportivos e de eventos venderem suas fotos diretamente.",
-    sameAs: ["https://instagram.com/gtclicks", "https://www.gtclicks.com"],
+    sameAs: ["https://instagram.com/gtclicks", "https://gtclicks.com.br"],
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+55-11-99999-9999",

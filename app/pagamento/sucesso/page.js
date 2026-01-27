@@ -37,10 +37,15 @@ export default function PaymentSuccessPage() {
     <div className="container">
       <section className="py-24">
         <div className="text-center max-w-2xl mx-auto p-12 bg-card border rounded-lg">
-          <div className="w-20 h-20 mx-auto mb-8 rounded-full flex items-center justify-center text-5xl font-bold text-white bg-green-500">✓</div>
-          <h1 className="text-4xl font-bold mb-4 text-heading">Tudo certo! Suas fotos são suas.</h1>
+          <div className="w-20 h-20 mx-auto mb-8 rounded-full flex items-center justify-center text-5xl font-bold text-white bg-green-500">
+            ✓
+          </div>
+          <h1 className="text-4xl font-bold mb-4 text-heading">
+            Tudo certo! Suas fotos são suas.
+          </h1>
           <p className="text-xl text-body mb-8">
-            O pagamento foi confirmado e seus arquivos em alta resolução já estão liberados para download.
+            O pagamento foi confirmado e seus arquivos em alta resolução já
+            estão liberados para download.
           </p>
 
           {loading ? (
@@ -54,25 +59,23 @@ export default function PaymentSuccessPage() {
                 <strong>Total:</strong> R$ {Number(order.total).toFixed(2)}
               </p>
               <p className="my-2 text-base">
-                <strong>Itens:</strong> {order.itens?.length || 0} {order.itens?.length === 1 ? 'foto' : 'fotos'}
+                <strong>Itens:</strong> {order.itens?.length || 0}{" "}
+                {order.itens?.length === 1 ? "foto" : "fotos"}
               </p>
             </div>
           ) : (
-            <p className="bg-blue-500/10 p-4 rounded-sm text-body my-8">
-              Seu pedido está sendo processado. Você receberá um email de confirmação em breve.
+            <p className="bg-primary/10 p-4 rounded-sm text-body my-8 border border-primary/20">
+              Seu pedido está sendo processado. Você receberá um email de
+              confirmação em breve.
             </p>
           )}
 
           <div className="flex flex-col gap-4 mt-8">
             <Button asChild size="lg" className="h-12 text-lg">
-              <Link href="/meus-downloads">
-                Baixar Minhas Fotos Agora
-              </Link>
+              <Link href="/meus-downloads">Baixar Minhas Fotos Agora</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/busca">
-                Continuar Comprando
-              </Link>
+              <Link href="/busca">Continuar Comprando</Link>
             </Button>
           </div>
         </div>

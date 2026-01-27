@@ -90,7 +90,15 @@ describe("POST /api/photos/process", () => {
     expect(response.status).toBe(200);
     expect(prisma.foto.update).toHaveBeenCalledWith({
       where: { id: "photo-1" },
-      data: expect.objectContaining({ status: "PUBLICADA" }),
+      data: {
+        status: "PUBLICADA",
+        previewUrl: "http://cdn/preview.jpg",
+      },
+      include: {
+        colecao: {
+          select: { faceRecognitionEnabled: true },
+        },
+      },
     });
     expect(prisma.foto.delete).not.toHaveBeenCalled();
   });

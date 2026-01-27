@@ -80,10 +80,7 @@ export default function DashboardContent() {
     views: backendStats.views || 0,
     sales: backendStats.sales || 0,
     downloads: backendStats.downloads || 0,
-    cartAdds: (fotografo.colecoes || []).reduce(
-      (acc, col) => acc + (col.carrinhoCount || 0),
-      0,
-    ), // Cart count is still per collection for now
+    cartAdds: backendStats.cart || 0,
     revenue: backendStats.revenue || 0,
     ordersCount: backendStats.orders || 0,
   };
@@ -126,7 +123,9 @@ export default function DashboardContent() {
       {/* Recent Events Table */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">Coleções Recentes</h2>
+          <h2 className="heading-display font-display font-black text-xl md:text-2xl text-white">
+            Coleções Recentes
+          </h2>
           <Link
             href="/dashboard/fotografo/colecoes"
             className="text-sm text-primary hover:underline"

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "Termos de Uso | GTClicks",
+  title: "Termos de Uso",
   description: "Termos e condições de uso do marketplace GTClicks.",
 };
 
@@ -11,7 +11,7 @@ export default function TermosPage() {
     <div className="container-wide py-12 md:py-24">
       <div className="mx-auto max-w-3xl space-y-8">
         <div className="space-y-4">
-          <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl md:text-5xl">
+          <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
             Termos de Uso
           </h1>
           <p className="text-xl text-muted-foreground">

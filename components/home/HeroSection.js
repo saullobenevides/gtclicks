@@ -20,28 +20,25 @@ export default function HeroSection() {
       <div className="absolute inset-0 -z-10 bg-linear-to-b from-black/70 via-black/60 to-black" />
 
       <div className="z-10 flex max-w-5xl flex-col items-center gap-8 animate-in fade-in zoom-in duration-700 pt-32 md:pt-96">
-        <h1 className="heading-display font-display text-4xl xs:text-5xl font-black text-white sm:text-7xl md:text-8xl lg:text-8xl">
-          CAPTURE MOMENTOS,
+        <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-[0.85]">
+          FOTOS DE ESPORTES,
           <br />
-          <span style={{ color: "#FF0000" }}>VENDA ARTE!</span>
+          <span className="text-primary">JOGOS E CAMPEONATOS</span>
         </h1>
 
         <p className="max-w-2xl text-lg text-gray-300 md:text-xl leading-relaxed font-medium drop-shadow-md">
-          O marketplace definitivo para fotógrafos e criadores.
+          Encontre seus registros instantaneamente com nossa busca por IA
           <br className="hidden sm:block" />
-          Compre e venda fotos exclusivas com segurança e rapidez.
+          ou monetize sua arte como fotógrafo profissional.
         </p>
 
         <div className="mt-8 flex flex-col w-full sm:w-auto sm:flex-row gap-5">
           <Button
             asChild
             size="lg"
-            className="h-14 px-10 text-base font-bold bg-transparent text-white hover:text-white transition-all duration-300 uppercase tracking-wider"
-            style={{ borderWidth: "2px", borderColor: "#FF0000" }}
+            className="h-14 px-10 text-base font-bold bg-transparent text-white border-2 border-primary hover:bg-primary transition-all duration-300 uppercase tracking-wider"
           >
-            <Link href="/busca" className="hover:bg-[#FF0000]!">
-              Comprar fotos
-            </Link>
+            <Link href="/busca">Comprar fotos</Link>
           </Button>
           <Button
             asChild

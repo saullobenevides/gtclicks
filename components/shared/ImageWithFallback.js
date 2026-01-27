@@ -22,7 +22,7 @@ export default function ImageWithFallback({
       <div
         className={cn(
           "flex h-full w-full items-center justify-center bg-secondary text-xs text-muted-foreground",
-          className
+          className,
         )}
       >
         {!src ? "Imagem indisponível" : "Erro ao carregar"}
@@ -31,7 +31,7 @@ export default function ImageWithFallback({
   }
 
   return (
-    <div className={cn("relative overflow-hidden", className)}>
+    <div className={cn("relative overflow-hidden h-full w-full", className)}>
       <Image
         src={src}
         alt={alt || "Imagem"}
@@ -45,7 +45,7 @@ export default function ImageWithFallback({
           isLoading
             ? "scale-110 blur-xl grayscale"
             : "scale-100 blur-0 grayscale-0",
-          imageClassName
+          imageClassName,
         )}
         onLoad={() => setIsLoading(false)}
         onError={() => setError(true)}

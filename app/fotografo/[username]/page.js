@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { CollectionCard } from "@/components/shared/cards";
 import PageHeader from "@/components/shared/layout/PageHeader";
 import PageContainer from "@/components/shared/layout/PageContainer";
+import AppPagination from "@/components/shared/AppPagination";
 
 export async function generateMetadata({ params }) {
   const { username } = await params;
@@ -28,12 +29,12 @@ export async function generateMetadata({ params }) {
 
   if (!photographer) {
     return {
-      title: "Fotógrafo não encontrado | GTClicks",
+      title: "Fotógrafo não encontrado",
     };
   }
 
   return {
-    title: `${photographer.name} (@${photographer.username}) | GTClicks`,
+    title: `${photographer.name} (@${photographer.username})`,
     description:
       photographer.bio ||
       `Confira o portfólio de ${photographer.name} no GTClicks.`,
@@ -48,6 +49,8 @@ export async function generateMetadata({ params }) {
 export default async function PhotographerProfilePage(props) {
   try {
     const params = await props.params;
+    const searchParams = await props.searchParams;
+    const page = searchParams?.page ? parseInt(searchParams.page) : 1;
 
     const rawUsername = params.username
       ? decodeURIComponent(params.username)
@@ -61,11 +64,10 @@ export default async function PhotographerProfilePage(props) {
     }
 
     // Fetch photographer collections directly from DB
-    const collections = await getCollectionsByPhotographerUsername(username);
-    const totalPhotos = collections.reduce(
-      (acc, col) => acc + (col.totalPhotos || 0),
-      0,
-    );
+    const { data: collections, metadata } =
+      await getCollectionsByPhotographerUsername(username, page);
+
+    const totalPhotos = photographer.totalPhotos || 0;
 
     return (
       <div className="min-h-screen pb-20 bg-background">
@@ -206,14 +208,22 @@ export default async function PhotographerProfilePage(props) {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2">
-                    {collections.map((collection, index) => (
-                      <CollectionCard
-                        key={collection.id ?? index}
-                        collection={collection}
-                      />
-                    ))}
-                  </div>
+                  <>
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2">
+                      {collections.map((collection, index) => (
+                        <CollectionCard
+                          key={collection.id ?? index}
+                          collection={collection}
+                        />
+                      ))}
+                    </div>
+                    <AppPagination
+                      currentPage={metadata.page}
+                      totalPages={metadata.totalPages}
+                      baseUrl={`/fotografo/${username}`}
+                      searchParams={searchParams}
+                    />
+                  </>
                 )}
               </div>
             </div>
@@ -256,7 +266,20 @@ export default async function PhotographerProfilePage(props) {
                 photographer.instagram
                   ? `https://instagram.com/${photographer.instagram.replace("@", "")}`
                   : null,
+                photographer.portfolioUrl,
               ].filter(Boolean),
+              knowsAbout: [
+                "Fotografia Esportiva",
+                "Fotografia de Eventos",
+                ...(photographer.especialidades || []),
+              ],
+              interactionStatistic: [
+                {
+                  "@type": "InteractionCounter",
+                  interactionType: "https://schema.org/WriteAction",
+                  userInteractionCount: collections.length,
+                },
+              ],
             }),
           }}
         />

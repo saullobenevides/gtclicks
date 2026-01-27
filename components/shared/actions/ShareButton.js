@@ -1,24 +1,45 @@
 "use client";
 
-import { Share2, Link as LinkIcon, Check, QrCode, MessageCircle } from "lucide-react";
+import {
+  Share2,
+  Link as LinkIcon,
+  Check,
+  QrCode,
+  MessageCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
-export default function ShareButton({ 
-  title, 
-  text, 
-  url = typeof window !== 'undefined' ? window.location.href : '', 
+export default function ShareButton({
+  title,
+  text,
+  url = typeof window !== "undefined" ? window.location.href : "",
   className,
   variant = "outline",
   size = "icon",
-  children
+  children,
 }) {
   const [showQr, setShowQr] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState(url);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentUrl(url || window.location.href);
+    }
+  }, [url]);
+
+  const finalUrl = currentUrl || url || "";
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -26,7 +47,7 @@ export default function ShareButton({
         await navigator.share({
           title,
           text,
-          url,
+          url: finalUrl,
         });
         toast.success("Conteúdo compartilhado!");
       } catch (error) {
@@ -41,7 +62,7 @@ export default function ShareButton({
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(url).then(() => {
+    navigator.clipboard.writeText(finalUrl).then(() => {
       setCopied(true);
       toast.success("Link copiado para a área de transferência!");
       setTimeout(() => setCopied(false), 2000);
@@ -49,7 +70,7 @@ export default function ShareButton({
   };
 
   const shareToWhatsApp = () => {
-    const encodedText = encodeURIComponent(`${text}\n\n${url}`);
+    const encodedText = encodeURIComponent(`${text}\n\n${finalUrl}`);
     window.open(`https://wa.me/?text=${encodedText}`, "_blank");
   };
 
@@ -57,11 +78,19 @@ export default function ShareButton({
     <div className="flex items-center gap-2">
       <Dialog open={showQr} onOpenChange={setShowQr}>
         <DialogTrigger asChild>
-          <Button variant={variant} size={size} className={className} title="Ver QR Code">
-             <QrCode className="h-4 w-4" />
+          <Button
+            variant={variant}
+            size={size}
+            className={className}
+            title="Ver QR Code"
+          >
+            <QrCode className="h-4 w-4" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white">
+        <DialogContent
+          className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white z-[150]"
+          overlayClassName="z-[149]"
+        >
           <DialogHeader>
             <DialogTitle>Compartilhar Coleção</DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -70,32 +99,48 @@ export default function ShareButton({
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-6 gap-6">
             <div className="bg-white p-4 rounded-xl">
-               <QRCodeSVG value={url} size={200} />
+              <QRCodeSVG value={finalUrl} size={200} />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 w-full">
-               <Button onClick={shareToWhatsApp} variant="outline" className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800 gap-2">
-                  <MessageCircle className="h-4 w-4 text-green-500" />
-                  WhatsApp
-               </Button>
-               <Button onClick={copyToClipboard} variant="outline" className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800 gap-2">
-                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <LinkIcon className="h-4 w-4" />}
-                  {copied ? "Copiado" : "Copiar Link"}
-               </Button>
+              <Button
+                onClick={shareToWhatsApp}
+                variant="outline"
+                className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800 gap-2"
+              >
+                <MessageCircle className="h-4 w-4 text-green-500" />
+                WhatsApp
+              </Button>
+              <Button
+                onClick={copyToClipboard}
+                variant="outline"
+                className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800 gap-2"
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <LinkIcon className="h-4 w-4" />
+                )}
+                {copied ? "Copiado" : "Copiar Link"}
+              </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      <Button 
-        variant={variant} 
-        size={size} 
-        className={className} 
+      <Button
+        variant={variant}
+        size={size}
+        className={className}
         onClick={handleShare}
         title="Compartilhar"
       >
-        {children ? children : (
-          copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />
+        {children ? (
+          children
+        ) : copied ? (
+          <Check className="h-4 w-4" />
+        ) : (
+          <Share2 className="h-4 w-4" />
         )}
       </Button>
     </div>

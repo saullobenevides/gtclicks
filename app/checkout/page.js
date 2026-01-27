@@ -36,7 +36,9 @@ export default function CheckoutPage() {
   return (
     <div className="container mx-auto py-16">
       <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold">Finalizar Compra</h1>
+        <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
+          Finalizar Compra
+        </h1>
         <p className="text-lg text-muted-foreground">
           Revise seu pedido e prossiga para o pagamento
         </p>

@@ -25,6 +25,7 @@ import EditorBottomBar from "./editor/EditorBottomBar";
 
 import { extractMetadata } from "../utils/metadata";
 import { usePhotoUpload } from "../hooks/usePhotoUpload";
+import { updateCollection } from "@/actions/collections";
 
 const blankPhoto = () => ({
   id: null,
@@ -63,6 +64,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
       ? new Date(initialCollection.dataFim).toISOString().split("T")[0]
       : "",
     descontos: initialCollection.descontos || [],
+    faceRecognitionEnabled: initialCollection.faceRecognitionEnabled || false,
   });
 
   const [currentFolder, setCurrentFolder] = useState(null);
@@ -272,15 +274,18 @@ export default function CollectionEditor({ collection: initialCollection }) {
         }
       }
 
-      const updateRes = await fetch(`/api/colecoes/${initialCollection.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...collectionData, capaUrl: finalCapaUrl }),
+      /* Refactored to use Server Action */
+      // Ideally we should use FormData, but since updateCollection accepts (id, data), we pass object for now
+      // or refactor action to expect FormData. I implemented action to accept 'data' as any (JSON object).
+      // So we can check actions/collections.ts: export async function updateCollection(collectionId: string, data: any)
+
+      const updateRes = await updateCollection(initialCollection.id, {
+        ...collectionData,
+        capaUrl: finalCapaUrl,
       });
 
-      if (!updateRes.ok) {
-        const err = await updateRes.json();
-        throw new Error(err.error || "Erro ao salvar coleção.");
+      if (updateRes.error) {
+        throw new Error(updateRes.error || "Erro ao salvar coleção.");
       }
 
       const payload = {

@@ -10,7 +10,7 @@ export async function GET(request, props) {
   if (!username) {
     return NextResponse.json(
       { error: "username is required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -23,7 +23,7 @@ export async function GET(request, props) {
     if (!fotografo) {
       return NextResponse.json(
         { error: "Fotógrafo não encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -33,14 +33,13 @@ export async function GET(request, props) {
         fotografoId: fotografo.id,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       select: {
         id: true,
         titulo: true,
         previewUrl: true,
         orientacao: true,
-        tags: true,
         createdAt: true,
       },
     });
@@ -50,7 +49,7 @@ export async function GET(request, props) {
     console.error("Error fetching photographer photos:", error);
     return NextResponse.json(
       { error: "Erro ao buscar fotos do fotógrafo" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -117,7 +117,9 @@ export default function MinhasFotosPage() {
     <div className="flex flex-col gap-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Minhas Fotos</h1>
+          <h1 className="heading-display font-display text-2xl md:text-3xl font-black text-white uppercase tracking-tight">
+            Minhas Fotos
+          </h1>
           <p className="text-muted-foreground">
             {fotos.length}{" "}
             {fotos.length === 1 ? "foto publicada" : "fotos publicadas"}

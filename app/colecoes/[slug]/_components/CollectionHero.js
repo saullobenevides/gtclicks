@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { User } from "lucide-react";
 import { formatDateLong } from "@/lib/utils/formatters";
+import ShareButton from "@/components/shared/actions/ShareButton";
 
 export default function CollectionHero({ collection }) {
   if (!collection) return null;
@@ -61,7 +62,7 @@ export default function CollectionHero({ collection }) {
         )}
 
         {/* Photographer Pill */}
-        <div className="mt-4">
+        <div className="mt-4 flex flex-col md:flex-row items-center gap-4">
           <Link
             href={
               collection.photographerUsername
@@ -70,7 +71,7 @@ export default function CollectionHero({ collection }) {
             }
             className="flex items-center gap-3 bg-black rounded-2xl p-3 pr-6 pl-4 border border-white/10 hover:bg-black/80 transition-all group shadow-lg"
           >
-            <Avatar className="h-10 w-10 border-2 border-red-600 shadow-sm">
+            <Avatar className="h-10 w-10 border-2 border-primary shadow-sm">
               <AvatarImage
                 src={collection.photographerAvatar}
                 className="object-cover"
@@ -88,6 +89,12 @@ export default function CollectionHero({ collection }) {
               </span>
             </div>
           </Link>
+
+          <ShareButton
+            title={collection.title}
+            text={`Confira as fotos de ${collection.title} no GT Clicks!`}
+            className="bg-black/50 hover:bg-black/80 text-white border-white/10 h-14 w-14 rounded-2xl backdrop-blur-md"
+          />
         </div>
       </div>
     </div>

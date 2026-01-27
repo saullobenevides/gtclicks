@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+import { getFinancialData } from "@/actions/photographers";
+
 export default function FinancialSummary() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,10 +21,9 @@ export default function FinancialSummary() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/fotografo/financeiro");
-        if (!res.ok) throw new Error("Falha ao carregar dados");
-        const json = await res.json();
-        setData(json);
+        const result = await getFinancialData();
+        if (result.error) throw new Error(result.error);
+        setData(result.data);
       } catch (error) {
         console.error(error);
         toast.error("Erro ao carregar saldo financeiro.");
@@ -45,7 +46,7 @@ export default function FinancialSummary() {
 
   return (
     <div className="space-y-6">
-      <span className="heading-display font-display font-black text-xl text-white">
+      <span className="heading-display font-display font-black text-xl md:text-2xl text-white">
         Financeiro
       </span>
 

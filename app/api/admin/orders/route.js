@@ -4,8 +4,18 @@ import { getAuthenticatedUser } from "@/lib/auth";
 import { z } from "zod";
 
 const querySchema = z.object({
-  status: z.enum(["PENDENTE", "PAGO", "CANCELADO"]).optional(),
+  status: z.string().optional(),
 });
+
+// Map frontend status values to Prisma enum values
+const statusMap = {
+  PENDING: "PENDENTE",
+  APPROVED: "PAGO",
+  CANCELLED: "CANCELADO",
+  PENDENTE: "PENDENTE",
+  PAGO: "PAGO",
+  CANCELADO: "CANCELADO",
+};
 
 export async function GET(request) {
   try {
@@ -23,26 +33,19 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const rawStatus = searchParams.get("status");
 
-    const validationResult = querySchema.safeParse({
-      status: rawStatus || undefined,
-    });
-
-    if (!validationResult.success) {
-      return NextResponse.json(
-        { error: "Invalid status parameter" },
-        { status: 400 },
-      );
+    // Map status to Prisma enum if provided
+    let prismaStatus = undefined;
+    if (rawStatus && statusMap[rawStatus]) {
+      prismaStatus = statusMap[rawStatus];
     }
-
-    const { status } = validationResult.data;
 
     // 3. Data Fetching
     const where = {};
-    if (status) {
-      where.status = status;
+    if (prismaStatus) {
+      where.status = prismaStatus;
     }
 
-    const orders = await prisma.pedido.findMany({
+    const rawOrders = await prisma.pedido.findMany({
       where,
       include: {
         user: {
@@ -51,7 +54,7 @@ export async function GET(request) {
             email: true,
           },
         },
-        items: {
+        itens: {
           select: {
             id: true,
           },
@@ -61,11 +64,22 @@ export async function GET(request) {
       take: 100,
     });
 
+    const orders = rawOrders.map((order) => ({
+      ...order,
+      total: order.total ? Number(order.total) : 0,
+      items: order.itens, // Rename for frontend compatibility
+    }));
+
     return NextResponse.json(orders);
   } catch (error) {
-    console.error("[API /admin/orders] Error:", error);
+    console.error("[API /admin/orders] Error:", error.message);
+    console.error("[API /admin/orders] Stack:", error.stack);
     return NextResponse.json(
-      { error: "Internal server error", message: error.message },
+      {
+        error: "Internal server error",
+        message: error.message,
+        stack: error.stack,
+      },
       { status: 500 },
     );
   }

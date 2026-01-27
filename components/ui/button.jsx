@@ -5,30 +5,30 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border-2",
   {
     variants: {
       variant: {
         default:
-          "bg-transparent border-2 border-[#FF0000] text-white uppercase tracking-wider font-bold hover:bg-[#FF0000] hover:text-white shadow-none",
+          "bg-black border-primary text-white hover:bg-primary hover:text-white shadow-none",
         secondary:
-          "bg-[#1b1c1c] border-2 border-white/30 text-white uppercase tracking-wider font-bold hover:bg-white/20 hover:border-white/50 backdrop-blur-sm",
+          "bg-background/50 border-white/20 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm",
         outline:
-          "border-2 border-white/20 bg-transparent hover:bg-white/5 hover:border-white/30 uppercase tracking-wider font-bold",
-        ghost: "hover:bg-white/10 hover:text-white",
+          "bg-transparent border-white/20 hover:bg-white/10 hover:border-white/50 text-white",
+        ghost: "border-transparent hover:bg-white/10 hover:text-white",
         danger:
-          "bg-red-600 text-white shadow-lg shadow-red-600/20 hover:bg-red-700 hover:shadow-red-600/30",
+          "bg-black border-primary text-white hover:bg-primary hover:text-white",
         destructive:
-          "bg-red-600 text-white shadow-lg shadow-red-600/20 hover:bg-red-700 hover:shadow-red-600/30",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-destructive border-destructive text-destructive-foreground hover:bg-destructive/90",
+        link: "text-primary underline-offset-4 hover:underline border-transparent shadow-none lowercase tracking-normal font-medium",
       },
       size: {
-        xs: "h-7 px-2 text-xs rounded-md",
-        sm: "h-9 px-4 text-sm",
-        default: "h-11 px-6 text-base",
-        lg: "h-13 px-8 text-lg",
-        xl: "h-14 px-10 text-xl",
-        icon: "h-11 w-11",
+        xs: "h-8 px-3 text-xs",
+        sm: "h-9 px-4 text-xs",
+        default: "h-11 px-6 text-sm",
+        lg: "h-14 px-8 text-base",
+        xl: "h-16 px-10 text-lg",
+        icon: "h-11 w-11 p-0",
       },
     },
     defaultVariants: {

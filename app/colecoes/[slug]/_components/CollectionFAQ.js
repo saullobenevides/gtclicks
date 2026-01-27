@@ -1,9 +1,4 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import StandardFaq from "@/components/shared/StandardFaq";
 
 const DEFAULT_FAQ = [
   {
@@ -41,22 +36,7 @@ export default function CollectionFAQ() {
           </p>
         </div>
 
-        <Accordion type="single" collapsible className="w-full space-y-4">
-          {DEFAULT_FAQ.map((item, index) => (
-            <AccordionItem
-              key={index}
-              value={`item-${index}`}
-              className="border border-border/50 bg-card/50 rounded-xl px-4 overflow-hidden"
-            >
-              <AccordionTrigger className="text-left text-lg font-semibold hover:no-underline py-6">
-                {item.question}
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-base pb-6">
-                {item.answer}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <StandardFaq items={DEFAULT_FAQ} />
       </div>
     </section>
   );

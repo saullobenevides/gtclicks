@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@stackframe/stack";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -24,6 +24,11 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import AppPagination from "@/components/shared/AppPagination";
+import { getFinancialData, updatePixKey } from "@/actions/photographers";
+import { requestWithdrawal } from "@/actions/payouts";
+
+// ... (FinanceiroSkeleton stays the same)
 
 function FinanceiroSkeleton() {
   return (
@@ -78,25 +83,32 @@ export default function FinanceiroPage() {
   const user = useUser();
   const isUserLoading = user === undefined;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page")) || 1;
   const [loading, setLoading] = useState(true);
   const [saldo, setSaldo] = useState(null);
   const [transacoes, setTransacoes] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
   const [chavePix, setChavePix] = useState("");
   const [editingPix, setEditingPix] = useState(false);
   const [valorSaque, setValorSaque] = useState("");
   const [solicitandoSaque, setSolicitandoSaque] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [minSaque, setMinSaque] = useState(50);
 
-  const fetchData = async (userId) => {
+  const fetchData = async () => {
     try {
-      const response = await fetch(
-        `/api/fotografos/financeiro?userId=${userId}`,
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setSaldo(data.saldo);
-        setTransacoes(data.transacoes || []);
-        setChavePix(data.saldo?.chavePix || "");
+      const result = await getFinancialData();
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      if (result.data) {
+        setSaldo(result.data.saldo);
+        setTransacoes(result.data.transacoes || []);
+        setChavePix(result.data.chavePix || "");
+        if (result.data.minSaque) {
+          setMinSaque(result.data.minSaque);
+        }
       }
     } catch (error) {
       console.error("Error fetching financial data:", error);
@@ -115,22 +127,59 @@ export default function FinanceiroPage() {
       router.push("/login?redirect=/dashboard/fotografo/financeiro");
       return;
     }
-    fetchData(user.id);
-  }, [user, isUserLoading, router]);
+    fetchData();
+  }, [user, isUserLoading, router, page]);
 
-  const handleSavePix = async () => {
+  const [verificationCode, setVerificationCode] = useState("");
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
+
+  const handleSendCode = async () => {
+    setSendingCode(true);
     try {
-      const response = await fetch("/api/fotografos/pix", {
+      const response = await fetch("/api/auth/code/send", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id, chavePix }),
+        body: JSON.stringify({ type: "PIX_UPDATE" }),
       });
       if (response.ok) {
-        setMessage({ type: "success", text: "Chave PIX salva com sucesso!" });
-        setEditingPix(false);
-        fetchData(user.id);
+        setMessage({ type: "success", text: "Código enviado para seu email!" });
+        setShowCodeInput(true);
       } else {
-        setMessage({ type: "error", text: "Erro ao salvar chave PIX" });
+        setMessage({ type: "error", text: "Erro ao enviar código." });
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: "Erro ao enviar código." });
+    } finally {
+      setSendingCode(false);
+    }
+  };
+
+  const handleSavePix = async () => {
+    if (!verificationCode) {
+      setMessage({ type: "error", text: "Digite o código de verificação." });
+      return;
+    }
+
+    try {
+      const result = await updatePixKey({
+        chavePix,
+        code: verificationCode,
+      });
+      if (result.success) {
+        setMessage({
+          type: "success",
+          text: "Chave PIX atualizada com sucesso!",
+        });
+        setEditingPix(false);
+        setShowCodeInput(false);
+        setVerificationCode("");
+        fetchData();
+      } else {
+        setMessage({
+          type: "error",
+          text: result.error || "Erro ao salvar chave PIX",
+        });
       }
     } catch (error) {
       setMessage({ type: "error", text: "Erro ao salvar chave PIX" });
@@ -143,8 +192,11 @@ export default function FinanceiroPage() {
       return;
     }
     const valor = parseFloat(valorSaque);
-    if (!valor || valor < 50) {
-      setMessage({ type: "error", text: "Valor mínimo para saque: R$ 50,00" });
+    if (!valor || valor < minSaque) {
+      setMessage({
+        type: "error",
+        text: `Valor mínimo para saque: R$ ${minSaque.toFixed(2)}`,
+      });
       return;
     }
     if (valor > parseFloat(saldo?.disponivel || 0)) {
@@ -154,23 +206,18 @@ export default function FinanceiroPage() {
 
     setSolicitandoSaque(true);
     try {
-      const response = await fetch("/api/fotografos/saques", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id, valor, chavePix }),
-      });
-      if (response.ok) {
+      const result = await requestWithdrawal({ valor, chavePix });
+      if (result.success) {
         setMessage({
           type: "success",
           text: "Saque solicitado com sucesso! Será processado em até 2 dias úteis.",
         });
         setValorSaque("");
-        fetchData(user.id);
+        fetchData();
       } else {
-        const data = await response.json();
         setMessage({
           type: "error",
-          text: data.error || "Erro ao solicitar saque.",
+          text: result.error || "Erro ao solicitar saque.",
         });
       }
     } catch (error) {
@@ -226,7 +273,10 @@ export default function FinanceiroPage() {
 
         <Card className="bg-black/20 border-white/10">
           <CardHeader>
-            <CardTitle>Chave PIX</CardTitle>
+            <CardTitle>CPF (Chave PIX)</CardTitle>
+            <CardDescription className="text-xs text-muted-foreground">
+              Para sua segurança, usamos o CPF como chave Pix obrigatória.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {editingPix ? (
@@ -235,16 +285,44 @@ export default function FinanceiroPage() {
                   type="text"
                   value={chavePix}
                   onChange={(e) => setChavePix(e.target.value)}
-                  placeholder="Digite sua chave PIX"
+                  placeholder="Digite seu CPF (apenas números)"
                 />
                 <div className="flex gap-4">
-                  <Button onClick={handleSavePix}>Salvar</Button>
-                  <Button
-                    onClick={() => setEditingPix(false)}
-                    variant="outline"
-                  >
-                    Cancelar
-                  </Button>
+                  {showCodeInput ? (
+                    <div className="flex flex-col gap-2 w-full">
+                      <Input
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        placeholder="Código de 6 dígitos"
+                        maxLength={6}
+                      />
+                      <div className="flex gap-2">
+                        <Button onClick={handleSavePix}>
+                          Confirmar Código
+                        </Button>
+                        <Button
+                          onClick={() => setShowCodeInput(false)}
+                          variant="ghost"
+                        >
+                          Voltar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <Button onClick={handleSendCode} disabled={sendingCode}>
+                        {sendingCode
+                          ? "Enviando..."
+                          : "Enviar Código de Verificação"}
+                      </Button>
+                      <Button
+                        onClick={() => setEditingPix(false)}
+                        variant="outline"
+                      >
+                        Cancelar
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             ) : (
@@ -269,26 +347,33 @@ export default function FinanceiroPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Input
-              type="number"
-              value={valorSaque}
-              onChange={(e) => setValorSaque(e.target.value)}
-              placeholder="Valor do saque"
-              min="50"
-              step="0.01"
-              className="flex-1 bg-black/40 border-white/10"
-            />
-            <Button
-              onClick={handleSolicitarSaque}
-              disabled={solicitandoSaque || !chavePix}
-            >
-              {solicitandoSaque && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              {solicitandoSaque ? "Solicitando..." : "Solicitar Saque"}
-            </Button>
-          </div>
+          {Number(saldo?.disponivel || 0) < 50 ? (
+            <div className="rounded-md bg-yellow-900/20 border border-yellow-700/50 p-4 text-sm text-yellow-200">
+              Você precisa acumular no mínimo <strong>R$ 50,00</strong> para
+              solicitar um saque.
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Input
+                type="number"
+                value={valorSaque}
+                onChange={(e) => setValorSaque(e.target.value)}
+                placeholder="Valor do saque"
+                min="50"
+                step="0.01"
+                className="flex-1 bg-black/40 border-white/10"
+              />
+              <Button
+                onClick={handleSolicitarSaque}
+                disabled={solicitandoSaque || !chavePix}
+              >
+                {solicitandoSaque && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {solicitandoSaque ? "Solicitando..." : "Solicitar Saque"}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -373,6 +458,14 @@ export default function FinanceiroPage() {
               )}
             </TableBody>
           </Table>
+
+          <div className="mt-4">
+            <AppPagination
+              currentPage={page}
+              totalPages={totalPages}
+              baseUrl="/dashboard/fotografo/financeiro"
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

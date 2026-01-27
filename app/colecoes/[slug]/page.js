@@ -22,13 +22,13 @@ export async function generateMetadata({ params }) {
 
   if (!collection) {
     return {
-      title: "Coleção não encontrada | GTClicks",
+      title: "Coleção não encontrada",
       description: "A coleção que você procura não está disponível.",
     };
   }
 
   return {
-    title: `${collection.title} por ${collection.photographer} | GTClicks`,
+    title: `${collection.title} por ${collection.photographer}`,
     description:
       collection.description ||
       `Confira a coleção ${collection.title} no GTClicks.`,
@@ -133,7 +133,7 @@ export default async function CollectionDetail({ params, searchParams }) {
                     className="group block"
                   >
                     <div className="bg-card/50 border border-white/5 rounded-xl p-6 flex flex-col items-center justify-center gap-4 transition-all hover:bg-card hover:border-primary/50 hover:shadow-lg hover:-translate-y-1">
-                      <Folder className="h-12 w-12 text-blue-500 fill-blue-500/20 group-hover:scale-110 transition-transform" />
+                      <Folder className="h-12 w-12 text-primary fill-primary/10 group-hover:scale-110 transition-transform" />
                       <div className="text-center w-full">
                         <p
                           className="font-medium truncate w-full px-2"
@@ -193,6 +193,38 @@ export default async function CollectionDetail({ params, searchParams }) {
               name: collection.photographer?.name || "GTClicks",
             },
           }),
+          // Event Schema for Local SEO
+          ...(collection.local || collection.cidade
+            ? {
+                "@context": "https://schema.org",
+                "@type": "Event",
+                name: collection.title,
+                startDate: collection.dataInicio || collection.createdAt,
+                endDate: collection.dataFim || collection.createdAt, // Fallback if single day
+                eventStatus: "https://schema.org/EventScheduled",
+                eventAttendanceMode:
+                  "https://schema.org/OfflineEventAttendanceMode",
+                location: {
+                  "@type": "Place",
+                  name: collection.local || "Local do Evento",
+                  address: {
+                    "@type": "PostalAddress",
+                    addressLocality: collection.cidade || "Brasil",
+                    addressRegion: collection.estado || "",
+                    addressCountry: "BR",
+                  },
+                },
+                image: collection.photos?.[0]?.previewUrl
+                  ? [collection.photos[0].previewUrl]
+                  : [],
+                description: collection.description || collection.title,
+                organizer: {
+                  "@type": "Person",
+                  name: collection.photographer?.name,
+                  url: `https://gtclicks.com.br/fotografo/${collection.photographer?.username}`,
+                },
+              }
+            : {}),
         }}
       />
     </div>

@@ -5,71 +5,79 @@ import { Prisma } from "@prisma/client";
 export async function POST(request) {
   try {
     const body = await request.json();
-    
+
     // Mercado Pago sends notifications for different events
     // We filter for "payment" type or "payment.updated" action (depending on API version, but 'payment' is safer)
     // The notification structure usually has `type` or `topic`
-    
+
     let paymentId = null;
 
     if (body.type === "payment") {
-       paymentId = body.data.id;
-    } else if (body.topic === "payment") { // Legacy or specific topic
-       paymentId = body.resource; // Usually the resource URL or ID
-       if (paymentId && typeof paymentId === 'string' && paymentId.includes('/')) {
-         paymentId = paymentId.split('/').pop();
-       }
+      paymentId = body.data.id;
+    } else if (body.topic === "payment") {
+      // Legacy or specific topic
+      paymentId = body.resource; // Usually the resource URL or ID
+      if (
+        paymentId &&
+        typeof paymentId === "string" &&
+        paymentId.includes("/")
+      ) {
+        paymentId = paymentId.split("/").pop();
+      }
     }
 
     if (!paymentId) {
-        // If it's just a test ping or unrelated event, we acknowledge it
-        return NextResponse.json({ received: true });
+      // If it's just a test ping or unrelated event, we acknowledge it
+      return NextResponse.json({ received: true });
     }
-      
+
     // Fetch payment details from Mercado Pago
     const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
-    
+
     const paymentResponse = await fetch(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      }
+      },
     );
 
     if (!paymentResponse.ok) {
       console.error(`Failed to fetch payment ${paymentId} from Mercado Pago`);
-      return NextResponse.json({ error: "Failed to fetch payment" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to fetch payment" },
+        { status: 500 },
+      );
     }
 
     const payment = await paymentResponse.json();
     const pedidoId = payment.external_reference;
 
-    console.log(`Payment ${paymentId} status: ${payment.status} for order ${pedidoId}`);
+    console.log(
+      `Payment ${paymentId} status: ${payment.status} for order ${pedidoId}`,
+    );
 
     if (payment.status === "approved") {
       // 1. Verify if order exists and is not already paid
       const pedido = await prisma.pedido.findUnique({
-          where: { id: pedidoId },
-          include: { itens: true }
+        where: { id: pedidoId },
+        include: { itens: true },
       });
 
       if (!pedido) {
-          console.error(`Order ${pedidoId} not found`);
-          return NextResponse.json({ error: "Order not found" }, { status: 404 });
+        console.error(`Order ${pedidoId} not found`);
+        return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
-
-
 
       // 2. Transaction: Update Order Status + Distribute Funds
       const result = await prisma.$transaction(async (tx) => {
         // Atomic Transition: Only update if status is NOT already 'PAGO' (or specifically 'PENDENTE')
         // This acts as a lock. If count is 0, it means another request likely beat us to it.
         const updateResult = await tx.pedido.updateMany({
-          where: { 
-            id: pedidoId, 
-            status: { not: 'PAGO' } // Idempotency Key
+          where: {
+            id: pedidoId,
+            status: { not: "PAGO" }, // Idempotency Key
           },
           data: {
             status: "PAGO",
@@ -78,30 +86,40 @@ export async function POST(request) {
         });
 
         if (updateResult.count === 0) {
-            // Already paid or doesn't exist (previously checked existance, so likely race condition occurred)
-            return { processed: false, reason: 'ALREADY_PROCESSED' };
+          // Already paid or doesn't exist (previously checked existance, so likely race condition occurred)
+          return { processed: false, reason: "ALREADY_PROCESSED" };
         }
 
         // Fetch items with photographer details to calculate commissions
         const items = await tx.itemPedido.findMany({
           where: { pedidoId },
-          include: { 
+          include: {
             foto: {
               include: {
-                fotografo: true,
+                fotografo: {
+                  include: { user: { select: { id: true } } },
+                },
               },
             },
           },
         });
 
+        // Fetch platform fee from config
+        const { getConfigNumber, CONFIG_KEYS } = await import("@/lib/config");
+        const taxaPlataformaPct = await getConfigNumber(
+          CONFIG_KEYS.TAXA_PLATAFORMA,
+        );
+        // Photographer gets (100 - fee)%
+        const photographerShare = new Prisma.Decimal(1).sub(
+          new Prisma.Decimal(taxaPlataformaPct).div(100),
+        );
+
         for (const item of items) {
-          // Calculate commission (80% for photographer, 20% for platform)
           const fotografoId = item.foto.fotografoId;
-          
+
           // Using Prisma.Decimal for precise calculation
           const precoPago = new Prisma.Decimal(item.precoPago);
-          const comissaoPercent = new Prisma.Decimal(0.80);
-          const valorFotografo = precoPago.mul(comissaoPercent);
+          const valorFotografo = precoPago.mul(photographerShare);
 
           // Ensure photographer has a balance record
           // Note: using upsert inside transaction
@@ -113,9 +131,9 @@ export async function POST(request) {
               bloqueado: 0,
             },
             update: {
-                disponivel: {
-                    increment: valorFotografo
-                }
+              disponivel: {
+                increment: valorFotografo,
+              },
             },
           });
 
@@ -129,27 +147,153 @@ export async function POST(request) {
             },
           });
 
-          console.log(`💰 Fotógrafo ${fotografoId} creditado: R$ ${valorFotografo.toString()}`);
+          // --- STATS: Increment Sales counts ---
+          await tx.foto.update({
+            where: { id: item.fotoId },
+            data: { vendas: { increment: 1 } },
+          });
+
+          if (item.foto.colecaoId) {
+            await tx.colecao.update({
+              where: { id: item.foto.colecaoId },
+              data: { vendas: { increment: 1 } },
+            });
+          }
+
+          // --- NOTIFICATION: Photo Sold ---
+          try {
+            const { notifyPhotographerSale } =
+              await import("@/actions/notifications");
+            await notifyPhotographerSale({
+              fotografoUserId: item.foto.fotografo.user.id,
+              photoTitle: item.foto.titulo,
+              value: Number(valorFotografo),
+              orderId: pedidoId,
+            });
+          } catch (nErr) {
+            console.error("Failed to send photographer notification:", nErr);
+          }
+
+          console.log(
+            `💰 Fotógrafo ${fotografoId} creditado: R$ ${valorFotografo.toString()}`,
+          );
         }
-        
+
+        // --- NOTIFICATION: Order Approved ---
+        try {
+          const { notifyOrderApproved } =
+            await import("@/actions/notifications");
+          await notifyOrderApproved({
+            userId: pedido.userId,
+            orderId: pedidoId,
+          });
+        } catch (nErr) {
+          console.error("Failed to send order approval notification:", nErr);
+        }
+
         return { processed: true };
       });
 
       if (!result.processed) {
-         console.log(`Order ${pedidoId} was already processed (Atomic Check).`);
-         return NextResponse.json({ received: true, message: "Already processed" });
+        console.log(`Order ${pedidoId} was already processed (Atomic Check).`);
+        return NextResponse.json({
+          received: true,
+          message: "Already processed",
+        });
       }
 
       console.log(`✅ Order ${pedidoId} successfully processed and paid.`);
-      
-    } else if (payment.status === "rejected" || payment.status === "cancelled") {
+
+      console.log(`✅ Order ${pedidoId} successfully processed and paid.`);
+    } else if (
+      payment.status === "rejected" ||
+      payment.status === "cancelled"
+    ) {
       await prisma.pedido.update({
         where: { id: pedidoId },
         data: {
           status: "CANCELADO",
         },
       });
-      console.log(`❌ Order ${pedidoId} marked as CANCELADO`);
+      console.log(
+        `❌ Order ${pedidoId} marked as CANCELADO (Payment Rejected/Cancelled)`,
+      );
+    } else if (
+      payment.status === "refunded" ||
+      payment.status === "charged_back"
+    ) {
+      // --- SECURITY FIX: Handle Refunds/Chargebacks ---
+      console.log(
+        `⚠️ Payment ${paymentId} was REFUNDED/CHARGED_BACK. Reversing funds...`,
+      );
+
+      const pedido = await prisma.pedido.findUnique({
+        where: { id: pedidoId },
+        include: { itens: { include: { foto: true } } },
+      });
+
+      if (!pedido) {
+        console.error(`Order ${pedidoId} not found during refund`);
+        return NextResponse.json({ received: true });
+      }
+
+      // If already cancelled, ignore (idempotency)
+      // Note: 'DEVOLVIDO' status would be better, but 'CANCELADO' works for now if we don't have enum
+      // Assuming enum allows CANCELADO.
+
+      await prisma.$transaction(async (tx) => {
+        // 1. Mark order as Cancelled/Refunded
+        await tx.pedido.update({
+          where: { id: pedidoId },
+          data: { status: "CANCELADO" },
+        });
+
+        // 2. Reverse transactions for photographers
+        for (const item of pedido.itens) {
+          const fotografoId = item.foto.fotografoId;
+
+          // Fetch platform fee from config
+          const { getConfigNumber, CONFIG_KEYS } = await import("@/lib/config");
+          const taxaPlataformaPct = await getConfigNumber(
+            CONFIG_KEYS.TAXA_PLATAFORMA,
+          );
+          const photographerShare = new Prisma.Decimal(1).sub(
+            new Prisma.Decimal(taxaPlataformaPct).div(100),
+          );
+
+          // Re-calculate original commission to reverse it
+          const precoPago = new Prisma.Decimal(item.precoPago);
+          const valorEstorno = precoPago.mul(photographerShare); // Positive value
+
+          // Create "Estorno" transaction (Negative value)
+          await tx.transacao.create({
+            data: {
+              fotografoId,
+              tipo: "ESTORNO", // or "REEMBOLSO"
+              valor: valorEstorno.negated(),
+              descricao: `Estorno de venda: ${item.foto.titulo} (Pedido ${pedidoId})`,
+              status: "PROCESSADO",
+            },
+          });
+
+          // Update balance (Decrement available)
+          // Allow negative balance (debt)
+          await tx.saldo.update({
+            where: { fotografoId },
+            data: {
+              disponivel: {
+                decrement: valorEstorno,
+              },
+            },
+          });
+
+          console.log(
+            `💸 Estorno aplicado para fotógrafo ${fotografoId}: -R$ ${valorEstorno}`,
+          );
+        }
+      });
+
+      console.log(`✅ Order ${pedidoId} fully refunded in DB.`);
     }
 
     return NextResponse.json({ received: true });
@@ -157,7 +301,7 @@ export async function POST(request) {
     console.error("Webhook error:", error);
     return NextResponse.json(
       { error: "Webhook processing failed", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

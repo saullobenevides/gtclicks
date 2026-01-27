@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/features/cart/context/CartContext";
@@ -17,10 +17,11 @@ import {
   Maximize2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ShareButton from "@/components/shared/actions/ShareButton";
 
 export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
-  const { addToCart } = useCart();
-  const [addedToCart, setAddedToCart] = useState(false);
+  const { items, addToCart } = useCart();
+  const isAdded = items.some((i) => i.fotoId === photo.id);
 
   const price = photo.colecao?.precoFoto || 0;
 
@@ -42,15 +43,16 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
   const handleAddToCart = () => {
     addToCart({
       fotoId: photo.id,
+      colecaoId: photo.colecaoId || photo.colecao?.id,
       titulo: photo.numeroSequencial
         ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
         : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`,
       preco: price,
+      precoBase: price,
+      descontos: photo.colecao?.descontos || [],
       licenca: "Uso Padrão",
       previewUrl: photo.previewUrl,
     });
-
-    setAddedToCart(true);
   };
 
   const displayName = photo.numeroSequencial
@@ -70,14 +72,22 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
       />
 
       {/* Close Button - Always visible top right */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onClose}
-        className="absolute top-4 right-4 z-50 bg-black/40 text-white hover:bg-black/60 backdrop-blur-md rounded-full border border-white/10 h-10 w-10 md:h-12 md:w-12"
-      >
-        <X className="h-5 w-5 md:h-6 md:w-6" />
-      </Button>
+      <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
+        <ShareButton
+          title="Foto GTClicks"
+          text="Olha essa foto incrível!"
+          variant="ghost"
+          className="bg-black/40 text-white hover:bg-black/60 backdrop-blur-md rounded-full border border-white/10 h-10 w-10 md:h-12 md:w-12"
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="bg-black/40 text-white hover:bg-black/60 backdrop-blur-md rounded-full border border-white/10 h-10 w-10 md:h-12 md:w-12"
+        >
+          <X className="h-5 w-5 md:h-6 md:w-6" />
+        </Button>
+      </div>
 
       {/* Navigation - Left */}
       {onPrev && (
@@ -132,16 +142,16 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
         {/* Big Add Button */}
         <Button
           onClick={handleAddToCart}
-          disabled={addedToCart}
+          disabled={isAdded}
           size="lg"
           className={cn(
             "h-14 px-8 md:px-12 text-lg font-bold shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all duration-300 rounded-full border border-white/10 backdrop-blur-sm",
-            addedToCart
+            isAdded
               ? "bg-zinc-800/90 text-zinc-300 hover:bg-zinc-800 cursor-default"
-              : "bg-[#480000] hover:bg-[#5a0000] text-white hover:scale-105 hover:shadow-[#480000]/30"
+              : "bg-[#480000] hover:bg-[#5a0000] text-white hover:scale-105 hover:shadow-[#480000]/30",
           )}
         >
-          {addedToCart ? (
+          {isAdded ? (
             <span className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5" />
               No Carrinho

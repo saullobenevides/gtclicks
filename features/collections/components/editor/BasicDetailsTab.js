@@ -109,6 +109,35 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
           />
         </div>
 
+        <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4 bg-primary/5 border-primary/20">
+          <div className="flex h-5 items-center">
+            <input
+              id="face-recognition"
+              type="checkbox"
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary bg-black/20"
+              checked={collectionData.faceRecognitionEnabled}
+              onChange={(e) =>
+                onDataChange("faceRecognitionEnabled", e.target.checked)
+              }
+            />
+          </div>
+          <div className="space-y-1 leading-none">
+            <Label
+              htmlFor="face-recognition"
+              className="text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-white flex items-center gap-2"
+            >
+              Ativar Reconhecimento Facial (IA)
+              <span className="text-[10px] bg-primary text-black px-1.5 py-0.5 rounded-full font-black uppercase">
+                Premium
+              </span>
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Permite que os clientes encontrem suas fotos através de uma selfie
+              utilizando IA da AWS.
+            </p>
+          </div>
+        </div>
+
         {/* 
         <div className="space-y-1.5 w-full max-w-full min-w-0">
           <PlaceSelector

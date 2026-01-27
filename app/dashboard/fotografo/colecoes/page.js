@@ -16,16 +16,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Images, PlusCircle, Edit, ExternalLink } from "lucide-react";
 import CreateCollectionButton from "@/features/collections/components/CreateCollectionButton";
+import { formatDateShort as formatDate } from "@/lib/utils/formatters";
+import AppPagination from "@/components/shared/AppPagination";
 
-const formatDate = (date) => {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-};
+export default async function MinhasColecoesPage(props) {
+  const searchParams = await props.searchParams;
+  const page = searchParams?.page ? Number(searchParams.page) : 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
 
-export default async function MinhasColecoesPage() {
   let user;
   try {
     user = await stackServerApp.getUser();
@@ -45,21 +44,35 @@ export default async function MinhasColecoesPage() {
     redirect("/dashboard/fotografo");
   }
 
-  const colecoes = await prisma.colecao.findMany({
-    where: { fotografoId: fotografo.id },
-    include: {
-      _count: {
-        select: { fotos: true },
+  const [total, rawColecoes] = await Promise.all([
+    prisma.colecao.count({
+      where: { fotografoId: fotografo.id },
+    }),
+    prisma.colecao.findMany({
+      where: { fotografoId: fotografo.id },
+      include: {
+        _count: {
+          select: { fotos: true },
+        },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      skip: skip,
+    }),
+  ]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  const colecoes = rawColecoes.map((c) => ({
+    ...c,
+    precoFoto: c.precoFoto ? Number(c.precoFoto) : 0,
+  }));
 
   return (
     <div className="flex flex-col gap-8 p-4 md:p-0">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl">
+          <h1 className="heading-display font-display text-2xl md:text-3xl font-black text-white uppercase tracking-tight">
             Minhas Coleções
           </h1>
           <p className="text-muted-foreground">
@@ -256,6 +269,13 @@ export default async function MinhasColecoesPage() {
           </Table>
         </div>
       </Card>
+
+      <AppPagination
+        currentPage={page}
+        totalPages={totalPages}
+        baseUrl="/dashboard/fotografo/colecoes"
+        searchParams={searchParams}
+      />
     </div>
   );
 }

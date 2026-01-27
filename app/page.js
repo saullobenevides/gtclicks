@@ -11,16 +11,10 @@ export const revalidate = 3600;
 
 export default async function Home() {
   const {
-    collections = [],
+    featuredCollections = [],
+    recentCollections = [],
     photographers = [],
-    highlights = [],
   } = await getHomepageData();
-
-  // Split collections for Featured and Recent
-  // Assuming we have at least 6 collections, otherwise we might duplicate or show fewer
-  const featuredCollections = collections.slice(0, 3);
-  const recentCollections =
-    collections.length > 3 ? collections.slice(3, 6) : collections.slice(0, 3); // Fallback to show something
 
   return (
     <div className="flex flex-col gap-0 pb-24">
@@ -29,7 +23,7 @@ export default async function Home() {
       <FeaturedCollections
         collections={featuredCollections}
         title="COLEÇÕES EM DESTAQUE"
-        subtitle="Séries autorais selecionadas para inspirar sua próxima criação"
+        subtitle="As coleções mais visualizadas da comunidade"
       />
 
       <PhotographerSpotlight photographers={photographers} />

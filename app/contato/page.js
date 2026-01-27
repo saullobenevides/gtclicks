@@ -10,7 +10,7 @@ import {
 import { Mail, MessageCircle, MapPin } from "lucide-react";
 
 export const metadata = {
-  title: "Fale Conosco | GTClicks",
+  title: "Fale Conosco",
   description: "Entre em contato com a equipe do GTClicks.",
 };
 
@@ -20,7 +20,7 @@ export default function ContatoPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         <div className="space-y-8">
           <div className="space-y-4">
-            <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl md:text-5xl">
+            <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
               Fale Conosco
             </h1>
             <p className="text-xl text-muted-foreground">

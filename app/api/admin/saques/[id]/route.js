@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function PATCH(request, { params }) {
@@ -25,6 +26,7 @@ export async function PATCH(request, { params }) {
 
     const saque = await prisma.solicitacaoSaque.findUnique({
       where: { id },
+      include: { fotografo: { select: { userId: true } } },
     });
 
     if (!saque) {
@@ -42,72 +44,149 @@ export async function PATCH(request, { params }) {
     }
 
     if (action === "aprovar") {
-      // Mark as processed
-      await prisma.solicitacaoSaque.update({
-        where: { id },
-        data: {
-          status: "PROCESSADO",
-          processadoEm: new Date(),
-          observacao: "Saque processado via PIX",
-        },
-      });
+      // --- NEW: Automated Payout with Mercado Pago ---
+      try {
+        const { sendPixPayout } = await import("@/lib/mercadopago");
+        const payoutResult = await sendPixPayout({
+          amount: Number(saque.valor),
+          pixKey: saque.chavePix,
+          description: `Pagamento GT Clicks - Saque ${saque.id}`,
+          externalReference: saque.id,
+        });
 
-      // Update transaction status
-      await prisma.transacao.updateMany({
-        where: {
-          saqueId: id,
-          tipo: "SAQUE",
-        },
-        data: {
-          status: "PROCESSADO",
-        },
-      });
+        if (!payoutResult.success) {
+          console.error(
+            `❌ Automatic payout failed for ${saque.id}:`,
+            payoutResult.error,
+          );
+          return NextResponse.json(
+            {
+              error: `Falha no Pix Automático: ${payoutResult.error}. O saque não foi processado no banco.`,
+            },
+            { status: 400 },
+          );
+        }
 
-      // Move from blocked to paid (remove from balance)
-      await prisma.saldo.update({
-        where: { fotografoId: saque.fotografoId },
-        data: {
-          bloqueado: {
-            decrement: Number(saque.valor), // Ensure number
+        console.log(
+          `✅ Pix Automático enviado com sucesso para saque ${saque.id}. ID MP: ${payoutResult.id}`,
+        );
+      } catch (payoutErr) {
+        console.error(`❌ Payout integration error:`, payoutErr);
+        return NextResponse.json(
+          {
+            error:
+              "Erro crítico ao tentar processar o Pix. Entre em contato com o suporte.",
           },
-        },
+          { status: 500 },
+        );
+      }
+
+      // Mark as processed logic wrapped in transaction
+      await prisma.$transaction(async (tx) => {
+        // 1. Mark withdrawal as processed
+        await tx.solicitacaoSaque.update({
+          where: { id },
+          data: {
+            status: "PROCESSADO",
+            processadoEm: new Date(),
+            observacao: "Saque processado via PIX Automático",
+          },
+        });
+
+        // 2. Update transaction status
+        await tx.transacao.updateMany({
+          where: {
+            saqueId: id,
+            tipo: "SAQUE",
+          },
+          data: {
+            status: "PROCESSADO",
+          },
+        });
+
+        // 3. Move from blocked to paid (remove from balance)
+        // Use Decimal for precision
+        const valorSaque = new Prisma.Decimal(saque.valor);
+
+        await tx.saldo.update({
+          where: { fotografoId: saque.fotografoId },
+          data: {
+            bloqueado: {
+              decrement: valorSaque,
+            },
+          },
+        });
       });
+
+      // --- NOTIFICATION: Withdrawal Approved ---
+      try {
+        const { notifyWithdrawalProcessed } =
+          await import("@/actions/notifications");
+        await notifyWithdrawalProcessed({
+          userId: saque.fotografo.userId,
+          value: Number(saque.valor),
+          status: "APROVADO",
+        });
+      } catch (nErr) {
+        console.error("Failed to send withdrawal approval notification:", nErr);
+      }
 
       console.log(`✅ Saque ${id} aprovado: R$ ${saque.valor} processado`);
     } else {
-      // Cancel withdrawal - return money to available balance
-      await prisma.solicitacaoSaque.update({
-        where: { id },
-        data: {
-          status: "CANCELADO",
-          processadoEm: new Date(),
-          observacao: "Saque cancelado pelo administrador",
-        },
+      // Cancel withdrawal logic wrapped in transaction
+      await prisma.$transaction(async (tx) => {
+        // 1. Cancel request
+        await tx.solicitacaoSaque.update({
+          where: { id },
+          data: {
+            status: "CANCELADO",
+            processadoEm: new Date(),
+            observacao: "Saque cancelado pelo administrador",
+          },
+        });
+
+        // 2. Update transaction status
+        await tx.transacao.updateMany({
+          where: {
+            saqueId: id,
+            tipo: "SAQUE",
+          },
+          data: {
+            status: "FALHOU",
+          },
+        });
+
+        // 3. Return money: blocked -> available
+        const valorSaque = new Prisma.Decimal(saque.valor);
+
+        await tx.saldo.update({
+          where: { fotografoId: saque.fotografoId },
+          data: {
+            bloqueado: {
+              decrement: valorSaque,
+            },
+            disponivel: {
+              increment: valorSaque,
+            },
+          },
+        });
       });
 
-      // Update transaction status
-      await prisma.transacao.updateMany({
-        where: {
-          saqueId: id,
-          tipo: "SAQUE",
-        },
-        data: {
-          status: "FALHOU",
-        },
-      });
-
-      // Move from blocked back to available
-      await prisma.saldo.update({
-        where: { fotografoId: saque.fotografoId },
-        data: {
-          bloqueado: {
-            decrement: Number(saque.valor),
-          },
-          disponivel: {
-            increment: Number(saque.valor),
-          },
-        },
-      });
+      // --- NOTIFICATION: Withdrawal Rejected ---
+      try {
+        const { notifyWithdrawalProcessed } =
+          await import("@/actions/notifications");
+        await notifyWithdrawalProcessed({
+          userId: saque.fotografo.userId,
+          value: Number(saque.valor),
+          status: "REJEITADO",
+        });
+      } catch (nErr) {
+        console.error(
+          "Failed to send withdrawal rejection notification:",
+          nErr,
+        );
+      }
 
       console.log(
         `❌ Saque ${id} cancelado: R$ ${saque.valor} devolvido ao saldo`,

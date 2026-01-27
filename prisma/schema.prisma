@@ -36,6 +36,7 @@ model User {
   carrinho      Carrinho?
   likes         Like[]
   notifications Notification[]
+  usageLogs     UsageLog[]
 }
 
 model Fotografo {
@@ -89,7 +90,6 @@ model Foto {
   // Descritivo
   titulo         String
   descricao      String?
-  tags           String[]
   orientacao     OrientacaoFoto
   likes          Int       @default(0)
   views          Int       @default(0) // Analytics: Detail Views
@@ -97,6 +97,7 @@ model Foto {
   downloads      Int       @default(0) // Analytics: Total Downloads count
   carrinhoCount  Int       @default(0) // Analytics: Added to Cart count
   numeroSequencial Int?    // Busca: "Foto 231"
+  sequentialId   Int       @unique @default(autoincrement()) // ID único global
   categoriaFoto  String?   // Busca: "Individual", "Grupo"
   
   // Técnico (Crítico para S3 e Next/Image)
@@ -117,6 +118,7 @@ model Foto {
   
   status         FotoStatus @default(PENDENTE)
   indexingStatus FaceIndexingStatus @default(PENDENTE)
+  indexedFaceIds String[]
   
   fotografoId    String
   fotografo      Fotografo @relation(fields: [fotografoId], references: [id])
@@ -166,6 +168,7 @@ model Colecao {
   status         ColecaoStatus @default(RASCUNHO)
   precoFoto      Decimal   @default(0.0) @db.Decimal(10, 2)
   descontos      Json?     // Ex: [{"min": 5, "price": 10.0}]
+  faceRecognitionEnabled Boolean @default(false)
   
   // Localização e Data
   cidade         String?
@@ -332,6 +335,7 @@ model SolicitacaoSaque {
   fotografo      Fotografo @relation(fields: [fotografoId], references: [id])
   
   valor          Decimal
+  chavePix       String?   // Audit trail: Key used at the time of request
   status         String    // PENDENTE, PAGO, CANCELADO, PROCESSADO
   processadoEm   DateTime?
   observacao     String?
@@ -355,4 +359,33 @@ model Notification {
   createdAt DateTime @default(now())
   
   @@index([userId, read])
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  type      String   // PIX_UPDATE, etc.
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email, code])
+}
+
+model SystemConfig {
+  key         String @id
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
+model UsageLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String   // Ex: "SELFIE_SEARCH", "FACE_INDEXING"
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, action, createdAt])
 }

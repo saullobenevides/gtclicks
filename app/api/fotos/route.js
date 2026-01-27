@@ -18,7 +18,6 @@ export async function GET() {
         id: foto.id,
         titulo: foto.titulo,
         previewUrl: foto.previewUrl,
-        tags: foto.tags,
         fotografo: foto.fotografo?.user?.name ?? "Fotografo GTClicks",
         licencas: foto.licencas.map((item) => ({
           licencaId: item.licencaId,
@@ -60,7 +59,6 @@ export async function POST(request) {
       titulo,
       slug,
       descricao,
-      tags = [],
       orientacao = OrientacaoFoto.HORIZONTAL,
       corPredominante,
       previewUrl,
@@ -91,7 +89,6 @@ export async function POST(request) {
         titulo,
         slug,
         descricao,
-        tags,
         orientacao: orientationValue,
         corPredominante,
         previewUrl,

@@ -6,6 +6,8 @@ import { z } from "zod";
 const querySchema = z.object({
   role: z.enum(["CLIENTE", "FOTOGRAFO", "ADMIN"]).optional(),
   search: z.string().optional(),
+  page: z.string().optional(),
+  limit: z.string().optional(),
 });
 
 export async function GET(request) {
@@ -24,10 +26,14 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const rawRole = searchParams.get("role");
     const rawSearch = searchParams.get("search");
+    const rawPage = searchParams.get("page");
+    const rawLimit = searchParams.get("limit");
 
     const validationResult = querySchema.safeParse({
       role: rawRole || undefined,
       search: rawSearch || undefined,
+      page: rawPage || undefined,
+      limit: rawLimit || undefined,
     });
 
     if (!validationResult.success) {
@@ -37,7 +43,15 @@ export async function GET(request) {
       );
     }
 
-    const { role, search } = validationResult.data;
+    const {
+      role,
+      search,
+      page: pageStr,
+      limit: limitStr,
+    } = validationResult.data;
+    const page = parseInt(pageStr || "1");
+    const limit = parseInt(limitStr || "20");
+    const skip = (page - 1) * limit;
 
     // 3. Data Fetching
     const where = {};
@@ -53,31 +67,42 @@ export async function GET(request) {
       ];
     }
 
-    const users = await prisma.user.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        fotografo: {
-          select: {
-            id: true,
-            username: true,
+    const [total, users] = await Promise.all([
+      prisma.user.count({ where }),
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          fotografo: {
+            select: {
+              id: true,
+              username: true,
+            },
+          },
+          _count: {
+            select: {
+              pedidos: true,
+            },
           },
         },
-        _count: {
-          select: {
-            pedidos: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 100,
-    });
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: skip,
+      }),
+    ]);
 
-    return NextResponse.json(users);
+    return NextResponse.json({
+      data: users,
+      metadata: {
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error("[API /admin/users] Error:", error);
     return NextResponse.json(

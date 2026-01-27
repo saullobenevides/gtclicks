@@ -5,6 +5,8 @@ import { z } from "zod";
 
 const querySchema = z.object({
   status: z.enum(["RASCUNHO", "PUBLICADA"]).optional().default("PUBLICADA"),
+  page: z.string().optional(),
+  limit: z.string().optional(),
 });
 
 export async function GET(request) {
@@ -22,9 +24,13 @@ export async function GET(request) {
     // 2. Input Validation
     const { searchParams } = new URL(request.url);
     const rawStatus = searchParams.get("status");
+    const rawPage = searchParams.get("page");
+    const rawLimit = searchParams.get("limit");
 
     const validationResult = querySchema.safeParse({
       status: rawStatus || undefined,
+      page: rawPage || undefined,
+      limit: rawLimit || undefined,
     });
 
     if (!validationResult.success) {
@@ -34,35 +40,53 @@ export async function GET(request) {
       );
     }
 
-    const { status } = validationResult.data;
+    const { status, page: pageStr, limit: limitStr } = validationResult.data;
+    const page = parseInt(pageStr || "1");
+    const limit = parseInt(limitStr || "20");
+    const skip = (page - 1) * limit;
 
     // 3. Data Fetching
-    const collections = await prisma.colecao.findMany({
-      where: {
-        status: status,
-      },
-      include: {
-        fotografo: {
-          include: {
-            user: {
-              select: {
-                name: true,
-                email: true,
+    const [total, collections] = await Promise.all([
+      prisma.colecao.count({
+        where: {
+          status: status,
+        },
+      }),
+      prisma.colecao.findMany({
+        where: {
+          status: status,
+        },
+        include: {
+          fotografo: {
+            include: {
+              user: {
+                select: {
+                  name: true,
+                  email: true,
+                },
               },
             },
           },
-        },
-        _count: {
-          select: {
-            fotos: true,
+          _count: {
+            select: {
+              fotos: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    });
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: skip,
+      }),
+    ]);
 
-    return NextResponse.json(collections);
+    return NextResponse.json({
+      data: collections,
+      metadata: {
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error("[API /admin/collections] Error:", error);
     return NextResponse.json(

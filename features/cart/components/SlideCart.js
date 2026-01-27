@@ -53,7 +53,7 @@ export default function SlideCart() {
                   key={item.fotoId}
                   className="flex gap-4 border-b border-white/5 pb-4 last:border-0"
                 >
-                  <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-white/10 bg-white/5">
+                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border border-white/10 bg-white/5">
                     <ImageWithFallback
                       src={item.previewUrl}
                       alt={item.titulo}
@@ -107,7 +107,7 @@ export default function SlideCart() {
               <Button
                 asChild
                 size="lg"
-                className="w-full bg-primary hover:bg-primary/90 text-white font-bold"
+                className="w-full font-bold"
                 onClick={() => setIsCartOpen(false)}
               >
                 <Link href="/checkout">Finalizar Compra</Link>

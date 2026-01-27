@@ -77,8 +77,8 @@ export default function PhotoCard({
     variant === "compact"
       ? "text-xs"
       : variant === "large"
-      ? "text-base"
-      : "text-sm";
+        ? "text-base"
+        : "text-sm";
 
   return (
     <div
@@ -89,15 +89,21 @@ export default function PhotoCard({
     >
       <Card
         className={cn(
-          "relative overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10 border border-[#480000]",
+          "relative overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/50 border border-white/5",
           aspectClass,
-          isSelected ? "ring-4 ring-primary translate-y-[-4px] shadow-xl" : ""
+          isSelected
+            ? "border-primary border-4 translate-y-[-4px] shadow-xl"
+            : "",
         )}
         aria-label={`Ver detalhes de ${photo.titulo || "foto"}`}
       >
         <ImageWithFallback
           src={photo.previewUrl}
-          alt={photo.titulo || "Foto"}
+          alt={
+            photo.titulo && photo.titulo !== "Foto"
+              ? `${photo.titulo} - GTClicks`
+              : `Foto Esportiva #${photo.numeroSequencial || photo.id.slice(-4)} - GTClicks Marketplace`
+          }
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           priority={priority}
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -110,7 +116,7 @@ export default function PhotoCard({
             isSelected ? "opacity-60 bg-primary/20" : "opacity-80",
             variant === "centered-hover"
               ? "opacity-0 group-hover:opacity-40 transition-opacity duration-300 bg-black"
-              : ""
+              : "",
           )}
         />
 
@@ -136,7 +142,7 @@ export default function PhotoCard({
                     "h-12 w-12 rounded-lg backdrop-blur-md border transition-all duration-200 shadow-lg",
                     isSelected
                       ? "bg-[#480000] border-[#480000] text-white shadow-[#480000]/30 scale-105"
-                      : "bg-white/10 border-[#480000]/20 text-white hover:bg-white hover:text-black"
+                      : "bg-white/10 border-[#480000]/20 text-white hover:bg-white hover:text-black",
                   )}
                   onClick={handleSelection}
                   title={
@@ -163,7 +169,7 @@ export default function PhotoCard({
                     "h-11 w-11 rounded-full backdrop-blur-md border transition-all duration-200 shadow-md",
                     isSelected
                       ? "bg-[#480000] border-[#480000] text-white shadow-[#480000]/30"
-                      : "bg-white/20 border-[#480000]/20 text-white"
+                      : "bg-white/20 border-[#480000]/20 text-white",
                   )}
                   onClick={handleSelection}
                   title={
@@ -188,7 +194,7 @@ export default function PhotoCard({
           <div
             className={cn(
               "absolute top-4 left-4 z-30 transition-all duration-200",
-              !isSelected ? "opacity-100" : "opacity-100"
+              !isSelected ? "opacity-100" : "opacity-100",
             )}
           >
             <button
@@ -197,7 +203,7 @@ export default function PhotoCard({
                 "h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-sm z-50",
                 isSelected
                   ? "bg-zinc-900 border-zinc-900 text-white scale-110 shadow-black/20"
-                  : "bg-black/50 border-white/50 text-white/80 hover:bg-black/80 hover:border-white hover:text-white hover:scale-105"
+                  : "bg-black/50 border-white/50 text-white/80 hover:bg-black/80 hover:border-white hover:text-white hover:scale-105",
               )}
               aria-label={isSelected ? "Desselecionar foto" : "Selecionar foto"}
               aria-pressed={isSelected}
@@ -234,7 +240,7 @@ export default function PhotoCard({
               textSize,
               variant === "centered-hover"
                 ? "opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
-                : ""
+                : "",
             )}
           >
             {photo.numeroSequencial

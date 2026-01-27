@@ -29,6 +29,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  createFolder,
+  getFolders,
+  updateFolder,
+  deleteFolder,
+} from "@/actions/folders";
 
 export default function FolderManager({
   collectionId,
@@ -54,22 +60,9 @@ export default function FolderManager({
     setLoading(true);
     setError(null);
     try {
-      const parentIdParam = currentFolder?.id
-        ? `&parentId=${currentFolder.id}`
-        : "";
-      const res = await fetch(
-        `/api/folders?colecaoId=${collectionId}${parentIdParam}`,
-      );
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(
-          errorData.details ||
-            errorData.error ||
-            `Erro ${res.status}: Falha ao carregar pastas`,
-        );
-      }
-      const data = await res.json();
-      setFolders(data);
+      const res = await getFolders(collectionId, currentFolder?.id);
+      if (res.error) throw new Error(res.error);
+      setFolders(res.data || []);
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -82,20 +75,13 @@ export default function FolderManager({
     if (!folderName.trim()) return;
     setSubmitting(true);
     try {
-      const res = await fetch("/api/folders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nome: folderName,
-          colecaoId: collectionId,
-          parentId: currentFolder?.id || null,
-        }),
+      const res = await createFolder({
+        nome: folderName,
+        colecaoId: collectionId,
+        parentId: currentFolder?.id || null,
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Erro ao criar pasta");
-      }
+      if (res.error) throw new Error(res.error);
 
       await fetchFolders();
       setIsDialogOpen(false);
@@ -111,13 +97,9 @@ export default function FolderManager({
     if (!folderName.trim() || !editingFolder) return;
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/folders/${editingFolder.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome: folderName }),
-      });
+      const res = await updateFolder(editingFolder.id, { nome: folderName });
 
-      if (!res.ok) throw new Error("Erro ao atualizar pasta");
+      if (res.error) throw new Error(res.error);
 
       await fetchFolders();
       setIsDialogOpen(false);
@@ -134,8 +116,8 @@ export default function FolderManager({
     if (!confirm("Tem certeza? Isso excluirá a pasta e todo o seu conteúdo."))
       return;
     try {
-      const res = await fetch(`/api/folders/${folderId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Erro ao deletar pasta");
+      const res = await deleteFolder(folderId);
+      if (res.error) throw new Error(res.error);
       await fetchFolders();
     } catch (err) {
       setError(err.message);
@@ -188,7 +170,7 @@ export default function FolderManager({
               onClick={() => onNavigate(folder)}
             >
               <CardContent className="p-3 md:p-4 flex flex-col items-center text-center space-y-2 relative">
-                <Folder className="h-10 w-10 md:h-12 md:w-12 text-blue-500 fill-blue-100" />
+                <Folder className="h-10 w-10 md:h-12 md:w-12 text-primary fill-primary/10" />
                 <span
                   className="font-medium truncate w-full min-w-0 text-sm md:text-base"
                   title={folder.nome}
@@ -215,7 +197,7 @@ export default function FolderManager({
                         <Pencil className="mr-2 h-4 w-4" /> Renomear
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-red-600"
+                        className="text-primary hover:bg-primary/10"
                         onClick={() => handleDeleteFolder(folder.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" /> Excluir

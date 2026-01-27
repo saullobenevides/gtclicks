@@ -1,9 +1,9 @@
-import { CollectionCard } from '@/components/shared/cards';
+import { CollectionCard } from "@/components/shared/cards";
 
-export default function FeaturedCollections({ 
-  collections = [], 
-  title = "Coleções em Destaque", 
-  subtitle = "Séries autorais selecionadas para inspirar sua próxima criação" 
+export default function FeaturedCollections({
+  collections = [],
+  title = "Coleções em Destaque",
+  subtitle = "Séries autorais selecionadas para inspirar sua próxima criação",
 }) {
   if (!collections || collections.length === 0) return null;
 
@@ -11,7 +11,7 @@ export default function FeaturedCollections({
     <section className="py-16">
       <div className="container-wide">
         <div className="mb-16 flex flex-col items-center text-center gap-3">
-          <h2 className="heading-section font-display text-4xl font-black text-white sm:text-5xl lg:text-6xl">
+          <h2 className="heading-section font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
             {title}
           </h2>
           {subtitle && (

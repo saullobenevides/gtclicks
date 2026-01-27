@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 export default function CollectionCard({
   collection,
   variant = "default",
-  showPhotographer = false,
+  showPhotographer = true,
   showDate = true,
   showDescription = true,
   showPrice = false,
@@ -50,8 +50,8 @@ export default function CollectionCard({
   const titleSize = isFeatured
     ? "text-2xl"
     : isCompact
-    ? "text-base"
-    : "text-xl";
+      ? "text-base"
+      : "text-xl";
   const padding = isCompact ? "p-4" : "p-6";
 
   const coverUrl = collection.cover || collection.capaUrl;
@@ -61,9 +61,9 @@ export default function CollectionCard({
     <Link href={`/colecoes/${collection.slug}`}>
       <Card
         className={cn(
-          "group relative block overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10 border-0",
+          "group relative block overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/50 border-0",
           aspectClass,
-          className
+          className,
         )}
         data-testid="collection-card"
         data-collection-id={collection.id}
@@ -103,16 +103,16 @@ export default function CollectionCard({
                   badge.variant === "success"
                     ? "default"
                     : badge.variant === "primary"
-                    ? "default"
-                    : "secondary"
+                      ? "default"
+                      : "secondary"
                 }
                 className={cn(
                   "backdrop-blur-sm",
                   badge.variant === "success"
                     ? "bg-green-500/90 hover:bg-green-500 text-white"
                     : badge.variant === "primary"
-                    ? "bg-primary/90 hover:bg-primary text-white"
-                    : "bg-white/90 hover:bg-white text-black"
+                      ? "bg-primary/90 hover:bg-primary text-white"
+                      : "bg-white/90 hover:bg-white text-black",
                 )}
               >
                 {badge.label}
@@ -125,14 +125,14 @@ export default function CollectionCard({
         <CardContent
           className={cn(
             "absolute bottom-0 left-0 w-full flex flex-col justify-end z-20 h-full",
-            padding
+            padding,
           )}
         >
           <div className="mt-auto">
             <h3
               className={cn(
                 "font-bold text-white line-clamp-1 mb-1 drop-shadow-md group-hover:text-primary transition-colors",
-                titleSize
+                titleSize,
               )}
             >
               {collection.title ||
@@ -140,6 +140,17 @@ export default function CollectionCard({
                 collection.titulo ||
                 "Sem título"}
             </h3>
+
+            {showPhotographer &&
+              (collection.photographer || collection.fotografo) && (
+                <p className="text-xs text-gray-300 font-medium mb-2 opacity-90">
+                  por{" "}
+                  {collection.photographer?.name ||
+                    collection.fotografo?.displayName ||
+                    collection.fotografo?.username ||
+                    "Autor"}
+                </p>
+              )}
 
             {showDescription && collection.description && !isCompact && (
               <p className="text-sm text-gray-300 line-clamp-1 mb-3 opacity-90">
@@ -152,7 +163,7 @@ export default function CollectionCard({
               collection.precoFoto &&
               Number(collection.precoFoto) > 0 && (
                 <div className="mb-3">
-                  <span className="text-lg font-bold text-primary">
+                  <span className="text-lg font-bold text-white">
                     R${" "}
                     {Number(collection.precoFoto).toFixed(2).replace(".", ",")}
                   </span>
@@ -170,12 +181,6 @@ export default function CollectionCard({
                   <span className="text-xs text-gray-400 font-medium flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     {date}
-                  </span>
-                )}
-
-                {showPhotographer && collection.fotografo && (
-                  <span className="text-xs text-gray-400 font-medium">
-                    por {collection.fotografo.displayName}
                   </span>
                 )}
               </div>

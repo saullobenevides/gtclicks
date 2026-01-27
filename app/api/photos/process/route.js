@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { processUploadedImage } from "@/lib/processing";
+import { indexPhotoFaces } from "@/lib/rekognition";
 
 export async function POST(request) {
   try {
@@ -122,7 +123,48 @@ export async function POST(request) {
         previewUrl: processResult.previewUrl,
         status: "PUBLICADA",
       },
+      include: {
+        colecao: {
+          select: { faceRecognitionEnabled: true },
+        },
+      },
     });
+
+    // 4. Async Facial Recognition Indexing (Optional/Background)
+    if (updatedFoto.colecao?.faceRecognitionEnabled) {
+      console.log(`[Process API] Indexing faces for photo ${foto.id}...`);
+      const bucket = process.env.S3_UPLOAD_BUCKET;
+
+      // we run this without await to not block the response,
+      // or we can await it if we want to be sure.
+      // since it's a serverless function, better avoid detached promises if possible,
+      // but let's await for reliability in this specific step.
+      try {
+        const indexResult = await indexPhotoFaces(bucket, s3Key, foto.id);
+        if (indexResult.success) {
+          await prisma.foto.update({
+            where: { id: foto.id },
+            data: {
+              indexingStatus: "INDEXED",
+              indexedFaceIds: indexResult.indexedFaces,
+            },
+          });
+          console.log(
+            `[Process API] Indexed ${indexResult.faceCount} faces for photo ${foto.id}`,
+          );
+        } else {
+          await prisma.foto.update({
+            where: { id: foto.id },
+            data: { indexingStatus: "FAILED" },
+          });
+        }
+      } catch (indexError) {
+        console.error(
+          `[Process API] Face indexing background error for ${foto.id}:`,
+          indexError,
+        );
+      }
+    }
 
     return NextResponse.json({
       message: "Processamento concluído",

@@ -39,7 +39,7 @@ export default function AnalyticsOverview({ stats }) {
 
   return (
     <div className="space-y-4">
-      <span className="heading-display font-display font-black text-2xl text-white">
+      <span className="heading-display font-display font-black text-xl md:text-2xl text-white">
         Desempenho
       </span>
 

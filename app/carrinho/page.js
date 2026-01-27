@@ -1,20 +1,27 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { useCart } from '@/features/cart/context/CartContext';
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/features/cart/context/CartContext";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import ImageWithFallback from '@/components/shared/ImageWithFallback';
-import { Trash2, ShoppingCart, ArrowRight, ShieldCheck } from 'lucide-react';
+} from "@/components/ui/card";
+import ImageWithFallback from "@/components/shared/ImageWithFallback";
+import { Trash2, ShoppingCart, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function CartPage() {
-  const { items, removeFromCart, clearCart, getTotalPrice, getItemPrice, getSavings } = useCart();
+  const {
+    items,
+    removeFromCart,
+    clearCart,
+    getTotalPrice,
+    getItemPrice,
+    getSavings,
+  } = useCart();
   const savings = getSavings();
 
   if (items.length === 0) {
@@ -23,11 +30,18 @@ export default function CartPage() {
         <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10">
           <ShoppingCart className="h-10 w-10 text-muted-foreground" />
         </div>
-        <h1 className="mb-2 text-3xl font-bold text-white">Seu carrinho está vazio</h1>
+        <h1 className="mb-2 text-3xl font-bold text-white">
+          Seu carrinho está vazio
+        </h1>
         <p className="mb-8 max-w-md text-muted-foreground">
-          Explore nossa galeria de fotos exclusivas e encontre a imagem perfeita para o seu projeto.
+          Explore nossa galeria de fotos exclusivas e encontre a imagem perfeita
+          para o seu projeto.
         </p>
-        <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-white">
+        <Button
+          asChild
+          size="lg"
+          className="bg-primary hover:bg-primary/90 text-white"
+        >
           <Link href="/busca">Explorar Fotos</Link>
         </Button>
       </div>
@@ -37,7 +51,9 @@ export default function CartPage() {
   return (
     <div className="container-wide py-16 md:py-24">
       <div className="mb-12">
-        <h1 className="text-4xl font-bold text-white">Seu Carrinho</h1>
+        <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
+          Seu Carrinho
+        </h1>
         <p className="text-lg text-muted-foreground">
           Revise seus itens antes de finalizar a compra.
         </p>
@@ -47,7 +63,7 @@ export default function CartPage() {
         {/* Cart Items List */}
         <div className="space-y-6">
           {items.map((item) => (
-            <div 
+            <div
               key={`${item.fotoId}-${item.licencaId}`}
               className="glass-panel group relative flex flex-col gap-6 rounded-xl border border-white/10 bg-black/40 p-6 transition-all hover:border-white/20 sm:flex-row sm:items-center"
             >
@@ -60,16 +76,23 @@ export default function CartPage() {
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
-              
+
               <div className="flex flex-1 flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-white">{item.titulo}</h3>
+                  <h3 className="text-xl font-bold text-white">
+                    {item.titulo}
+                  </h3>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <ShieldCheck className="h-4 w-4 text-primary" />
-                    <span>Licença: {typeof item.licenca === 'object' ? item.licenca.nome : item.licenca}</span>
+                    <span>
+                      Licença:{" "}
+                      {typeof item.licenca === "object"
+                        ? item.licenca.nome
+                        : item.licenca}
+                    </span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between gap-6 sm:justify-end">
                   <div className="flex flex-col items-end gap-1">
                     {Number(item.precoBase) > getItemPrice(item) && (
@@ -86,7 +109,7 @@ export default function CartPage() {
                       </span>
                     )}
                   </div>
-                  
+
                   <Button
                     variant="ghost"
                     size="icon"
@@ -100,7 +123,7 @@ export default function CartPage() {
               </div>
             </div>
           ))}
-          
+
           <div className="flex justify-end pt-4">
             <Button
               onClick={clearCart}
@@ -116,51 +139,65 @@ export default function CartPage() {
         <div className="h-fit lg:sticky lg:top-24">
           <Card className="glass-panel border-white/10 bg-black/40">
             <CardHeader>
-              <CardTitle className="text-xl text-white">Resumo do Pedido</CardTitle>
+              <CardTitle className="text-xl text-white">
+                Resumo do Pedido
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal ({items.length} itens)</span>
-                <span>R$ {items.reduce((sum, i) => sum + Number(i.precoBase || i.preco), 0).toFixed(2)}</span>
+                <span>
+                  R${" "}
+                  {items
+                    .reduce((sum, i) => sum + Number(i.precoBase || i.preco), 0)
+                    .toFixed(2)}
+                </span>
               </div>
               {savings > 0 && (
                 <div className="flex justify-between text-green-400">
-                    <span>Economia Progressiva</span>
-                    <span>- R$ {savings.toFixed(2)}</span>
+                  <span>Economia Progressiva</span>
+                  <span>- R$ {savings.toFixed(2)}</span>
                 </div>
               )}
-              
+
               {/* Progressive Discount Upsell */}
               {(() => {
                 // Get items from first collection to check next discount tier
-                const collectionItems = items.filter(i => i.colecaoId === items[0]?.colecaoId);
+                const collectionItems = items.filter(
+                  (i) => i.colecaoId === items[0]?.colecaoId,
+                );
                 const count = collectionItems.length;
                 const firstItem = collectionItems[0];
-                
+
                 if (firstItem?.descontos && firstItem.descontos.length > 0) {
                   // Find next applicable discount
                   const nextDiscount = firstItem.descontos
-                    .filter(d => d.min > count)
+                    .filter((d) => d.min > count)
                     .sort((a, b) => a.min - b.min)[0];
-                  
+
                   if (nextDiscount) {
                     const photosNeeded = nextDiscount.min - count;
                     const currentPrice = getItemPrice(firstItem);
                     const savingsPerPhoto = currentPrice - nextDiscount.price;
                     const totalSavings = savingsPerPhoto * count;
-                    
+
                     return (
                       <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 animate-slide-up">
                         <p className="text-sm font-medium text-white mb-1">
-                          🎉 Faltam {photosNeeded} {photosNeeded === 1 ? 'foto' : 'fotos'} para economizar mais!
+                          🎉 Faltam {photosNeeded}{" "}
+                          {photosNeeded === 1 ? "foto" : "fotos"} para
+                          economizar mais!
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Adicione mais {photosNeeded} e economize R$ {totalSavings.toFixed(2)}
+                          Adicione mais {photosNeeded} e economize R${" "}
+                          {totalSavings.toFixed(2)}
                         </p>
                         <div className="mt-2 h-2 bg-white/10 rounded-full overflow-hidden">
-                          <div 
+                          <div
                             className="h-full bg-primary transition-all duration-500"
-                            style={{ width: `${(count / nextDiscount.min) * 100}%` }}
+                            style={{
+                              width: `${(count / nextDiscount.min) * 100}%`,
+                            }}
                           />
                         </div>
                       </div>
@@ -169,7 +206,7 @@ export default function CartPage() {
                 }
                 return null;
               })()}
-              
+
               <div className="my-4 h-px bg-white/10" />
               <div className="flex justify-between text-2xl font-bold text-white">
                 <span>Total</span>
@@ -177,19 +214,26 @@ export default function CartPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
-              <Button asChild className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-12 text-lg" size="lg">
-                <Link href="/checkout" className="flex items-center justify-center gap-2">
+              <Button
+                asChild
+                className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-12 text-lg"
+                size="lg"
+              >
+                <Link
+                  href="/checkout"
+                  className="flex items-center justify-center gap-2"
+                >
                   Ir para Pagamento
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
               <div className="space-y-2 text-center">
-                 <p className="text-xs text-green-400 font-medium">
-                    ⚡ Entrega automática e download imediato
-                 </p>
-                 <p className="text-xs text-muted-foreground">
-                    Pagamento 100% seguro via Mercado Pago
-                 </p>
+                <p className="text-xs text-green-400 font-medium">
+                  ⚡ Entrega automática e download imediato
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Pagamento 100% seguro via Mercado Pago
+                </p>
               </div>
             </CardFooter>
           </Card>

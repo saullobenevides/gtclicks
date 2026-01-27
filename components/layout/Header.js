@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { Menu, ShoppingCart, Heart, Search } from "lucide-react";
 import { useCart } from "@/features/cart/context/CartContext";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 // Lazy load Mobile Menu to reduce initial bundle size
 const MobileMenu = dynamic(() => import("./MobileMenu"), { ssr: false });
@@ -105,6 +106,9 @@ export default function Header() {
                 <Heart className="h-5 w-5" />
               </Link>
             </Button>
+
+            {/* Notifications */}
+            <NotificationBell />
 
             {/* Cart Trigger */}
             <Button

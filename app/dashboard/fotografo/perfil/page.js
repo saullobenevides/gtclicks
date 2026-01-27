@@ -32,7 +32,9 @@ export default async function ProfilePage() {
   return (
     <div className="py-8 px-4 md:px-0">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Meu Perfil</h1>
+        <h1 className="heading-display font-display text-3xl sm:text-4xl font-black text-white">
+          Meu Perfil
+        </h1>
         <p className="text-muted-foreground">
           Gerencie suas informações públicas e dados de recebimento.
         </p>

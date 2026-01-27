@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { requireAdmin, logAdminActivity } from '@/lib/admin/permissions';
-import prisma from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { requireAdmin, logAdminActivity } from "@/lib/admin/permissions";
+import prisma from "@/lib/prisma";
 
 export async function POST(request, { params }) {
   try {
@@ -8,51 +8,50 @@ export async function POST(request, { params }) {
     const { id } = params;
     const body = await request.json();
     const { reason } = body;
-    
+
     // Update collection status to RASCUNHO (back to draft)
     const collection = await prisma.colecao.update({
       where: { id },
       data: {
-        status: 'RASCUNHO',
+        status: "RASCUNHO",
         reviewedAt: new Date(),
         reviewedBy: admin.id,
-        rejectionReason: reason || 'Não especificado'
-      }
+        rejectionReason: reason || "Não especificado",
+      },
+      include: { fotografo: { select: { userId: true } } },
     });
-    
+
     // Log activity
-    await logAdminActivity(
-      admin.id,
-      'COLLECTION_REJECTED',
-      'Collection',
-      id,
-      { 
-        collectionName: collection.nome,
-        reason 
-      }
-    );
-    
-    // Create in-app notification
-    await prisma.notification.create({
-      data: {
+    await logAdminActivity(admin.id, "COLLECTION_REJECTED", "Collection", id, {
+      collectionName: collection.nome,
+      reason,
+    });
+
+    // --- NOTIFICATION: Collection Rejected ---
+    try {
+      const { createNotification } = await import("@/actions/notifications");
+      const { NotificationType } = await import("@/lib/constants");
+
+      await createNotification({
         userId: collection.fotografo.userId,
-        title: "Coleção Rejeitada",
-        message: `Sua coleção "${collection.nome}" foi rejeitada. Motivo: ${reason || 'Não especificado'}. Faça os ajustes e envie novamente.`,
-        type: "ERROR",
-        link: `/dashboard/fotografo/colecoes/${id}/editar`
-      }
+        title: "❌ Coleção rejeitada",
+        message: `Sua coleção "${collection.nome}" foi rejeitada. Motivo: ${reason || "Não especificado"}. Faça os ajustes e envie novamente.`,
+        type: NotificationType.ERROR,
+        link: `/dashboard/fotografo/colecoes/${id}/editar`,
+      });
+    } catch (nErr) {
+      console.error("Failed to send collection rejection notification:", nErr);
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Coleção rejeitada e fotógrafo notificado",
     });
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Coleção rejeitada e fotógrafo notificado' 
-    });
-    
   } catch (error) {
-    console.error('Error rejecting collection:', error);
+    console.error("Error rejecting collection:", error);
     return NextResponse.json(
-      { error: 'Erro ao rejeitar coleção' },
-      { status: 500 }
+      { error: "Erro ao rejeitar coleção" },
+      { status: 500 },
     );
   }
 }

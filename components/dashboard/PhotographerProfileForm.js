@@ -5,19 +5,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Save, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useUser, useStackApp } from "@stackframe/stack";
 import { toast } from "sonner";
+import { updatePhotographer } from "@/actions/photographers";
 
 export default function PhotographerProfileForm({ photographer }) {
   const user = useUser();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
+
   const [formData, setFormData] = useState({
     userId: photographer.userId,
     username: photographer.username || "",
@@ -37,23 +45,32 @@ export default function PhotographerProfileForm({ photographer }) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  /* Refactored to use Server Action */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch("/api/fotografos/update", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const payload = new FormData();
+      // Append simple fields
+      Object.keys(formData).forEach((key) => {
+        if (key === "especialidades") return; // Handle array separately
+        if (formData[key] !== null && formData[key] !== undefined) {
+          payload.append(key, formData[key]);
+        }
       });
+      // Append especialidades
+      if (Array.isArray(formData.especialidades)) {
+        formData.especialidades.forEach((spec) =>
+          payload.append("especialidades", spec),
+        );
+      }
 
-      const data = await res.json();
+      const result = await updatePhotographer(payload);
 
-      if (!res.ok) {
-        console.error("Server Error Details:", data);
-        throw new Error(data.error || "Erro ao atualizar perfil");
+      if (result.error) {
+        throw new Error(result.error);
       }
 
       toast.success("Perfil atualizado com sucesso!");
@@ -85,7 +102,9 @@ export default function PhotographerProfileForm({ photographer }) {
             </Avatar>
             <div className="space-y-2">
               <h3 className="text-lg font-medium">{user.displayName}</h3>
-              <p className="text-sm text-muted-foreground">{user.primaryEmail}</p>
+              <p className="text-sm text-muted-foreground">
+                {user.primaryEmail}
+              </p>
               <Button variant="outline" size="sm" asChild>
                 <Link href="/handler/account-settings" target="_blank">
                   Alterar Foto ou Nome
@@ -99,170 +118,190 @@ export default function PhotographerProfileForm({ photographer }) {
 
       <form onSubmit={handleSubmit}>
         <Card>
-            <CardHeader>
-                <CardTitle>Meu Perfil</CardTitle>
-                <CardDescription>
-                    Informações exibidas publicamente no seu portfólio.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                {error && (
-                    <Alert variant="destructive">
-                    <AlertTitle>Erro</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                )}
+          <CardHeader>
+            <CardTitle>Meu Perfil</CardTitle>
+            <CardDescription>
+              Informações exibidas publicamente no seu portfólio.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {error && (
+              <Alert variant="destructive">
+                <AlertTitle>Erro</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-                <div className="grid gap-2">
-                    <Label htmlFor="bio">Bio / Sobre mim</Label>
-                    <Textarea
-                        id="bio"
-                        placeholder="Conte um pouco sobre sua experiência..."
-                        value={formData.bio}
-                        onChange={(e) => handleChange("bio", e.target.value)}
-                        rows={4}
-                    />
+            <div className="grid gap-2">
+              <Label htmlFor="bio">Bio / Sobre mim</Label>
+              <Textarea
+                id="bio"
+                placeholder="Conte um pouco sobre sua experiência..."
+                value={formData.bio}
+                onChange={(e) => handleChange("bio", e.target.value)}
+                rows={4}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="cidade">Cidade</Label>
+                <Input
+                  id="cidade"
+                  placeholder="Ex: São Paulo"
+                  value={formData.cidade}
+                  onChange={(e) => handleChange("cidade", e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="estado">Estado</Label>
+                <Input
+                  id="estado"
+                  placeholder="Ex: SP"
+                  maxLength={2}
+                  value={formData.estado}
+                  onChange={(e) => handleChange("estado", e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="instagram">Instagram</Label>
+                <div className="flex">
+                  <span className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted text-muted-foreground text-sm">
+                    @
+                  </span>
+                  <Input
+                    id="instagram"
+                    className="rounded-l-none"
+                    placeholder="seu.perfil"
+                    value={formData.instagram}
+                    onChange={(e) => handleChange("instagram", e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="telefone">WhatsApp / Telefone</Label>
+                <Input
+                  id="telefone"
+                  placeholder="(00) 00000-0000"
+                  value={formData.telefone}
+                  onChange={(e) => handleChange("telefone", e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2 pt-4 border-t border-border">
+              <Label htmlFor="chavePix">Dados Financeiros</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="cpf">CPF</Label>
+                  <Input
+                    id="cpf"
+                    placeholder="000.000.000-00"
+                    value={formData.cpf || ""}
+                    onChange={(e) => handleChange("cpf", e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="chavePix">Chave Pix</Label>
+                  <Input
+                    id="chavePix"
+                    placeholder="CPF, Email ou Aleatória"
+                    value={formData.chavePix}
+                    onChange={(e) => handleChange("chavePix", e.target.value)}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Esses dados são criptografados e utilizados apenas para
+                repasses.
+              </p>
+            </div>
+
+            <div className="grid gap-2 pt-4 border-t border-border">
+              <Label>Profissional</Label>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label>Suas Especialidades</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      "Casamentos",
+                      "Eventos Corporativos",
+                      "Retratos",
+                      "Moda",
+                      "Produtos",
+                      "Gastronomia",
+                      "Esportes",
+                      "Natureza",
+                      "Arquitetura",
+                      "Jornalismo",
+                      "Ensaios",
+                      "Viagens",
+                    ].map((spec) => (
+                      <div
+                        key={spec}
+                        className={`cursor-pointer border rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                          (formData.especialidades || []).includes(spec)
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        }`}
+                        onClick={() => {
+                          const current = formData.especialidades || [];
+                          const updated = current.includes(spec)
+                            ? current.filter((s) => s !== spec)
+                            : [...current, spec];
+                          handleChange("especialidades", updated);
+                        }}
+                      >
+                        {spec}
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="cidade">Cidade</Label>
-                        <Input
-                            id="cidade"
-                            placeholder="Ex: São Paulo"
-                            value={formData.cidade}
-                            onChange={(e) => handleChange("cidade", e.target.value)}
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="estado">Estado</Label>
-                        <Input
-                            id="estado"
-                            placeholder="Ex: SP"
-                            maxLength={2}
-                            value={formData.estado}
-                            onChange={(e) => handleChange("estado", e.target.value)}
-                        />
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="portfolio">Portfólio (Site Externo)</Label>
+                  <Input
+                    id="portfolio"
+                    placeholder="https://..."
+                    value={formData.portfolioUrl || ""}
+                    onChange={(e) =>
+                      handleChange("portfolioUrl", e.target.value)
+                    }
+                  />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="instagram">Instagram</Label>
-                        <div className="flex">
-                            <span className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted text-muted-foreground text-sm">@</span>
-                            <Input
-                                id="instagram"
-                                className="rounded-l-none"
-                                placeholder="seu.perfil"
-                                value={formData.instagram}
-                                onChange={(e) => handleChange("instagram", e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="telefone">WhatsApp / Telefone</Label>
-                        <Input
-                            id="telefone"
-                            placeholder="(00) 00000-0000"
-                            value={formData.telefone}
-                            onChange={(e) => handleChange("telefone", e.target.value)}
-                        />
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="equipamentos">Equipamentos</Label>
+                  <Textarea
+                    id="equipamentos"
+                    placeholder="Câmeras, Lentes..."
+                    value={formData.equipamentos || ""}
+                    onChange={(e) =>
+                      handleChange("equipamentos", e.target.value)
+                    }
+                    rows={2}
+                  />
                 </div>
-
-                <div className="grid gap-2 pt-4 border-t border-border">
-                    <Label htmlFor="chavePix">Dados Financeiros</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                             <Label htmlFor="cpf">CPF</Label>
-                             <Input
-                                 id="cpf"
-                                 placeholder="000.000.000-00"
-                                 value={formData.cpf || ''}
-                                 onChange={(e) => handleChange("cpf", e.target.value)}
-                             />
-                        </div>
-                        <div className="space-y-2">
-                             <Label htmlFor="chavePix">Chave Pix</Label>
-                             <Input
-                                 id="chavePix"
-                                 placeholder="CPF, Email ou Aleatória"
-                                 value={formData.chavePix}
-                                 onChange={(e) => handleChange("chavePix", e.target.value)}
-                             />
-                        </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Esses dados são criptografados e utilizados apenas para repasses.
-                    </p>
-                </div>
-                
-                <div className="grid gap-2 pt-4 border-t border-border">
-                    <Label>Profissional</Label>
-                    <div className="grid grid-cols-1 gap-4">
-                        <div className="space-y-2">
-                           <Label>Suas Especialidades</Label>
-                           <div className="flex flex-wrap gap-2">
-                              {["Casamentos", "Eventos Corporativos", "Retratos", "Moda", "Produtos", "Gastronomia", "Esportes", "Natureza", "Arquitetura", "Jornalismo", "Ensaios", "Viagens"].map(spec => (
-                                <div 
-                                    key={spec} 
-                                    className={`cursor-pointer border rounded-full px-3 py-1 text-xs font-medium transition-all ${
-                                        (formData.especialidades || []).includes(spec) 
-                                        ? 'bg-primary text-primary-foreground border-primary' 
-                                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                    }`}
-                                    onClick={() => {
-                                        const current = formData.especialidades || [];
-                                        const updated = current.includes(spec) 
-                                            ? current.filter(s => s !== spec) 
-                                            : [...current, spec];
-                                        handleChange("especialidades", updated);
-                                    }}
-                                >
-                                    {spec}
-                                </div>
-                              ))}
-                           </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="portfolio">Portfólio (Site Externo)</Label>
-                          <Input
-                              id="portfolio"
-                              placeholder="https://..."
-                              value={formData.portfolioUrl || ''}
-                              onChange={(e) => handleChange("portfolioUrl", e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="equipamentos">Equipamentos</Label>
-                          <Textarea
-                              id="equipamentos"
-                              placeholder="Câmeras, Lentes..."
-                              value={formData.equipamentos || ''}
-                              onChange={(e) => handleChange("equipamentos", e.target.value)}
-                              rows={2}
-                          />
-                        </div>
-                    </div>
-                </div>
-            </CardContent>
-            <CardFooter className="flex justify-end sticky bottom-0 bg-background/95 backdrop-blur py-4 border-t z-10">
-                <Button type="submit" disabled={loading} size="lg">
-                    {loading ? (
-                        <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Salvando...
-                        </>
-                    ) : (
-                        <>
-                            <Save className="mr-2 h-4 w-4" />
-                            Salvar Alterações
-                        </>
-                    )}
-                </Button>
-            </CardFooter>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-end sticky bottom-0 bg-background/95 backdrop-blur py-4 border-t z-10">
+            <Button type="submit" disabled={loading} size="lg">
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Salvar Alterações
+                </>
+              )}
+            </Button>
+          </CardFooter>
         </Card>
       </form>
     </div>
