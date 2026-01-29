@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { sendOrderConfirmationEmail } from "@/lib/mail";
 
 export async function POST(request) {
   try {
@@ -62,7 +62,14 @@ export async function POST(request) {
       // 1. Verify if order exists and is not already paid
       const pedido = await prisma.pedido.findUnique({
         where: { id: pedidoId },
-        include: { itens: true },
+        include: {
+          itens: {
+            include: {
+              foto: true,
+            },
+          },
+          user: true,
+        },
       });
 
       if (!pedido) {
@@ -189,6 +196,30 @@ export async function POST(request) {
           });
         } catch (nErr) {
           console.error("Failed to send order approval notification:", nErr);
+        }
+
+        // --- EMAIL NOTIFICATION: Order Confirmation with Links ---
+        try {
+          const emailItems = items.map((item) => ({
+            titulo: item.foto.titulo,
+            previewUrl: item.foto.previewUrl,
+            downloadToken: item.downloadToken,
+            width: item.foto.width,
+            height: item.foto.height,
+            tamanhoBytes: item.foto.tamanhoBytes,
+          }));
+
+          await sendOrderConfirmationEmail({
+            email: pedido.user.email,
+            orderId: pedidoId,
+            items: emailItems,
+            total: pedido.total,
+          });
+          console.log(
+            `📧 Confirmation email sent to ${pedido.user.email} for order ${pedidoId}`,
+          );
+        } catch (eErr) {
+          console.error("Failed to send order confirmation email:", eErr);
         }
 
         return { processed: true };

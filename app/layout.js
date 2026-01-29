@@ -7,6 +7,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import LazyClientComponents from "@/components/providers/LazyClientComponents";
 import BottomNav from "@/components/mobile/BottomNav";
+import NavigationController from "@/components/layout/NavigationController";
 
 import "./globals.css";
 
@@ -121,7 +122,7 @@ export default function RootLayout({ children }) {
       data-scroll-behavior="smooth"
     >
       <body
-        className={`${inter.className} ${syne.variable} font-sans antialiased min-h-screen flex flex-col bg-black text-foreground`}
+        className={`${inter.className} ${syne.variable} font-sans antialiased min-h-screen flex flex-col bg-surface-page text-text-primary`}
       >
         <script
           type="application/ld+json"
@@ -129,10 +130,12 @@ export default function RootLayout({ children }) {
         />
         <AppProviders>
           <Header />
-          <main className="flex-1 w-full pt-20">{children}</main>
+          <main className="flex-1 w-full pt-20 pb-24 md:pb-0">{children}</main>
           <Footer />
           <LazyClientComponents />
-          <BottomNav />
+          <NavigationController>
+            <BottomNav />
+          </NavigationController>
           <SpeedInsights />
           <Analytics />
         </AppProviders>

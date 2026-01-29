@@ -18,7 +18,26 @@ export default function PaymentSuccessPage() {
           const response = await fetch(`/api/pedidos/${pedidoId}`);
           if (response.ok) {
             const data = await response.json();
-            setOrder(data.data);
+            const orderData = data.data;
+            setOrder(orderData);
+
+            // If still pending, try to force verification with Mercado Pago
+            if (orderData && orderData.status !== "PAGO") {
+              console.log("Order pending, attempting manual verification...");
+              const verifyRes = await fetch(
+                `/api/pedidos/${pedidoId}/verificar-pagamento`,
+                {
+                  method: "POST",
+                },
+              );
+              if (verifyRes.ok) {
+                const verifyData = await verifyRes.json();
+                if (verifyData.status === "PAGO") {
+                  // If verified successfully, update local state immediately
+                  setOrder((prev) => ({ ...prev, status: "PAGO" }));
+                }
+              }
+            }
           }
         } catch (error) {
           console.error("Error fetching order:", error);
@@ -28,8 +47,9 @@ export default function PaymentSuccessPage() {
       };
 
       checkOrder();
-      const timer = setTimeout(checkOrder, 3000);
-      return () => clearTimeout(timer);
+      // Keep polling every 5 seconds just in case
+      const timer = setInterval(checkOrder, 5000);
+      return () => clearInterval(timer);
     }
   }, [pedidoId]);
 

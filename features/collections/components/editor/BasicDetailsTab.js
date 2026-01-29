@@ -55,7 +55,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
               >
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px] overflow-y-auto">
                 {CATEGORIES.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
@@ -82,7 +82,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
             <Label htmlFor="collection-date-start">Início do Evento</Label>
             <Input
               id="collection-date-start"
-              className="w-full min-w-0"
+              className="w-full min-w-0 date-icon-right"
               type="date"
               value={collectionData.dataInicio}
               onChange={(e) => onDataChange("dataInicio", e.target.value)}
@@ -92,7 +92,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
             <Label htmlFor="collection-date-end">Fim do Evento</Label>
             <Input
               id="collection-date-end"
-              className="w-full min-w-0"
+              className="w-full min-w-0 date-icon-right"
               type="date"
               value={collectionData.dataFim}
               onChange={(e) => onDataChange("dataFim", e.target.value)}

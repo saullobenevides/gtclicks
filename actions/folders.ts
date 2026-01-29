@@ -3,6 +3,24 @@
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+
+// --- VALIDATION SCHEMAS ---
+
+const createFolderSchema = z.object({
+  nome: z.string().min(1, "Nome é obrigatório").max(50, "Nome muito longo"),
+  colecaoId: z.string().cuid("ID de coleção inválido"),
+  parentId: z.string().optional().nullable(),
+});
+
+const updateFolderSchema = z.object({
+  nome: z
+    .string()
+    .min(1, "Nome é obrigatório")
+    .max(50, "Nome muito longo")
+    .optional(),
+  parentId: z.string().optional().nullable(),
+});
 
 /**
  * Cria uma nova pasta em uma coleção
@@ -17,11 +35,16 @@ export async function createFolder(data: {
     return { error: "Não autorizado" };
   }
 
-  const { nome, colecaoId, parentId } = data;
+  const validation = createFolderSchema.safeParse(data);
 
-  if (!nome || !colecaoId) {
-    return { error: "Nome e Coleção são obrigatórios" };
+  if (!validation.success) {
+    return {
+      error: "Dados inválidos",
+      details: validation.error.flatten().fieldErrors,
+    };
   }
+
+  const { nome, colecaoId, parentId } = validation.data;
 
   try {
     // Verificar propriedade
@@ -105,6 +128,18 @@ export async function updateFolder(
     return { error: "Não autorizado" };
   }
 
+  const validation = updateFolderSchema.safeParse(data);
+  if (!validation.success) {
+    return {
+      error: "Dados inválidos",
+      details: validation.error.flatten().fieldErrors,
+    };
+  }
+
+  // Use validated data
+  // Explicitly extract validated fields to avoid passing unknown properties
+  const { nome, parentId } = validation.data;
+
   try {
     // Verificar propriedade através da cadeia folder -> colecao -> fotografo
     const existingFolder = await prisma.folder.findUnique({
@@ -122,8 +157,9 @@ export async function updateFolder(
     const folder = await prisma.folder.update({
       where: { id: folderId },
       data: {
-        nome: data.nome || undefined,
-        parentId: data.parentId === undefined ? undefined : data.parentId,
+        nome: nome || undefined,
+        // If parentId is strictly null or string, we accept it. undefined is ignored.
+        parentId: parentId === undefined ? undefined : parentId,
       },
     });
 

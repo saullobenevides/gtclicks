@@ -48,11 +48,11 @@ export default function CollectionCard({
 
   const aspectClass = "aspect-square md:aspect-[2/3]";
   const titleSize = isFeatured
-    ? "text-2xl"
+    ? "text-text-2xl"
     : isCompact
-      ? "text-base"
-      : "text-xl";
-  const padding = isCompact ? "p-4" : "p-6";
+      ? "text-text-base"
+      : "text-text-xl";
+  const padding = isCompact ? "p-space-4" : "p-space-6";
 
   const coverUrl = collection.cover || collection.capaUrl;
   const isGradient = coverUrl?.startsWith("linear-gradient");
@@ -61,7 +61,7 @@ export default function CollectionCard({
     <Link href={`/colecoes/${collection.slug}`}>
       <Card
         className={cn(
-          "group relative block overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/50 border-0",
+          "group relative block overflow-hidden rounded-radius-xl bg-surface-subtle transition-all duration-300 hover:-translate-y-1 hover:shadow-shadow-card-hover border-0",
           aspectClass,
           className,
         )}
@@ -84,18 +84,18 @@ export default function CollectionCard({
               style={{ background: coverUrl }}
             />
           ) : (
-            <div className="h-full w-full bg-linear-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
-              <ImageIconLucide className="h-12 w-12 text-zinc-700" />
+            <div className="h-full w-full bg-linear-to-br from-surface-elevated to-surface-section flex items-center justify-center">
+              <ImageIconLucide className="h-12 w-12 text-surface-subtle" />
             </div>
           )}
         </div>
 
         {/* Overlay Gradient */}
-        <div className="absolute inset-0 z-10 bg-linear-to-t from-black/90 via-black/40 to-transparent opacity-80" />
+        <div className="absolute inset-0 z-10 bg-linear-to-t from-surface-page/90 via-surface-page/40 to-transparent opacity-80" />
 
         {/* Badges */}
         {badges.length > 0 && (
-          <div className="absolute top-4 right-4 flex gap-2 z-20">
+          <div className="absolute top-space-4 right-space-4 flex gap-space-2 z-20">
             {badges.map((badge, index) => (
               <Badge
                 key={index}
@@ -109,10 +109,10 @@ export default function CollectionCard({
                 className={cn(
                   "backdrop-blur-sm",
                   badge.variant === "success"
-                    ? "bg-green-500/90 hover:bg-green-500 text-white"
+                    ? "bg-status-success/90 hover:bg-status-success text-text-on-dark"
                     : badge.variant === "primary"
-                      ? "bg-primary/90 hover:bg-primary text-white"
-                      : "bg-white/90 hover:bg-white text-black",
+                      ? "bg-action-primary/90 hover:bg-action-primary text-text-on-brand"
+                      : "bg-text-on-dark/90 hover:bg-text-on-dark text-black",
                 )}
               >
                 {badge.label}
@@ -131,7 +131,7 @@ export default function CollectionCard({
           <div className="mt-auto">
             <h3
               className={cn(
-                "font-bold text-white line-clamp-1 mb-1 drop-shadow-md group-hover:text-primary transition-colors",
+                "font-font-bold text-text-primary line-clamp-1 mb-space-1 drop-shadow-md group-hover:text-action-primary transition-colors",
                 titleSize,
               )}
             >
@@ -143,7 +143,7 @@ export default function CollectionCard({
 
             {showPhotographer &&
               (collection.photographer || collection.fotografo) && (
-                <p className="text-xs text-gray-300 font-medium mb-2 opacity-90">
+                <p className="text-text-xs text-text-secondary font-font-medium mb-space-2 opacity-90">
                   por{" "}
                   {collection.photographer?.name ||
                     collection.fotografo?.displayName ||
@@ -153,7 +153,7 @@ export default function CollectionCard({
               )}
 
             {showDescription && collection.description && !isCompact && (
-              <p className="text-sm text-gray-300 line-clamp-1 mb-3 opacity-90">
+              <p className="text-text-sm text-text-secondary line-clamp-1 mb-space-3 opacity-90">
                 {collection.description}
               </p>
             )}
@@ -162,23 +162,23 @@ export default function CollectionCard({
             {showPrice &&
               collection.precoFoto &&
               Number(collection.precoFoto) > 0 && (
-                <div className="mb-3">
-                  <span className="text-lg font-bold text-white">
+                <div className="mb-space-3">
+                  <span className="text-text-lg font-font-bold text-text-primary">
                     R${" "}
                     {Number(collection.precoFoto).toFixed(2).replace(".", ",")}
                   </span>
                 </div>
               )}
 
-            <div className="flex items-center justify-between border-t border-white/10 pt-3 mt-1">
-              <span className="text-xs font-medium text-white/70 bg-white/10 px-2 py-1 rounded-full backdrop-blur-sm flex items-center gap-1">
+            <div className="flex items-center justify-between border-t border-border-subtle pt-space-3 mt-space-1">
+              <span className="text-text-xs font-font-medium text-text-primary/70 bg-surface-subtle/40 px-space-2 py-space-1 rounded-radius-full backdrop-blur-sm flex items-center gap-space-1">
                 <ImageIconLucide className="h-3 w-3" />
                 {photoCount} {photoCount === 1 ? "foto" : "fotos"}
               </span>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-space-3">
                 {showDate && date && (
-                  <span className="text-xs text-gray-400 font-medium flex items-center gap-1">
+                  <span className="text-text-xs text-text-muted font-font-medium flex items-center gap-space-1">
                     <Calendar className="h-3 w-3" />
                     {date}
                   </span>

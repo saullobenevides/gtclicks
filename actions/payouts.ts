@@ -9,6 +9,17 @@ import { Prisma } from "@prisma/client";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { getConfigNumber, CONFIG_KEYS } from "@/lib/config";
+import { z } from "zod";
+import { serializeDecimal, serializeModel } from "@/lib/serialization";
+
+// --- Schemas ---
+
+const withdrawalSchema = z.object({
+  valor: z.number().positive("Valor deve ser positivo"),
+  chavePix: z.string().min(5, "Chave PIX inválida"),
+});
+
+// --- Actions ---
 
 /**
  * Solicita um saque para o fotógrafo autenticado
@@ -23,11 +34,16 @@ export async function requestWithdrawal(data: {
     return { error: "Não autenticado" };
   }
 
-  const { valor, chavePix } = data;
+  const validation = withdrawalSchema.safeParse(data);
 
-  if (!valor || !chavePix) {
-    return { error: "Valor e chave PIX são obrigatórios" };
+  if (!validation.success) {
+    return {
+      error: "Dados inválidos",
+      details: validation.error.flatten().fieldErrors,
+    };
   }
+
+  const { valor, chavePix } = validation.data;
 
   const valorDecimal = new Prisma.Decimal(valor);
   const minSaque = await getConfigNumber(CONFIG_KEYS.MIN_SAQUE);
@@ -98,9 +114,9 @@ export async function requestWithdrawal(data: {
     });
 
     revalidatePath("/dashboard/fotografo/financeiro");
-    return { success: true, data: result };
+    return { success: true, data: serializeModel(result) };
   } catch (error: any) {
-    console.error("[Action] requestWithdrawal error:", error);
+    console.error("[requestWithdrawal] Error:", error.message);
 
     if (
       error.message === "INSUFFICIENT_FUNDS" ||
@@ -145,12 +161,12 @@ export async function getWithdrawals() {
     return {
       success: true,
       data: saques.map((s) => ({
-        ...s,
-        valor: Number(s.valor),
+        ...serializeModel(s),
+        valor: serializeDecimal(s.valor),
       })),
     };
   } catch (error: any) {
-    console.error("[Action] getWithdrawals error:", error);
+    console.error("[getWithdrawals] Error:", error.message);
     return { error: "Erro ao buscar solicitações de saque" };
   }
 }

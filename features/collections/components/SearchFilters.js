@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,9 +21,39 @@ import { useState } from "react";
 import { Filter, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CATEGORIES } from "@/lib/constants";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SearchFilters({ filters }) {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Local state to manage inputs before applying
+  const [query, setQuery] = useState(filters.q || "");
+  const [category, setCategory] = useState(filters.categoria || "all");
+  const [date, setDate] = useState(filters.date || "");
+
+  const handleApplyFilters = (e) => {
+    e.preventDefault();
+
+    // Construct URL params
+    const params = new URLSearchParams(searchParams);
+
+    if (query) params.set("q", query);
+    else params.delete("q");
+
+    if (category && category !== "all") params.set("categoria", category);
+    else params.delete("categoria");
+
+    if (date) params.set("date", date);
+    else params.delete("date");
+
+    // Reset page to 1 on new filter
+    params.delete("page");
+
+    router.push(`?${params.toString()}`);
+    setIsOpen(false); // Close mobile drawer if open
+  };
 
   return (
     <aside className="w-full max-w-3xl mx-auto h-fit z-30 lg:sticky lg:top-24">
@@ -47,7 +76,7 @@ export default function SearchFilters({ filters }) {
       </div>
 
       <form
-        method="get"
+        onSubmit={handleApplyFilters}
         className={cn(
           "transition-all duration-300 lg:block",
           isOpen ? "block animate-in fade-in zoom-in-95" : "hidden",
@@ -66,11 +95,10 @@ export default function SearchFilters({ filters }) {
               </Label>
               <Input
                 id="q"
-                name="q"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder="Ex: natureza, retrato..."
-                defaultValue={filters.q}
                 className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 rounded-lg focus:border-primary/50 focus:ring-primary/20 h-9 text-sm"
-                suppressHydrationWarning
               />
             </div>
 
@@ -81,14 +109,11 @@ export default function SearchFilters({ filters }) {
               >
                 Categoria
               </Label>
-              <Select name="categoria" defaultValue={filters.categoria}>
-                <SelectTrigger
-                  className="bg-zinc-900/50 border-zinc-800 text-white rounded-lg focus:ring-primary/20 h-9 text-sm"
-                  suppressHydrationWarning
-                >
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white rounded-lg focus:ring-primary/20 h-9 text-sm">
                   <SelectValue placeholder="Todas as categorias" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                <SelectContent className="bg-zinc-900 border-zinc-800 text-white max-h-[300px] overflow-y-auto">
                   <SelectItem value="all">Todas as categorias</SelectItem>
                   {CATEGORIES.map((cat) => (
                     <SelectItem key={cat} value={cat}>
@@ -109,12 +134,11 @@ export default function SearchFilters({ filters }) {
               <div className="relative">
                 <Input
                   id="date"
-                  name="date"
                   type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
                   placeholder="dd/mm/aaaa"
-                  defaultValue={filters.date}
                   className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 rounded-lg focus:border-primary/50 focus:ring-primary/20 h-9 w-full text-sm scheme-dark date-icon-right"
-                  suppressHydrationWarning
                 />
               </div>
             </div>
@@ -122,8 +146,7 @@ export default function SearchFilters({ filters }) {
           <CardFooter className="p-0 mt-4">
             <Button
               type="submit"
-              className="w-full bg-black border-2 border-[#FF0000] text-white font-bold h-10 text-sm rounded-xl hover:bg-[#FF0000] hover:text-white transition-all duration-300"
-              suppressHydrationWarning
+              className="w-full bg-black border-2 border-destructive text-white font-bold h-10 text-sm rounded-xl hover:bg-destructive hover:text-white transition-all duration-300"
             >
               Aplicar Filtros
             </Button>

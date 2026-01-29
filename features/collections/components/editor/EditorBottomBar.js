@@ -5,7 +5,7 @@ import { Loader2, Save, ArrowLeft } from "lucide-react";
 
 export default function EditorBottomBar({ onSave, onBack, submitting }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-black/80 backdrop-blur-2xl border-t border-white/10 z-50 md:hidden flex gap-4">
+    <div className="fixed bottom-0 left-0 right-0 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] bg-black/80 backdrop-blur-2xl border-t border-white/10 z-100 md:hidden flex gap-4">
       <Button
         type="button"
         variant="outline"

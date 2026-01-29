@@ -3,6 +3,24 @@ import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { processUploadedImage } from "@/lib/processing";
 import { indexPhotoFaces } from "@/lib/rekognition";
+import { z } from "zod";
+
+// --- Validation Schema ---
+
+const processPhotoSchema = z.object({
+  s3Key: z.string().min(1, "S3 Key é obrigatória"),
+  colecaoId: z.string().cuid("ID de coleção inválido"),
+  folderId: z.string().optional().nullable(),
+  titulo: z.string().optional().nullable(),
+  width: z.number().optional().default(0),
+  height: z.number().optional().default(0),
+  camera: z.string().optional().nullable(),
+  lens: z.string().optional().nullable(),
+  focalLength: z.string().optional().nullable(),
+  iso: z.union([z.string(), z.number()]).optional().nullable(),
+  shutterSpeed: z.string().optional().nullable(),
+  aperture: z.string().optional().nullable(),
+});
 
 export async function POST(request) {
   try {
@@ -12,6 +30,18 @@ export async function POST(request) {
     }
 
     const body = await request.json();
+    const validation = processPhotoSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: "Dados inválidos",
+          details: validation.error.flatten().fieldErrors,
+        },
+        { status: 400 },
+      );
+    }
+
     const {
       s3Key,
       colecaoId,
@@ -25,14 +55,7 @@ export async function POST(request) {
       iso,
       shutterSpeed,
       aperture,
-    } = body;
-
-    if (!s3Key || !colecaoId) {
-      return NextResponse.json(
-        { error: "Dados incompletos (s3Key e colecaoId obrigatórios)" },
-        { status: 400 },
-      );
-    }
+    } = validation.data;
 
     const fotografo = await prisma.fotografo.findUnique({
       where: { userId: user.id },
@@ -45,33 +68,49 @@ export async function POST(request) {
       );
     }
 
+    const colecao = await prisma.colecao.findUnique({
+      where: { id: colecaoId },
+      select: { nome: true },
+    });
+
+    if (!colecao) {
+      return NextResponse.json(
+        { error: "Coleção não encontrada" },
+        { status: 404 },
+      );
+    }
+
+    // 0. Calculate Sequential Number (Scoped to Collection)
+    const lastPhoto = await prisma.foto.findFirst({
+      where: { colecaoId },
+      orderBy: { numeroSequencial: "desc" },
+      select: { numeroSequencial: true },
+    });
+    const nextSequentialNumber = (lastPhoto?.numeroSequencial || 0) + 1;
+
     // 1. Create Initial Record (Pending)
-    // We create it first to get the ID for Rekognition
     const foto = await prisma.foto.create({
       data: {
         titulo: titulo || "Sem título",
         s3Key,
-        width: width || 0,
-        height: height || 0,
-        formato: "jpg", // Default, will be validated if needed.
-        tamanhoBytes: 0, // We could get this from S3 head object but optional for now
-        previewUrl: "", // Placeholder until processed
-
+        width,
+        height,
+        formato: "jpg",
+        tamanhoBytes: 0,
+        previewUrl: "",
         camera,
         lens,
         focalLength,
-        iso: iso ? parseInt(iso) : null,
+        iso: iso ? Number(iso) : null,
         shutterSpeed,
         aperture,
-
-        orientacao:
-          width && height && width > height ? "HORIZONTAL" : "VERTICAL",
-
-        colecaoId,
-        folderId,
-        fotografoId: fotografo.id,
+        orientacao: width > height ? "HORIZONTAL" : "VERTICAL",
+        colecao: { connect: { id: colecaoId } },
+        folder: folderId ? { connect: { id: folderId } } : undefined,
+        fotografo: { connect: { id: fotografo.id } },
         status: "PENDENTE",
         indexingStatus: "PENDENTE",
+        numeroSequencial: nextSequentialNumber,
       },
     });
 
@@ -80,23 +119,16 @@ export async function POST(request) {
     );
 
     // 2. Trigger async processing
-    // Note: Vercel serverless has timeout limits (10s-60s). Processing might take 2-5s, so it should be fine.
-    // For production with large files, we might want to decouple this (background job), but for MVP sync is okay.
-
     let processResult;
     try {
       processResult = await processUploadedImage(s3Key, foto.id);
     } catch (procError) {
       console.error(
         "Processing failed, rolling back photo creation",
-        procError,
+        procError.message,
       );
 
-      // 🚨 ARCHITECTURE NOTE:
-      // We create the record BEFORE processing to get an ID.
-      // If processing fails, we must manually delete (rollback).
-      // If this delete fails, we might have a "phantom" record.
-      // TODO: Implement a background cleanup job for PENDING photos older than X hours.
+      // Rollback
       try {
         await prisma.foto.delete({ where: { id: foto.id } });
         console.log(`[Process API] Rollback successful for photo ${foto.id}`);
@@ -116,12 +148,19 @@ export async function POST(request) {
       );
     }
 
-    // 3. Update Record with Processed Data
+    // 3. Update Record with Processed Data AND Set Final Title
+    const finalTitle =
+      titulo && titulo.trim() !== "Sem título"
+        ? titulo
+        : `${colecao.nome || "Coleção"} IMG_${String(nextSequentialNumber).padStart(4, "0")}`;
+
     const updatedFoto = await prisma.foto.update({
       where: { id: foto.id },
       data: {
         previewUrl: processResult.previewUrl,
         status: "PUBLICADA",
+        titulo: finalTitle,
+        dataCaptura: processResult.dataCaptura,
       },
       include: {
         colecao: {
@@ -135,10 +174,8 @@ export async function POST(request) {
       console.log(`[Process API] Indexing faces for photo ${foto.id}...`);
       const bucket = process.env.S3_UPLOAD_BUCKET;
 
-      // we run this without await to not block the response,
-      // or we can await it if we want to be sure.
-      // since it's a serverless function, better avoid detached promises if possible,
-      // but let's await for reliability in this specific step.
+      // Ensure non-blocking execution properly if environment supports it,
+      // otherwise await to guarantee execution in serverless.
       try {
         const indexResult = await indexPhotoFaces(bucket, s3Key, foto.id);
         if (indexResult.success) {

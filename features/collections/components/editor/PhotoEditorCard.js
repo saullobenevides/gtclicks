@@ -40,9 +40,10 @@ function PhotoEditorCard({
         <div className="absolute top-0 right-0 flex flex-col md:flex-row opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all duration-200">
           <button
             type="button"
-            className="h-12 w-12 flex items-center justify-center text-white bg-black/60 hover:bg-black/80 hover:text-yellow-400 active:scale-90 transition-transform"
-            onClick={() => onSetCover(photo)}
-            title="Definir como Capa"
+            disabled={isCover}
+            className={`h-12 w-12 flex items-center justify-center text-white bg-black/60 transition-transform ${isCover ? "opacity-100 cursor-default" : "hover:bg-black/80 hover:text-yellow-400 active:scale-90"}`}
+            onClick={() => !isCover && onSetCover(photo)}
+            title={isCover ? "Já é a capa" : "Definir como Capa"}
           >
             <Star
               className={`h-5 w-5 ${isCover ? "fill-yellow-400 text-yellow-400" : ""}`}
@@ -60,8 +61,8 @@ function PhotoEditorCard({
 
         <div className="absolute bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm p-3 border-t border-white/5">
           <p className="text-[10px] text-muted-foreground truncate text-center font-mono tracking-tight uppercase">
-            {photo.numeroSequencial
-              ? `IMG_${photo.numeroSequencial.toString().padStart(4, "0")}`
+            {photo.numeroSequencial || photo.sequentialId
+              ? `IMG_${(photo.numeroSequencial || photo.sequentialId).toString().padStart(4, "0")}`
               : "PROCESSANDO..."}
           </p>
         </div>

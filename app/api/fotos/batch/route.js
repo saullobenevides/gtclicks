@@ -14,7 +14,7 @@ function resolveOrientation(value) {
 }
 
 import { getAuthenticatedUser } from "@/lib/auth";
-import { deleteManyFromS3 } from "@/lib/s3-delete";
+import { deleteManyPhotoFiles } from "@/lib/s3-delete";
 
 export async function POST(request) {
   const user = await getAuthenticatedUser();
@@ -65,28 +65,61 @@ export async function POST(request) {
 
     // Delete removed photos
     if (deletedPhotoIds.length > 0) {
-      // Fetch s3Keys before deletion
-      const photosToDelete = await prisma.foto.findMany({
-        where: {
-          id: { in: deletedPhotoIds },
-          fotografoId: fotografoId,
-        },
-        select: { s3Key: true },
-      });
+      try {
+        console.log(
+          `[Batch API] Processing ${deletedPhotoIds.length} deletions/unlinks`,
+        );
 
-      const s3KeysToDelete = photosToDelete.map((p) => p.s3Key).filter(Boolean);
+        for (const photoId of deletedPhotoIds) {
+          // Verify ownership and check for dependencies
+          const photo = await prisma.foto.findFirst({
+            where: {
+              id: photoId,
+              fotografoId: fotografoId,
+            },
+            include: {
+              _count: {
+                select: { itensPedido: true },
+              },
+            },
+          });
 
-      // Clean up S3
-      if (s3KeysToDelete.length > 0) {
-        await deleteManyFromS3(s3KeysToDelete);
+          if (!photo) continue;
+
+          if (photo._count.itensPedido > 0) {
+            // Soft unlink: remove from collection/folder but keep record for order history
+            console.log(`[Batch API] Soft unlinking sold photo: ${photoId}`);
+            await prisma.foto.update({
+              where: { id: photoId },
+              data: {
+                colecaoId: null,
+                folderId: null,
+              },
+            });
+          } else {
+            // Hard delete: remove from DB and cleanup S3
+            console.log(`[Batch API] Hard deleting photo: ${photoId}`);
+            if (photo.s3Key) {
+              await deleteManyPhotoFiles([photo.s3Key]).catch((err) => {
+                console.error(
+                  `[Batch API] S3 deletion failed for ${photoId}:`,
+                  err,
+                );
+              });
+            }
+
+            await prisma.foto.delete({
+              where: { id: photoId },
+            });
+          }
+        }
+      } catch (deletionError) {
+        console.error(
+          "[Batch API] Error during photo deletion process:",
+          deletionError,
+        );
+        throw deletionError;
       }
-
-      await prisma.foto.deleteMany({
-        where: {
-          id: { in: deletedPhotoIds },
-          fotografoId: fotografoId, // Security check: ensure they belong to this photographer
-        },
-      });
     }
 
     if (
@@ -115,17 +148,40 @@ export async function POST(request) {
 
     let nextNumber = (lastPhoto?.numeroSequencial || 0) + 1;
 
+    // Fetch a default license in case one isn't provided (User: "all photos have the same license")
+    const defaultLicenca = await prisma.licenca.findFirst();
+
     for (const foto of fotos) {
-      // Use the targetCollectionId if not explicitly provided in the photo object
       const currentCollectionId = foto.colecaoId || targetCollectionId;
 
+      const photoLicencas =
+        foto.licencas && foto.licencas.length > 0
+          ? foto.licencas
+          : defaultLicenca
+            ? [{ licencaId: defaultLicenca.id, preco: 0 }]
+            : [];
+
       const commonData = {
-        titulo: `Foto #${nextNumber.toString().padStart(3, "0")}`,
+        titulo:
+          foto.titulo || `Foto #${nextNumber.toString().padStart(3, "0")}`,
         descricao: foto.descricao,
         orientacao: resolveOrientation(foto.orientacao),
-        folderId: foto.folderId || null,
         status: "PUBLICADA",
         numeroSequencial: foto.numeroSequencial || nextNumber++,
+        dataCaptura: foto.dataCaptura || undefined,
+        camera: foto.camera || undefined,
+        lens: foto.lens || undefined,
+        iso: foto.iso || undefined,
+        shutterSpeed: foto.shutterSpeed || undefined,
+        aperture: foto.aperture || undefined,
+        colecao: currentCollectionId
+          ? { connect: { id: currentCollectionId } }
+          : undefined,
+        folder: foto.folderId
+          ? { connect: { id: foto.folderId } }
+          : foto.id
+            ? { disconnect: true }
+            : undefined,
       };
 
       let processedFoto;
@@ -139,9 +195,9 @@ export async function POST(request) {
             licencas: {
               deleteMany: {}, // Clear existing licenses
               create:
-                foto.licencas?.map((l) => ({
+                photoLicencas.map((l) => ({
                   licencaId: l.licencaId,
-                  preco: parseFloat(l.preco),
+                  preco: parseFloat(l.preco) || 0,
                 })) || [],
             },
           },
@@ -182,22 +238,19 @@ export async function POST(request) {
           continue;
         }
 
-        const command = new GetObjectCommand({
-          Bucket: process.env.S3_UPLOAD_BUCKET,
-          Key: foto.s3Key,
-        });
+        // Use a permanent proxy URL instead of a signed URL that expires
+        const previewUrl = `/api/images/${foto.s3Key}`;
 
-        const previewUrl = await getSignedUrl(s3Client, command, {
-          expiresIn: 604800,
-        });
+        // Verify existence logic (HeadObject) remains to ensure file exists before saving record
+        // ... (The HEAD check is good, keep it if not removed by this block replacement)
 
         processedFoto = await prisma.foto.create({
           data: {
             ...commonData,
             s3Key: foto.s3Key,
             previewUrl: previewUrl,
-            width: foto.width || 0,
-            height: foto.height || 0,
+            width: typeof foto.width === "number" ? foto.width : 0, // Ensure strictly number
+            height: typeof foto.height === "number" ? foto.height : 0,
             formato: "jpg", // Default/Mock
             tamanhoBytes: 0, // Default/Mock
             fotografo: {
@@ -205,9 +258,9 @@ export async function POST(request) {
             },
             licencas: {
               create:
-                foto.licencas?.map((l) => ({
+                photoLicencas.map((l) => ({
                   licencaId: l.licencaId,
-                  preco: parseFloat(l.preco),
+                  preco: parseFloat(l.preco) || 0,
                 })) || [],
             },
           },
@@ -221,10 +274,21 @@ export async function POST(request) {
       data: processedFotos,
     });
   } catch (error) {
-    console.error("Batch error:", error);
+    console.error("[Batch API Error]:", error);
+    try {
+      const fs = await import("fs");
+      const logMsg = `\n--- ${new Date().toISOString()} ---\nError: ${error.message}\nStack: ${error.stack}\n`;
+      fs.appendFileSync("batch_error_debug.log", logMsg);
+    } catch (e) {
+      // ignore log error
+    }
     logError(error, "Batch API");
     return NextResponse.json(
-      { error: "Nao foi possivel salvar as fotos.", details: error.message },
+      {
+        error: "Nao foi possivel salvar as fotos.",
+        details: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+      },
       { status: 500 },
     );
   }

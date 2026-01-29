@@ -134,6 +134,7 @@ model Foto {
   itensCarrinho  ItemCarrinho[]
   likesList      Like[]
   
+  dataCaptura    DateTime? // EXIF: Date Taken
   createdAt      DateTime  @default(now())
   
   @@index([colecaoId])

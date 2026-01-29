@@ -2,9 +2,25 @@
 
 import { useState, useMemo, useContext } from "react";
 import { createPortal } from "react-dom";
-import { Search, X, CheckSquare, ShoppingCart, PlusCircle } from "lucide-react";
+import {
+  Search,
+  X,
+  CheckSquare,
+  ShoppingCart,
+  PlusCircle,
+  Calendar,
+  Clock,
+  FilterX,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useCart } from "@/features/cart/context/CartContext";
 import { toast } from "sonner";
 import { SelectionContext } from "../context/SelectionContext";
@@ -17,11 +33,37 @@ export default function CollectionSearchClient({
   children,
 }) {
   const [query, setQuery] = useState("");
+  const [selectedDate, setSelectedDate] = useState("all");
+  const [selectedTime, setSelectedTime] = useState("all");
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const { addToCart } = useCart();
 
   const ITEMS_PER_PAGE = 12;
+
+  // Extract available filters from photos
+  const availableFilters = useMemo(() => {
+    const dates = new Set();
+    const hours = new Set();
+
+    allPhotos.forEach((photo) => {
+      if (!photo.dataCaptura) return;
+      const date = new Date(photo.dataCaptura);
+
+      // Date string: YYYY-MM-DD
+      const dateStr = date.toISOString().split("T")[0];
+      dates.add(dateStr);
+
+      // Hour string: HH
+      const hourStr = date.getHours().toString().padStart(2, "0") + "h";
+      hours.add(hourStr);
+    });
+
+    return {
+      dates: Array.from(dates).sort(),
+      hours: Array.from(hours).sort(),
+    };
+  }, [allPhotos]);
 
   const toggleSelection = (id) => {
     // ... (keep existing implementation)
@@ -36,10 +78,7 @@ export default function CollectionSearchClient({
     });
   };
 
-  // Reset pagination when query changes
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [query]);
+  // Pagination reset is now handled in event handlers
 
   // ... (keep handleBulkAddToCart)
   const handleBulkAddToCart = () => {
@@ -49,9 +88,11 @@ export default function CollectionSearchClient({
         addToCart({
           fotoId: photo.id,
           colecaoId: collectionId,
-          titulo: photo.numeroSequencial
-            ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
-            : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`,
+          titulo:
+            photo.titulo ||
+            (photo.numeroSequencial
+              ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
+              : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`),
           preco: photo.colecao?.precoFoto || photo.preco || 0,
           precoBase: photo.colecao?.precoFoto || photo.preco || 0,
           descontos: photo.colecao?.descontos || [],
@@ -72,22 +113,45 @@ export default function CollectionSearchClient({
   };
 
   const filteredPhotos = useMemo(() => {
-    if (!query.trim()) return [];
-    const lowerQuery = query.toLowerCase().trim();
+    let results = allPhotos;
 
-    return allPhotos.filter((photo) => {
-      const bibMatch =
-        photo.numeroSequencial &&
-        photo.numeroSequencial.toString() === lowerQuery;
-      const bibMatchPartial =
-        photo.numeroSequencial &&
-        photo.numeroSequencial.toString().includes(lowerQuery);
-      return bibMatch || bibMatchPartial;
-    });
-  }, [allPhotos, query]);
+    // 1. Filter by Date
+    if (selectedDate !== "all") {
+      results = results.filter((p) => {
+        if (!p.dataCaptura) return false;
+        return p.dataCaptura.startsWith(selectedDate);
+      });
+    }
 
-  // Determine which photos to display based on mode (Search vs Default)
-  const photosToDisplay = query ? filteredPhotos : initialDisplayPhotos;
+    // 2. Filter by Time (Hour)
+    if (selectedTime !== "all") {
+      results = results.filter((p) => {
+        if (!p.dataCaptura) return false;
+        const hour =
+          new Date(p.dataCaptura).getHours().toString().padStart(2, "0") + "h";
+        return hour === selectedTime;
+      });
+    }
+
+    // 3. Filter by Query (Title)
+    if (query.trim()) {
+      const lowerQuery = query.toLowerCase().trim();
+      results = results.filter((photo) => {
+        const title = (photo.titulo || "").toLowerCase();
+        return title.includes(lowerQuery);
+      });
+    }
+
+    return results;
+  }, [allPhotos, query, selectedDate, selectedTime]);
+
+  const hasActiveFilters =
+    query || selectedDate !== "all" || selectedTime !== "all";
+
+  // Determine which photos to display based on mode (Search/Filters vs Default)
+  const photosToDisplay = hasActiveFilters
+    ? filteredPhotos
+    : initialDisplayPhotos;
   const totalPages = Math.ceil(photosToDisplay.length / ITEMS_PER_PAGE);
 
   const currentPhotos = useMemo(() => {
@@ -100,15 +164,25 @@ export default function CollectionSearchClient({
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
+  const clearFilters = () => {
+    setQuery("");
+    setSelectedDate("all");
+    setSelectedTime("all");
+    setCurrentPage(1);
+  };
+
   // Shared handlers
   const handleSelect = (id) => toggleSelection(id);
   const handleAddToCart = (photo) => {
     addToCart({
       fotoId: photo.id,
       colecaoId: collectionId,
-      titulo: photo.numeroSequencial
-        ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
-        : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`,
+      titulo:
+        photo.title ||
+        photo.titulo ||
+        (photo.numeroSequencial
+          ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
+          : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`),
       preco: photo.colecao?.precoFoto || 0,
       licenca: "Uso Padrão",
       previewUrl: photo.previewUrl,
@@ -125,39 +199,114 @@ export default function CollectionSearchClient({
       }}
     >
       <div className="space-y-8 relative pb-24">
-        <div className="relative max-w-md mx-auto flex gap-2">
+        {/* Filter Controls */}
+        <div className="flex flex-col gap-4 max-w-4xl mx-auto">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder="Buscar pelo número de peito..."
+              placeholder="Localizar foto..."
               className="pl-10 pr-10 bg-secondary/50 border-border focus:bg-background transition-colors h-12 text-lg"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setCurrentPage(1);
+              }}
             />
             {query && (
               <button
-                onClick={() => setQuery("")}
+                onClick={() => {
+                  setQuery("");
+                  setCurrentPage(1);
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full"
               >
                 <X className="h-4 w-4 text-muted-foreground" />
               </button>
             )}
           </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {/* Date Filter */}
+            {availableFilters.dates.length > 1 && (
+              <div className="min-w-[160px]">
+                <Select
+                  value={selectedDate}
+                  onValueChange={(val) => {
+                    setSelectedDate(val);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="bg-secondary/30 border-white/10 h-10">
+                    <Calendar className="mr-2 h-4 w-4 text-primary" />
+                    <SelectValue placeholder="Data" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as Datas</SelectItem>
+                    {availableFilters.dates.map((date) => (
+                      <SelectItem key={date} value={date}>
+                        {new Date(date + "T12:00:00Z").toLocaleDateString(
+                          "pt-BR",
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Time Filter */}
+            {availableFilters.hours.length > 1 && (
+              <div className="min-w-[140px]">
+                <Select
+                  value={selectedTime}
+                  onValueChange={(val) => {
+                    setSelectedTime(val);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="bg-secondary/30 border-white/10 h-10">
+                    <Clock className="mr-2 h-4 w-4 text-primary" />
+                    <SelectValue placeholder="Horário" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todo Horário</SelectItem>
+                    {availableFilters.hours.map((hour) => (
+                      <SelectItem key={hour} value={hour}>
+                        {hour}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {hasActiveFilters && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearFilters}
+                className="h-10 px-4 border-dashed border-primary/40 hover:border-primary text-xs"
+              >
+                <FilterX className="mr-2 h-4 w-4" />
+                Limpar Filtros
+              </Button>
+            )}
+          </div>
         </div>
 
-        {!query && children}
+        {!hasActiveFilters && children}
 
         <div className="space-y-8">
-          {query && (
+          {hasActiveFilters && (
             <div className="flex items-center justify-between text-muted-foreground">
               <p>
-                Resultados para "{query}":{" "}
+                {query ? `Resultados para "${query}": ` : "Filtros aplicados: "}
                 <span className="text-foreground font-bold">
                   {filteredPhotos.length}
                 </span>{" "}
                 fotos encontradas
               </p>
-              <Button variant="ghost" size="sm" onClick={() => setQuery("")}>
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
                 Limpar busca
               </Button>
             </div>
@@ -213,7 +362,7 @@ export default function CollectionSearchClient({
                 Nenhuma foto encontrada
               </h3>
               <p className="text-muted-foreground">
-                Não encontramos fotos com o termo "{query}".
+                Não encontramos fotos com o termo &quot;{query}&quot;.
               </p>
             </div>
           ) : (
@@ -230,7 +379,7 @@ export default function CollectionSearchClient({
         {typeof document !== "undefined" &&
           createPortal(
             <div
-              className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 w-[95%] md:w-auto ${
+              className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-100 transition-all duration-300 w-[95%] md:w-auto ${
                 selectedIds.size > 0
                   ? "translate-y-0 opacity-100"
                   : "translate-y-24 opacity-0 pointer-events-none"
@@ -266,7 +415,7 @@ export default function CollectionSearchClient({
                 </div>
               </div>
             </div>,
-            document.body
+            document.body,
           )}
       </div>
     </SelectionContext.Provider>

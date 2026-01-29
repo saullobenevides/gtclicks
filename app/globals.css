@@ -2,50 +2,142 @@
 @config "../tailwind.config.js";
 
 @theme {
-  --color-background: #000000;
-  --color-foreground: #fafafa;
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-on-dark: var(--text-on-dark);
+  --color-text-on-brand: var(--text-on-brand);
 
-  --color-card: #0a0a0a;
-  --color-card-foreground: #fafafa;
+  --color-surface-page: var(--surface-page);
+  --color-surface-section: var(--surface-section);
+  --color-surface-card: var(--surface-card);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-elevated: var(--surface-elevated);
 
-  --color-popover: #000000;
-  --color-popover-foreground: #fafafa;
+  --color-action-primary: var(--action-primary);
+  --color-action-primary-hover: var(--action-primary-hover);
+  --color-action-primary-active: var(--action-primary-active);
+  --color-action-secondary: var(--action-secondary);
+  --color-action-strong: var(--action-strong);
+  --color-action-strong-hover: var(--action-strong-hover);
 
-  --color-primary: #ff0000;
-  --color-primary-foreground: #ffffff;
+  --color-border-default: var(--border-default);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-focus: var(--border-focus);
 
-  --color-secondary: #171717;
-  --color-secondary-foreground: #fafafa;
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-error: var(--status-error);
 
-  --color-muted: #171717;
-  --color-muted-foreground: #a1a1aa;
+  /* Mapping back to standard Tailwind names for compatibility */
+  --color-background: var(--surface-page);
+  --color-foreground: var(--text-primary);
+  --color-primary: var(--action-primary);
+  --color-primary-foreground: var(--text-on-brand);
+  --color-secondary: var(--action-secondary);
+  --color-muted: var(--surface-subtle);
+  --color-muted-foreground: var(--text-secondary);
+  --color-accent: var(--surface-subtle);
+  --color-border: var(--border-default);
+  --color-ring: var(--border-focus);
 
-  --color-accent: #171717;
-  --color-accent-foreground: #fafafa;
+  /* Spacing */
+  --spacing-space-1: var(--space-1);
+  --spacing-space-2: var(--space-2);
+  --spacing-space-3: var(--space-3);
+  --spacing-space-4: var(--space-4);
+  --spacing-space-6: var(--space-6);
+  --spacing-space-8: var(--space-8);
+  --spacing-space-12: var(--space-12);
+  --spacing-space-16: var(--space-16);
+  --spacing-space-20: var(--space-20);
 
-  --color-destructive: #7f1d1d;
-  --color-destructive-foreground: #fafafa;
+  /* Radius */
+  --radius-radius-sm: var(--radius-sm);
+  --radius-radius-md: var(--radius-md);
+  --radius-radius-lg: var(--radius-lg);
+  --radius-radius-xl: var(--radius-xl);
+  --radius-radius-2xl: var(--radius-2xl);
+  --radius-radius-full: var(--radius-full);
 
-  --color-border: #262626;
-  --color-input: #171717;
-  --color-ring: #ff0000;
+  /* Standard Tailwind Names for compatibility */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-full: var(--radius-full);
 
-  --radius-lg: 0.75rem;
-  --radius-md: calc(0.75rem - 2px);
-  --radius-sm: calc(0.75rem - 4px);
-}
-
-@layer base {
-  :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
-    --primary: 0 100% 50%;
-    --border: 0 0% 15%;
-  }
+  /* Shadows */
+  --shadow-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-shadow-card-hover: 0 12px 48px rgba(0, 0, 0, 0.6);
+  --shadow-shadow-button-primary: 0 4px 14px 0 rgba(239, 35, 60, 0.39);
 }
 
 :root {
-  --max-width: 1400px; /* Wider container for modern look */
+  /* Cores - Texto */
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-on-dark: #ffffff;
+  --text-on-brand: #ffffff;
+
+  /* Cores - Superfícies */
+  --surface-page: #000000;
+  --surface-section: #0a0a0a;
+  --surface-card: #0a0a0a;
+  --surface-subtle: #171717;
+  --surface-elevated: #1c1c1c;
+
+  /* Cores - Ações */
+  --action-primary: #ff0000;
+  --action-primary-hover: #cc0000;
+  --action-primary-active: #990000;
+  --action-secondary: #262626;
+  --action-strong: #ffffff;
+  --action-strong-hover: #f4f4f5;
+
+  /* Cores - Bordas */
+  --border-default: #262626;
+  --border-subtle: #171717;
+  --border-focus: #ef233c;
+
+  /* Cores - Status */
+  --status-success: #22c55e;
+  --status-warning: #eab308;
+  --status-error: #ef4444;
+
+  /* Espaçamento */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* Legacy Compat */
+  --background: 0 0% 0%;
+  --foreground: 0 0% 98%;
+  --primary: 348 83% 54%; /* #ef233c */
+  --border: 0 0% 15%;
+
+  --max-width: 1400px;
   --header-height: 80px;
   --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -56,6 +148,25 @@ html {
   scroll-behavior: smooth;
   overflow-x: hidden;
   width: 100%;
+  scroll-padding-top: calc(
+    var(--header-height) + 1rem
+  ); /* Standard padding for anchors */
+}
+
+@media (max-width: 768px) {
+  html {
+    scroll-padding-top: calc(
+      4rem + 1rem
+    ); /* header height on mobile is smaller */
+  }
+}
+
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Content Protection */
@@ -169,7 +280,13 @@ html {
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    line-height: 0.95;
+    line-height: 1.1; /* Increased from 0.95 to avoid clipping */
+  }
+
+  @media (min-width: 640px) {
+    .heading-display {
+      line-height: 0.95;
+    }
   }
 
   .heading-section {
@@ -236,8 +353,8 @@ html {
 
   @media (max-width: 374px) {
     .container-wide {
-      padding-left: 0.75rem;
-      padding-right: 0.75rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
   }
 
@@ -277,12 +394,21 @@ html {
   .date-icon-right::-webkit-calendar-picker-indicator {
     position: absolute;
     right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
-    opacity: 0.5;
+    opacity: 0.7;
     transition: opacity 0.2s;
+    filter: invert(1);
   }
 
   .date-icon-right::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
+  }
+
+  .date-icon-right {
+    position: relative;
+    padding-right: 40px; /* Space for the icon */
+    text-align: left;
   }
 }

@@ -25,7 +25,7 @@ import EditorBottomBar from "./editor/EditorBottomBar";
 
 import { extractMetadata } from "../utils/metadata";
 import { usePhotoUpload } from "../hooks/usePhotoUpload";
-import { updateCollection } from "@/actions/collections";
+import { updateCollection, setCollectionCover } from "@/actions/collections";
 
 const blankPhoto = () => ({
   id: null,
@@ -97,12 +97,29 @@ export default function CollectionEditor({ collection: initialCollection }) {
     setCollectionData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSetCover = useCallback((photo) => {
-    if (photo.previewUrl) {
-      setCollectionData((prev) => ({ ...prev, capaUrl: photo.previewUrl }));
-      toast.success("Capa definida com sucesso!");
-    }
-  }, []);
+  const handleSetCover = useCallback(
+    async (photo) => {
+      if (!photo.id) {
+        toast.error("Aguarde o processamento da foto para definir como capa.");
+        return;
+      }
+
+      const toastId = toast.loading("Gerando capa original...");
+      try {
+        const result = await setCollectionCover(initialCollection.id, photo.id);
+        if (result.error) throw new Error(result.error);
+
+        setCollectionData((prev) => ({ ...prev, capaUrl: result.coverUrl }));
+        toast.dismiss(toastId);
+        toast.success("Capa definida com sucesso!");
+      } catch (error) {
+        console.error(error);
+        toast.dismiss(toastId);
+        toast.error(error.message || "Erro ao definir capa");
+      }
+    },
+    [initialCollection.id],
+  );
 
   const handleNavigate = (folder) => {
     if (folder.id === null) {
@@ -303,8 +320,10 @@ export default function CollectionEditor({ collection: initialCollection }) {
                     .map((tag) => tag.trim())
                     .filter(Boolean)
                 : p.tags || [],
+            licencas: p.licencas || [],
             orientacao: p.orientacao,
             folderId: p.folderId,
+            colecaoId: initialCollection.id,
           })),
         deletedPhotoIds,
       };
@@ -325,8 +344,14 @@ export default function CollectionEditor({ collection: initialCollection }) {
       toast.success("Alterações salvas com sucesso!");
       router.refresh();
     } catch (error) {
-      console.error(error);
-      toast.error(error.message);
+      console.error("Save Error Detail:", error);
+      if (error.message.includes("Nao foi possivel salvar as fotos")) {
+        toast.error(
+          "Erro ao salvar fotos. Verifique os logs do servidor para mais detalhes.",
+        );
+      } else {
+        toast.error(error.message);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -397,42 +422,42 @@ export default function CollectionEditor({ collection: initialCollection }) {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden">
-      <div className="block space-y-8 pb-64 md:pb-8 w-full px-0 sm:px-0">
+      <div className="block space-y-8 pb-32 md:pb-8 w-full px-0 sm:px-0">
         <div className="px-4 md:px-0 w-full min-w-0">
           <EditorHeader submitting={submitting} onSave={handleSaveChanges} />
         </div>
 
         <Tabs defaultValue="detalhes" className="w-full">
-          <div className="w-full h-14 overflow-x-auto overflow-y-hidden sticky top-14 md:static z-40 bg-black/95 backdrop-blur-md md:bg-transparent border-b border-white/5 md:border-none pl-0 md:pl-0 mb-6 md:mb-8">
-            <TabsList className="inline-flex w-auto md:grid md:grid-cols-4 lg:w-[600px] overflow-visible h-14 p-0 bg-transparent rounded-none gap-0 no-scrollbar select-none pr-4 md:pr-0">
+          <div className="w-full max-w-[100vw] h-14 overflow-x-auto overflow-y-hidden sticky top-16 md:static z-40 bg-black/95 backdrop-blur-md md:bg-transparent border-b border-white/5 md:border-none mb-6 md:mb-8 no-scrollbar">
+            <TabsList className="flex w-max md:w-full md:grid md:grid-cols-4 lg:w-[600px] h-14 p-0 bg-transparent rounded-none gap-0 select-none px-4 md:px-0">
               <TabsTrigger
                 value="detalhes"
-                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px]"
               >
                 Detalhes
               </TabsTrigger>
               <TabsTrigger
                 value="fotos"
-                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px]"
               >
                 Fotos ({currentPhotos.length})
               </TabsTrigger>
               <TabsTrigger
                 value="precos"
-                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px]"
               >
                 Preços
               </TabsTrigger>
               <TabsTrigger
                 value="publicacao"
-                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px]"
               >
                 Publicação
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <div className="px-2 md:px-0 w-full min-w-0">
+          <div className="px-4 md:px-0 w-full min-w-0">
             <TabsContent
               value="detalhes"
               className="mt-6 w-full overflow-x-hidden"
@@ -470,7 +495,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
             </TabsContent>
           </div>
 
-          <div className="px-2 md:px-0">
+          <div className="px-4 md:px-0">
             <TabsContent
               value="precos"
               className="mt-6 w-full overflow-x-hidden"
@@ -485,7 +510,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
             </TabsContent>
           </div>
 
-          <div className="px-2 md:px-0 w-full min-w-0">
+          <div className="px-4 md:px-0 w-full min-w-0">
             <TabsContent
               value="publicacao"
               className="mt-6 w-full overflow-x-hidden"

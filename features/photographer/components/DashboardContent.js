@@ -94,7 +94,7 @@ export default function DashboardContent() {
       : formatCurrency(0);
 
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-0">
+    <div className="flex flex-col gap-8 p-0 md:p-0">
       {/* Header & Main Action */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

@@ -4,21 +4,24 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-[10px] uppercase tracking-wider font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-radius-sm border px-space-2 py-[2px] text-text-xs uppercase tracking-wider font-font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-border-focus focus:ring-offset-2",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+          "border-transparent bg-action-primary text-text-on-brand shadow-shadow-sm hover:bg-action-primary-hover",
         secondary:
-          "border-transparent bg-white/10 text-white hover:bg-white/20",
+          "border-transparent bg-surface-subtle/80 text-text-primary hover:bg-surface-subtle",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-white border-white/20",
+          "border-transparent bg-status-error text-white shadow-shadow-sm hover:opacity-90",
+        outline:
+          "text-text-primary border-border-default hover:bg-surface-subtle",
         success:
-          "border-transparent bg-green-500/10 text-green-500 hover:bg-green-500/20",
+          "border-transparent bg-status-success/10 text-status-success hover:bg-status-success/20",
         warning:
-          "border-transparent bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20",
+          "border-transparent bg-status-warning/10 text-status-warning hover:bg-status-warning/20",
+        error:
+          "border-transparent bg-status-error/10 text-status-error hover:bg-status-error/20",
       },
     },
     defaultVariants: {

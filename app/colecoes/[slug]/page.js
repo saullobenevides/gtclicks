@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCollectionBySlug, getCollections } from "@/lib/data/marketplace";
+import {
+  getCollectionBySlugSafe,
+  getCollections,
+} from "@/lib/data/marketplace";
 import { Button } from "@/components/ui/button";
 import { PhotoCard } from "@/components/shared/cards";
 import { Folder, ArrowLeft, InfoIcon } from "lucide-react";
@@ -18,7 +21,7 @@ export const revalidate = 60; // Revalidate every minute
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const collection = await getCollectionBySlug(slug);
+  const collection = await getCollectionBySlugSafe(slug);
 
   if (!collection) {
     return {
@@ -47,7 +50,7 @@ export default async function CollectionDetail({ params, searchParams }) {
   const { folderId } = await searchParams;
 
   // Fetch collection data
-  const collection = await getCollectionBySlug(slug);
+  const collection = await getCollectionBySlugSafe(slug);
 
   if (!collection) {
     notFound();

@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useSyncExternalStore,
+} from "react";
 import { useUser } from "@stackframe/stack";
 
 const CartContext = createContext();
@@ -172,9 +179,15 @@ export function CartProvider({ children }) {
 }
 
 function CartSync({ items, setItems }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
+  // Use useSyncExternalStore for proper client-side detection without warnings
+  const isClient = useSyncExternalStore(
+    () => () => {}, // subscribe (no-op)
+    () => true, // getSnapshot (client)
+    () => false, // getServerSnapshot (server)
+  );
+
+  if (!isClient) return null;
+
   return <CartSyncInner items={items} setItems={setItems} />;
 }
 

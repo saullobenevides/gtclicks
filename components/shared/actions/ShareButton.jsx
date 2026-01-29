@@ -88,7 +88,7 @@ export default function ShareButton({
           </Button>
         </DialogTrigger>
         <DialogContent
-          className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white z-[150]"
+          className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white z-150"
           overlayClassName="z-[149]"
         >
           <DialogHeader>

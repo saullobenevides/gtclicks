@@ -27,7 +27,7 @@ export default function PhotographerProfileForm({ photographer }) {
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
-    userId: photographer.userId,
+    // userId: photographer.userId, // Not editable
     username: photographer.username || "",
     bio: photographer.bio || "",
     telefone: photographer.telefone || "",
@@ -193,7 +193,19 @@ export default function PhotographerProfileForm({ photographer }) {
             </div>
 
             <div className="grid gap-2 pt-4 border-t border-border">
-              <Label htmlFor="chavePix">Dados Financeiros</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="chavePix">Dados Financeiros</Label>
+                <Button
+                  variant="link"
+                  size="sm"
+                  asChild
+                  className="px-0 h-auto"
+                >
+                  <Link href="/dashboard/fotografo/financeiro">
+                    Gerenciar Chaves e Saques
+                  </Link>
+                </Button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="cpf">CPF</Label>
@@ -201,7 +213,8 @@ export default function PhotographerProfileForm({ photographer }) {
                     id="cpf"
                     placeholder="000.000.000-00"
                     value={formData.cpf || ""}
-                    onChange={(e) => handleChange("cpf", e.target.value)}
+                    disabled={true}
+                    className="bg-muted text-muted-foreground cursor-not-allowed"
                   />
                 </div>
                 <div className="space-y-2">
@@ -210,13 +223,13 @@ export default function PhotographerProfileForm({ photographer }) {
                     id="chavePix"
                     placeholder="CPF, Email ou Aleatória"
                     value={formData.chavePix}
-                    onChange={(e) => handleChange("chavePix", e.target.value)}
+                    disabled={true}
+                    className="bg-muted text-muted-foreground cursor-not-allowed"
                   />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Esses dados são criptografados e utilizados apenas para
-                repasses.
+                Para alterar seus dados financeiros, acesse a página Financeiro.
               </p>
             </div>
 

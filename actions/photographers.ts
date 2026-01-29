@@ -5,8 +5,42 @@ import { getAuthenticatedUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getConfigNumber, CONFIG_KEYS } from "@/lib/config";
+import { serializeDecimal, serializeModel } from "@/lib/serialization";
 
-// Helper for username generation
+// --- Schemas ---
+
+const createPhotographerSchema = z.object({
+  username: z
+    .string()
+    .min(3, "Username muito curto")
+    .regex(
+      /^[a-zA-Z0-9_]+$/,
+      "Username deve conter apenas letras, números e underline",
+    )
+    .optional(),
+  bio: z.string().max(500, "Bio muito longa").optional(),
+  telefone: z.string().optional(),
+  cidade: z.string().optional(),
+  estado: z.string().length(2, "UF deve ter 2 caracteres").optional(),
+  instagram: z.string().optional(),
+  chavePix: z.string().optional(),
+});
+
+const updatePhotographerSchema = z.object({
+  bio: z.string().max(500).optional(),
+  telefone: z.string().optional(),
+  cidade: z.string().optional(),
+  estado: z.string().optional(),
+  instagram: z.string().optional(),
+  // chavePix: z.string().optional(), // Removed
+  portfolioUrl: z.string().url("URL inválida").optional().or(z.literal("")),
+  equipamentos: z.string().optional(),
+  // cpf: z.string().optional(), // Removed
+  especialidades: z.array(z.string()).optional(),
+});
+
+// --- Helper ---
+
 function generateUniqueUsername(baseName: string) {
   let username = baseName
     .toLowerCase()
@@ -22,19 +56,7 @@ function generateUniqueUsername(baseName: string) {
   return `@${username}_${randomSuffix}`;
 }
 
-const photographerSchema = z.object({
-  username: z.string().min(3).optional(),
-  bio: z.string().optional(),
-  telefone: z.string().optional(),
-  cidade: z.string().optional(),
-  estado: z.string().optional(),
-  instagram: z.string().optional(),
-  portfolioUrl: z.string().optional(),
-  chavePix: z.string().optional(),
-  equipamentos: z.string().optional(),
-  especialidades: z.array(z.string()).optional(),
-  cpf: z.string().optional(),
-});
+// --- Actions ---
 
 export async function createPhotographer(formData: FormData) {
   const user = await getAuthenticatedUser();
@@ -43,14 +65,25 @@ export async function createPhotographer(formData: FormData) {
   }
 
   const rawData = {
-    username: formData.get("username"),
-    bio: formData.get("bio"),
-    telefone: formData.get("telefone"),
-    cidade: formData.get("cidade"),
-    estado: formData.get("estado"),
-    instagram: formData.get("instagram"),
-    chavePix: formData.get("chavePix"),
+    username: formData.get("username")?.toString(),
+    bio: formData.get("bio")?.toString(),
+    telefone: formData.get("telefone")?.toString(),
+    cidade: formData.get("cidade")?.toString(),
+    estado: formData.get("estado")?.toString(),
+    instagram: formData.get("instagram")?.toString(),
+    chavePix: formData.get("chavePix")?.toString(),
   };
+
+  const validation = createPhotographerSchema.safeParse(rawData);
+
+  if (!validation.success) {
+    return {
+      error: "Dados inválidos",
+      details: validation.error.flatten().fieldErrors,
+    };
+  }
+
+  const data = validation.data;
 
   try {
     const existing = await prisma.fotografo.findUnique({
@@ -58,15 +91,19 @@ export async function createPhotographer(formData: FormData) {
     });
 
     if (existing) {
-      return { success: true, data: existing };
+      return { success: true, data: serializeModel(existing) };
     }
 
     const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+
+    // Ensure user role is updated
     if (!dbUser) {
+      // Should catch this edge case where user exists in Auth but not DB (sync issue)
+      // Ideally auth.js handles this, but defensive coding here.
       await prisma.user.create({
         data: {
+          ...(user as any), // Fallback, though user object from auth is clean
           id: user.id,
-          name: user.name || "Fotógrafo",
           email: user.email,
           role: "FOTOGRAFO",
         },
@@ -78,10 +115,11 @@ export async function createPhotographer(formData: FormData) {
       });
     }
 
-    let finalUsername = rawData.username?.toString();
+    let finalUsername = data.username;
     if (!finalUsername) {
       const baseName = user.name || user.email?.split("@")[0] || "fotografo";
       finalUsername = generateUniqueUsername(baseName);
+
       let attempt = 0;
       while (attempt < 10) {
         const exists = await prisma.fotografo.findUnique({
@@ -93,6 +131,7 @@ export async function createPhotographer(formData: FormData) {
       }
       if (attempt >= 10) throw new Error("Falha ao gerar username único");
     } else {
+      // Remove @ if present at start
       if (finalUsername.startsWith("@"))
         finalUsername = finalUsername.substring(1);
     }
@@ -101,19 +140,19 @@ export async function createPhotographer(formData: FormData) {
       data: {
         userId: user.id,
         username: finalUsername,
-        bio: rawData.bio?.toString() || "Fotógrafo profissional",
-        telefone: rawData.telefone?.toString(),
-        cidade: rawData.cidade?.toString(),
-        estado: rawData.estado?.toString(),
-        instagram: rawData.instagram?.toString(),
-        chavePix: rawData.chavePix?.toString(),
+        bio: data.bio || "Fotógrafo profissional",
+        telefone: data.telefone,
+        cidade: data.cidade,
+        estado: data.estado,
+        instagram: data.instagram,
+        chavePix: data.chavePix,
       },
     });
 
     revalidatePath("/dashboard");
-    return { success: true, data: newPhotographer };
-  } catch (error) {
-    console.error("Erro ao criar fotógrafo:", error);
+    return { success: true, data: serializeModel(newPhotographer) };
+  } catch (error: any) {
+    console.error("[createPhotographer] Error:", error.message);
     return { error: "Falha ao criar perfil" };
   }
 }
@@ -123,38 +162,52 @@ export async function updatePhotographer(formData: FormData) {
   if (!user) return { error: "Não autorizado" };
 
   const rawData = {
-    bio: formData.get("bio"),
-    telefone: formData.get("telefone"),
-    cidade: formData.get("cidade"),
-    estado: formData.get("estado"),
-    instagram: formData.get("instagram"),
-    chavePix: formData.get("chavePix"),
-    portfolioUrl: formData.get("portfolioUrl"),
-    equipamentos: formData.get("equipamentos"),
-    cpf: formData.get("cpf"),
+    bio: formData.get("bio")?.toString(),
+    telefone: formData.get("telefone")?.toString(),
+    cidade: formData.get("cidade")?.toString(),
+    estado: formData.get("estado")?.toString(),
+    instagram: formData.get("instagram")?.toString()?.replace(/^@/, ""),
+    // chavePix: formData.get("chavePix")?.toString(),
+    portfolioUrl: formData.get("portfolioUrl")?.toString(),
+    equipamentos: formData.get("equipamentos")?.toString(),
+    // cpf: formData.get("cpf")?.toString(),
   };
+
+  const validation = updatePhotographerSchema.safeParse({
+    ...rawData,
+    especialidades: formData.getAll("especialidades"),
+  });
+
+  if (!validation.success) {
+    return {
+      error: "Dados inválidos",
+      details: validation.error.flatten().fieldErrors,
+    };
+  }
+
+  const data = validation.data;
 
   try {
     const updated = await prisma.fotografo.update({
       where: { userId: user.id },
       data: {
-        bio: rawData.bio?.toString(),
-        telefone: rawData.telefone?.toString(),
-        cidade: rawData.cidade?.toString(),
-        estado: rawData.estado?.toString(),
-        instagram: rawData.instagram?.toString(),
-        chavePix: rawData.chavePix?.toString(),
-        portfolioUrl: rawData.portfolioUrl?.toString(),
-        equipamentos: rawData.equipamentos?.toString(),
-        cpf: rawData.cpf?.toString(),
-        especialidades: formData.getAll("especialidades") as string[],
+        bio: data.bio,
+        telefone: data.telefone,
+        cidade: data.cidade,
+        estado: data.estado,
+        instagram: data.instagram,
+        // chavePix: data.chavePix, // Removed for security (use updatePixKey)
+        portfolioUrl: data.portfolioUrl,
+        equipamentos: data.equipamentos,
+        // cpf: data.cpf, // Removed for security
+        especialidades: data.especialidades,
       },
     });
 
     revalidatePath(`/fotografos/${updated.username}`);
-    return { success: true, data: updated };
-  } catch (error) {
-    console.error("Erro ao atualizar fotógrafo:", error);
+    return { success: true, data: serializeModel(updated) };
+  } catch (error: any) {
+    console.error("[updatePhotographer] Error:", error.message);
     return { error: "Falha ao atualizar perfil" };
   }
 }
@@ -163,13 +216,10 @@ export async function updatePhotographer(formData: FormData) {
  * Busca dados financeiros do fotógrafo autenticado
  */
 export async function getFinancialData() {
-  console.log("[Action] getFinancialData: Starting...");
   const user = await getAuthenticatedUser();
   if (!user) {
-    console.warn("[Action] getFinancialData: No user authenticated.");
     return { error: "Não autorizado" };
   }
-  console.log("[Action] getFinancialData: User authenticated:", user.id);
 
   try {
     const fotografo = await prisma.fotografo.findUnique({
@@ -177,71 +227,61 @@ export async function getFinancialData() {
     });
 
     if (!fotografo) {
-      console.warn(
-        "[Action] getFinancialData: Photographer profile not found for user:",
-        user.id,
-      );
       return { error: "Perfil de fotógrafo não encontrado" };
     }
-    console.log("[Action] getFinancialData: Photographer found:", fotografo.id);
 
-    const rawSaldo = await prisma.saldo.upsert({
+    // Using findUnique first to avoid unnecessary write (upsert)
+    let saldo = await prisma.saldo.findUnique({
       where: { fotografoId: fotografo.id },
-      create: {
-        fotografoId: fotografo.id,
-        disponivel: 0,
-        bloqueado: 0,
-      },
-      update: {},
     });
-    console.log("[Action] getFinancialData: Saldo upserted.");
 
-    const rawTransacoes = await prisma.transacao.findMany({
+    if (!saldo) {
+      saldo = await prisma.saldo.create({
+        data: {
+          fotografoId: fotografo.id,
+          disponivel: 0,
+          bloqueado: 0,
+        },
+      });
+    }
+
+    const transacoes = await prisma.transacao.findMany({
       where: { fotografoId: fotografo.id },
       orderBy: { createdAt: "desc" },
       take: 50,
     });
-    console.log(
-      "[Action] getFinancialData: Transactions found:",
-      rawTransacoes.length,
-    );
 
     let minSaque = 50;
     try {
       minSaque = await getConfigNumber(CONFIG_KEYS.MIN_SAQUE);
-      console.log("[Action] getFinancialData: Config fetched:", minSaque);
     } catch (configError) {
-      console.error(
-        "[Action] getFinancialData: Error fetching config, using default 50.",
-        configError,
-      );
+      // Silent error for config, default fallback
     }
 
-    // Converte Decimals para Numbers para evitar erro de serialização
-    const saldo = {
-      disponivel: Number(rawSaldo.disponivel),
-      bloqueado: Number(rawSaldo.bloqueado),
+    // Use centralized serialization
+    const serializedSaldo = {
+      disponivel: serializeDecimal(saldo.disponivel),
+      bloqueado: serializeDecimal(saldo.bloqueado),
     };
 
-    const transacoes = rawTransacoes.map((t) => ({
-      ...t,
-      valor: Number(t.valor),
+    const serializedTransacoes = transacoes.map((t) => ({
+      ...serializeModel(t),
+      valor: serializeDecimal(t.valor),
     }));
 
-    console.log("[Action] getFinancialData: Success.");
     return {
       success: true,
       data: {
-        saldo,
-        transacoes,
+        saldo: serializedSaldo,
+        transacoes: serializedTransacoes,
         chavePix: fotografo.chavePix,
         minSaque,
       },
     };
   } catch (error: any) {
-    console.error("[Action] getFinancialData CRITICAL error:", error);
+    console.error("[getFinancialData] Error:", error.message);
     return {
-      error: `Falha ao buscar dados financeiros: ${error.message || "Erro desconhecido"}`,
+      error: "Falha ao buscar dados financeiros",
     };
   }
 }
@@ -258,6 +298,7 @@ export async function updatePixKey(data: { chavePix: string; code: string }) {
 
   const { chavePix, code } = data;
 
+  // Simple validation
   if (!chavePix || !code) {
     return { error: "Chave PIX e código de verificação são obrigatórios" };
   }
@@ -294,14 +335,14 @@ export async function updatePixKey(data: { chavePix: string; code: string }) {
       where: { userId: user.id },
       data: {
         chavePix,
-        cpf: chavePix, // Force sync for security
+        cpf: chavePix, // Force sync for security based on user requirements (assuming PIX is CPF)
       },
     });
 
     revalidatePath("/dashboard/fotografo/financeiro");
-    return { success: true, data: updated };
+    return { success: true, data: serializeModel(updated) };
   } catch (error: any) {
-    console.error("[Action] updatePixKey error:", error);
+    console.error("[updatePixKey] Error:", error.message);
     return { error: "Erro ao atualizar chave PIX" };
   }
 }

@@ -40,7 +40,7 @@ export function DashboardLayout({ children, navItems }) {
         {/* Mobile Horizontal Nav - Replaces the Sidebar Trigger */}
         <DashboardMobileNav navItems={navItems} />
 
-        <main className="flex-1 flex flex-col gap-4 py-8 px-0 sm:px-4 lg:gap-6 lg:py-10 lg:px-6 w-full max-w-full overflow-x-hidden">
+        <main className="flex-1 flex flex-col gap-4 py-8 px-4 lg:gap-6 lg:py-10 lg:px-6 w-full max-w-full overflow-x-hidden">
           {children}
         </main>
       </div>

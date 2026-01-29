@@ -61,7 +61,7 @@ export function usePhotoUpload(collectionId, currentFolder) {
           s3Key: originalPresign.s3Key,
           width: img.width,
           height: img.height,
-          titulo: file.name.split(".")[0],
+          // titulo: null (Let backend generate it)
           ...metadata,
           colecaoId: collectionId,
           folderId: currentFolder?.id || null,
@@ -79,6 +79,9 @@ export function usePhotoUpload(collectionId, currentFolder) {
         s3Key: originalPresign.s3Key,
         previewUrl: processData.foto.previewUrl,
         titulo: processData.foto.titulo,
+        sequentialId: processData.foto.sequentialId,
+        numeroSequencial:
+          processData.foto.numeroSequencial || processData.foto.sequentialId,
         ...metadata,
         folderId: currentFolder?.id || null,
       };

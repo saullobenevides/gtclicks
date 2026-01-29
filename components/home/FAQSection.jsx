@@ -25,10 +25,10 @@ export default function FAQSection() {
   ];
 
   return (
-    <section className="py-24">
-      <div className="container max-w-3xl mx-auto">
-        <div className="mb-16 flex flex-col items-center text-center gap-3">
-          <h2 className="heading-section font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
+    <section className="py-space-20">
+      <div className="container max-w-3xl mx-auto px-space-6">
+        <div className="mb-space-12 flex flex-col items-center text-center gap-space-3">
+          <h2 className="heading-section font-display text-text-3xl md:text-text-4xl font-font-bold text-text-primary uppercase tracking-tight">
             PERGUNTAS FREQUENTES
           </h2>
         </div>

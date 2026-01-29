@@ -169,7 +169,7 @@ export async function notifyOrderApproved(data: {
     message:
       "Seu pagamento foi confirmado. Suas fotos já estão disponíveis para download.",
     type: NotificationType.SUCCESS,
-    link: `/meus-pedidos/${data.orderId}`,
+    link: `/pedidos/${data.orderId}`,
   });
 }
 

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import RetryPaymentButton from "@/components/pedidos/RetryPaymentButton";
+import PaymentStatusChecker from "@/components/pedidos/PaymentStatusChecker";
 
 export async function generateMetadata(props) {
   const params = await props.params;
@@ -91,20 +92,11 @@ export default async function PedidoDetalhesPage(props) {
                       })}
                     </p>
                   </div>
-                  {isPaid ? (
-                    <Badge className="bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/50 px-4 py-1.5 text-sm">
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Pedido Pago
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="outline"
-                      className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 px-4 py-1.5 text-sm"
-                    >
-                      <Clock className="h-4 w-4 mr-2" />
-                      Aguardando Pagamento
-                    </Badge>
-                  )}
+                  {/* Dynamic Status Checker */}
+                  <PaymentStatusChecker
+                    orderId={pedido.id}
+                    initialStatus={pedido.status}
+                  />
                 </div>
               </CardHeader>
               <CardContent className="pt-6">

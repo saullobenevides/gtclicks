@@ -2,6 +2,17 @@
 
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
+import { serializeModel, serializeDecimal } from "@/lib/serialization";
+import { z } from "zod";
+
+// --- Schemas ---
+
+const updateAdminConfigSchema = z.object({
+  minSaque: z.number().nonnegative().optional(),
+  taxaPlataforma: z.number().min(0).max(100).optional(),
+});
+
+// --- Actions ---
 
 /**
  * Busca estatísticas administrativas globais
@@ -57,9 +68,7 @@ export async function getAdminStats() {
     ]);
 
     const stats = {
-      totalRevenue: totalRevenueResult._sum.total
-        ? Number(totalRevenueResult._sum.total)
-        : 0,
+      totalRevenue: serializeDecimal(totalRevenueResult._sum.total),
       activeUsers: activeUsersCount,
       ordersCount: ordersCount,
       collectionsCount: collectionsCount,
@@ -68,7 +77,7 @@ export async function getAdminStats() {
         type: "order",
         description: `Pedido de ${order.user?.name || order.user?.email || "Usuário"}`,
         itemsCount: order.itens?.length || 0,
-        total: order.total ? Number(order.total) : 0,
+        total: serializeDecimal(order.total),
         status: order.status,
         createdAt: order.createdAt,
       })),
@@ -76,7 +85,7 @@ export async function getAdminStats() {
 
     return { success: true, data: stats };
   } catch (error: any) {
-    console.error("[Action] getAdminStats error:", error);
+    console.error("[getAdminStats] Error:", error.message);
     return { error: "Erro ao buscar estatísticas administrativas" };
   }
 }
@@ -103,7 +112,7 @@ export async function getAdminConfig() {
 
     return { success: true, data: configMap };
   } catch (error: any) {
-    console.error("[Action] getAdminConfig error:", error);
+    console.error("[getAdminConfig] Error:", error.message);
     return { error: "Erro ao buscar configurações" };
   }
 }
@@ -121,19 +130,30 @@ export async function updateAdminConfig(data: {
     return { error: "Acesso negado: Admin requerido" };
   }
 
+  const validation = updateAdminConfigSchema.safeParse(data);
+
+  if (!validation.success) {
+    return {
+      error: "Dados inválidos",
+      details: validation.error.flatten().fieldErrors,
+    };
+  }
+
+  const validData = validation.data;
+
   try {
     const { setConfig, CONFIG_KEYS } = await import("@/lib/config");
 
-    if (data.minSaque !== undefined) {
-      await setConfig(CONFIG_KEYS.MIN_SAQUE, data.minSaque);
+    if (validData.minSaque !== undefined) {
+      await setConfig(CONFIG_KEYS.MIN_SAQUE, validData.minSaque);
     }
-    if (data.taxaPlataforma !== undefined) {
-      await setConfig(CONFIG_KEYS.TAXA_PLATAFORMA, data.taxaPlataforma);
+    if (validData.taxaPlataforma !== undefined) {
+      await setConfig(CONFIG_KEYS.TAXA_PLATAFORMA, validData.taxaPlataforma);
     }
 
     return { success: true, message: "Configurações atualizadas" };
   } catch (error: any) {
-    console.error("[Action] updateAdminConfig error:", error);
+    console.error("[updateAdminConfig] Error:", error.message);
     return { error: "Erro ao atualizar configurações" };
   }
 }

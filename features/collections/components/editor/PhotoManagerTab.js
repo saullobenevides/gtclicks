@@ -37,7 +37,7 @@ export default function PhotoManagerTab({
       </CardHeader>
       <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6">
         {/* Breadcrumbs */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6 overflow-hidden md: bg-background/95 backdrop-blur-md md:bg-transparent w-full min-w-0 transition-all duration-200">
+        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6 overflow-hidden bg-background/95 backdrop-blur-md md:bg-transparent w-full min-w-0 transition-all duration-200">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full min-w-0 pr-4 mask-linear-fade">
             <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest whitespace-nowrap">
               PASTA:
@@ -108,7 +108,14 @@ export default function PhotoManagerTab({
                 <PhotoEditorCard
                   key={photo.tempId}
                   photo={photo}
-                  isCover={collectionData.capaUrl === photo.previewUrl}
+                  isCover={
+                    collectionData.capaUrl === photo.previewUrl ||
+                    (collectionData.capaUrl &&
+                      photo.s3Key &&
+                      collectionData.capaUrl.includes(
+                        photo.s3Key.split("/").pop(),
+                      ))
+                  }
                   uploadState={uploadState}
                   onSetCover={onSetCover}
                   onRemove={onRemovePhoto}

@@ -4,6 +4,24 @@ import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { Prisma, PedidoStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { serializeModel } from "@/lib/serialization";
+
+// --- Schemas ---
+
+const createOrderSchema = z.object({
+  itens: z
+    .array(
+      z.object({
+        fotoId: z.string().cuid(),
+        licencaId: z.string().cuid().optional(),
+      }),
+    )
+    .min(1, "O carrinho não pode estar vazio"),
+  checkoutSessionId: z.string().optional(),
+});
+
+// --- Actions ---
 
 /**
  * Cria um novo pedido a partir dos itens do carrinho ou seleção direta
@@ -17,11 +35,16 @@ export async function createOrder(data: {
     return { error: "Não autorizado" };
   }
 
-  const { itens, checkoutSessionId } = data;
+  const validation = createOrderSchema.safeParse(data);
 
-  if (!itens || itens.length === 0) {
-    return { error: "Informe ao menos um item." };
+  if (!validation.success) {
+    return {
+      error: "Dados inválidos",
+      details: validation.error.flatten().fieldErrors,
+    };
   }
+
+  const { itens, checkoutSessionId } = validation.data;
 
   try {
     let calculatedTotal = new Prisma.Decimal(0);
@@ -86,9 +109,9 @@ export async function createOrder(data: {
     });
 
     revalidatePath("/meus-pedidos");
-    return { success: true, data: pedido };
-  } catch (error) {
-    console.error("[Action] createOrder error:", error);
+    return { success: true, data: serializeModel(pedido) };
+  } catch (error: any) {
+    console.error("[createOrder] Error:", error.message);
     return { error: "Erro ao criar pedido" };
   }
 }
@@ -116,9 +139,9 @@ export async function getUserOrders() {
       },
     });
 
-    return { success: true, data: pedidos };
-  } catch (error) {
-    console.error("[Action] getUserOrders error:", error);
+    return { success: true, data: serializeModel(pedidos) };
+  } catch (error: any) {
+    console.error("[getUserOrders] Error:", error.message);
     return { error: "Erro ao buscar pedidos" };
   }
 }
@@ -155,9 +178,9 @@ export async function getOrderById(orderId: string) {
       return { error: "Acesso negado" };
     }
 
-    return { success: true, data: pedido };
-  } catch (error) {
-    console.error("[Action] getOrderById error:", error);
+    return { success: true, data: serializeModel(pedido) };
+  } catch (error: any) {
+    console.error("[getOrderById] Error:", error.message);
     return { error: "Erro ao buscar pedido" };
   }
 }

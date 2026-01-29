@@ -5,11 +5,11 @@ import { Instagram, Youtube, Twitter, MessageCircle } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-white/5 bg-linear-to-b from-black to-zinc-950 pt-20 pb-8">
+    <footer className="w-full border-t border-border-subtle bg-surface-section pt-space-16 pb-space-8">
       <div className="container-wide">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-20 mb-16">
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-2 group">
+        <div className="grid grid-cols-1 gap-space-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-space-20 mb-space-16">
+          <div className="flex flex-col gap-space-6">
+            <Link href="/" className="flex items-center gap-space-2 group">
               <div className="relative h-10 w-auto aspect-3/1">
                 <Image
                   src="/logo.png"
@@ -20,17 +20,17 @@ export default function Footer() {
                 />
               </div>
             </Link>
-            <p className="text-sm leading-relaxed text-muted-foreground max-w-xs">
+            <p className="text-text-sm leading-relaxed text-text-secondary max-w-xs">
               {siteConfig.description}
             </p>
 
             {/* Social Icons */}
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-space-2 mt-space-2">
               <a
                 href="https://instagram.com/gt.clicks"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-white/5"
+                className="flex items-center justify-center min-h-11 min-w-11 text-text-secondary hover:text-action-primary transition-all rounded-radius-full hover:bg-surface-subtle"
               >
                 <Instagram className="h-6 w-6" />
               </a>
@@ -38,7 +38,7 @@ export default function Footer() {
                 href="https://youtube.com/@gtclicks"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-white/5"
+                className="flex items-center justify-center min-h-11 min-w-11 text-text-secondary hover:text-action-primary transition-all rounded-radius-full hover:bg-surface-subtle"
               >
                 <Youtube className="h-6 w-6" />
               </a>
@@ -46,7 +46,7 @@ export default function Footer() {
                 href="https://twitter.com/gtclicks"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-white/5"
+                className="flex items-center justify-center min-h-11 min-w-11 text-text-secondary hover:text-action-primary transition-all rounded-radius-full hover:bg-surface-subtle"
               >
                 <Twitter className="h-6 w-6" />
               </a>
@@ -54,23 +54,23 @@ export default function Footer() {
                 href="https://tiktok.com/@gtclicks"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center min-h-11 min-w-11 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-white/5"
+                className="flex items-center justify-center min-h-11 min-w-11 text-text-secondary hover:text-action-primary transition-all rounded-radius-full hover:bg-surface-subtle"
               >
                 <MessageCircle className="h-6 w-6" />
               </a>
             </div>
           </div>
 
-          <div className="flex flex-col gap-6">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
+          <div className="flex flex-col gap-space-6">
+            <h4 className="text-text-xs font-font-bold uppercase tracking-widest text-text-secondary/80">
               Plataforma
             </h4>
-            <ul className="flex flex-col gap-3 text-sm text-muted-foreground">
+            <ul className="flex flex-col gap-space-3 text-text-sm text-text-secondary">
               {siteConfig.footerParams.platform.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="transition-all duration-200 hover:text-white hover:translate-x-1 inline-block"
+                    className="transition-all duration-200 hover:text-text-primary hover:translate-x-1 inline-block"
                   >
                     {item.label}
                   </Link>
@@ -79,16 +79,16 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="flex flex-col gap-6">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
+          <div className="flex flex-col gap-space-6">
+            <h4 className="text-text-xs font-font-bold uppercase tracking-widest text-text-secondary/80">
               Fotógrafos
             </h4>
-            <ul className="flex flex-col gap-3 text-base text-muted-foreground">
+            <ul className="flex flex-col gap-space-3 text-text-sm text-text-secondary">
               {siteConfig.footerParams.photographers.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="transition-colors hover:text-white hover:translate-x-1 inline-block"
+                    className="transition-all duration-200 hover:text-text-primary hover:translate-x-1 inline-block"
                   >
                     {item.label}
                   </Link>
@@ -97,16 +97,16 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="flex flex-col gap-6">
-            <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
+          <div className="flex flex-col gap-space-6">
+            <h4 className="text-text-xs font-font-bold uppercase tracking-widest text-text-secondary/80">
               Suporte
             </h4>
-            <ul className="flex flex-col gap-3 text-base text-muted-foreground">
+            <ul className="flex flex-col gap-space-3 text-text-sm text-text-secondary">
               {siteConfig.footerParams.support.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="transition-colors hover:text-white hover:translate-x-1 inline-block"
+                    className="transition-all duration-200 hover:text-text-primary hover:translate-x-1 inline-block"
                   >
                     {item.label}
                   </Link>
@@ -116,14 +116,15 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground/80">
+        <div className="border-t border-border-subtle pt-space-10 flex flex-col md:flex-row items-center justify-between gap-space-4">
+          <p className="text-text-xs text-text-secondary/80">
             © {new Date().getFullYear()} {siteConfig.name}. Todos os direitos
             reservados.
           </p>
-          <div className="flex items-center gap-6">
-            <span className="text-xs text-muted-foreground/80">
-              Feito com <span className="text-primary">❤️</span> para criadores
+          <div className="flex items-center gap-space-6">
+            <span className="text-text-xs text-text-secondary/80">
+              Feito com <span className="text-action-primary">❤️</span> para
+              criadores
             </span>
           </div>
         </div>

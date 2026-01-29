@@ -47,7 +47,7 @@ export default function ComoFuncionaPage() {
           <Badge variant="secondary" className="mb-6 px-4 py-1 text-[10px]">
             Central de Ajuda GTClicks
           </Badge>
-          <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-[0.85] mb-6">
+          <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-tight sm:leading-[0.85] mb-6">
             Como podemos <br />
             <span className="text-primary">ajudar você?</span>
           </h1>
@@ -57,8 +57,8 @@ export default function ComoFuncionaPage() {
           </p>
 
           <Tabs defaultValue="fotografo" className="w-full max-w-5xl mx-auto">
-            <div className="flex justify-center mb-16 overflow-x-auto pb-2">
-              <TabsList className="bg-white/5 border border-white/10 p-1 rounded-full h-auto flex-shrink-0">
+            <div className="flex justify-start sm:justify-center mb-16 overflow-x-auto pb-2 px-4 no-scrollbar">
+              <TabsList className="bg-white/5 border border-white/10 p-1 rounded-full h-auto shrink-0">
                 <TabsTrigger
                   value="fotografo"
                   className="rounded-full px-4 sm:px-8 py-3 text-base sm:text-lg font-bold data-[state=active]:bg-primary! data-[state=active]:text-white! transition-all flex items-center gap-2 whitespace-nowrap"

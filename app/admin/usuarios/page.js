@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import AppPagination from "@/components/shared/AppPagination";
 import Link from "next/link";
 
 export default function UsersPage() {
@@ -16,11 +18,7 @@ export default function UsersPage() {
   const page = Number(searchParams.get("page")) || 1;
   const router = useRouter();
 
-  useEffect(() => {
-    fetchUsers();
-  }, [roleFilter, page]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -46,7 +44,11 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [roleFilter, page, search]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleSearch = (e) => {
     e.preventDefault();

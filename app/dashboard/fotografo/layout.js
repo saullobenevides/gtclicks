@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "@stackframe/stack";
 import { useRouter, usePathname } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import LoadingSkeleton from "./loading";
 
 export default function PhotographerLayout({ children }) {
   const user = useUser();
@@ -59,9 +60,9 @@ export default function PhotographerLayout({ children }) {
 
   if (checking) {
     return (
-      <div className="flex w-full flex-1 items-center justify-center min-h-screen">
-        <p>Verificando perfil...</p>
-      </div>
+      <DashboardLayout navItems={navItems}>
+        <LoadingSkeleton />
+      </DashboardLayout>
     );
   }
 

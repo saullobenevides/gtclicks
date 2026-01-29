@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { getCollectionByIdForEdit } from "@/lib/data/marketplace";
+import { getCollectionByIdForEditSafe } from "@/lib/data/marketplace";
 import CollectionEditor from "@/features/collections/components/CollectionEditor";
 
 export default async function EditCollectionPage(props) {
   const params = await props.params;
   const { id } = params;
 
-  const collection = await getCollectionByIdForEdit(id);
+  const collection = await getCollectionByIdForEditSafe(id);
 
   if (!collection) {
     notFound();

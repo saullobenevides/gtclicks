@@ -89,10 +89,10 @@ export default function PhotoCard({
     >
       <Card
         className={cn(
-          "relative overflow-hidden rounded-xl bg-muted transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/50 border border-white/5",
+          "relative overflow-hidden rounded-radius-xl bg-surface-card transition-all duration-300 hover:-translate-y-1 hover:shadow-shadow-card-hover border border-border-subtle",
           aspectClass,
           isSelected
-            ? "border-primary border-4 translate-y-[-4px] shadow-xl"
+            ? "border-action-primary border-4 translate-y-[-4px] shadow-shadow-lg"
             : "",
         )}
         aria-label={`Ver detalhes de ${photo.titulo || "foto"}`}
@@ -112,10 +112,10 @@ export default function PhotoCard({
         {/* Gradient Overlay */}
         <div
           className={cn(
-            "absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent",
-            isSelected ? "opacity-60 bg-primary/20" : "opacity-80",
+            "absolute inset-0 bg-linear-to-t from-surface-page/90 via-surface-page/40 to-transparent",
+            isSelected ? "opacity-60 bg-action-primary/20" : "opacity-80",
             variant === "centered-hover"
-              ? "opacity-0 group-hover:opacity-40 transition-opacity duration-300 bg-black"
+              ? "opacity-0 group-hover:opacity-40 transition-opacity duration-300 bg-surface-page"
               : "",
           )}
         />
@@ -127,7 +127,7 @@ export default function PhotoCard({
             <div className="absolute inset-0 hidden md:flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 scale-90 group-hover:scale-100">
               <Button
                 size="icon"
-                className="h-12 w-12 rounded-lg bg-white/10 backdrop-blur-md border border-[#480000]/20 hover:bg-white hover:text-black text-white transition-all duration-200 shadow-lg"
+                className="h-12 w-12 rounded-radius-lg bg-surface-subtle/50 backdrop-blur-md border border-action-primary/20 hover:bg-surface-page hover:text-text-primary text-text-primary transition-all duration-200 shadow-shadow-md"
                 onClick={handleOpenModal}
                 title="Ver detalhes"
               >
@@ -139,10 +139,10 @@ export default function PhotoCard({
                 <Button
                   size="icon"
                   className={cn(
-                    "h-12 w-12 rounded-lg backdrop-blur-md border transition-all duration-200 shadow-lg",
+                    "h-12 w-12 rounded-radius-lg backdrop-blur-md border transition-all duration-200 shadow-shadow-md",
                     isSelected
-                      ? "bg-[#480000] border-[#480000] text-white shadow-[#480000]/30 scale-105"
-                      : "bg-white/10 border-[#480000]/20 text-white hover:bg-white hover:text-black",
+                      ? "bg-action-primary border-action-primary text-text-on-brand shadow-action-primary/30 scale-105"
+                      : "bg-surface-subtle/50 border-action-primary/20 text-text-primary hover:bg-surface-page hover:text-text-primary",
                   )}
                   onClick={handleSelection}
                   title={
@@ -166,10 +166,10 @@ export default function PhotoCard({
                 <Button
                   size="icon"
                   className={cn(
-                    "h-11 w-11 rounded-full backdrop-blur-md border transition-all duration-200 shadow-md",
+                    "h-11 w-11 rounded-radius-full backdrop-blur-md border transition-all duration-200 shadow-shadow-sm",
                     isSelected
-                      ? "bg-[#480000] border-[#480000] text-white shadow-[#480000]/30"
-                      : "bg-white/20 border-[#480000]/20 text-white",
+                      ? "bg-action-primary border-action-primary text-text-on-brand shadow-action-primary/30"
+                      : "bg-surface-subtle/20 border-action-primary/20 text-text-primary",
                   )}
                   onClick={handleSelection}
                   title={
@@ -200,10 +200,10 @@ export default function PhotoCard({
             <button
               onClick={handleSelection}
               className={cn(
-                "h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-lg backdrop-blur-sm z-50",
+                "h-8 w-8 rounded-radius-full border-2 flex items-center justify-center transition-all duration-200 shadow-shadow-md backdrop-blur-sm z-50",
                 isSelected
-                  ? "bg-zinc-900 border-zinc-900 text-white scale-110 shadow-black/20"
-                  : "bg-black/50 border-white/50 text-white/80 hover:bg-black/80 hover:border-white hover:text-white hover:scale-105",
+                  ? "bg-surface-elevated border-surface-elevated text-text-primary scale-110 shadow-shadow-sm"
+                  : "bg-surface-page/50 border-border-default text-text-secondary hover:bg-surface-page/80 hover:border-text-primary hover:text-text-primary hover:scale-105",
               )}
               aria-label={isSelected ? "Desselecionar foto" : "Selecionar foto"}
               aria-pressed={isSelected}
@@ -219,7 +219,7 @@ export default function PhotoCard({
             {showQuickAdd && onAddToCart && (
               <Button
                 size="icon"
-                className="rounded-full h-10 w-10 bg-white/90 text-black hover:bg-neutral-900 hover:text-white shadow-lg backdrop-blur-sm transition-colors"
+                className="rounded-radius-full h-10 w-10 bg-surface-page/90 text-text-primary hover:bg-surface-elevated hover:text-text-primary shadow-shadow-md backdrop-blur-sm transition-colors"
                 onClick={handleQuickAdd}
                 title="Adicionar ao carrinho"
                 aria-label="Adicionar ao carrinho"

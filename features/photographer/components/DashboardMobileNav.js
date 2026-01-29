@@ -26,7 +26,7 @@ export default function DashboardMobileNav({ navItems }) {
   }, [pathname]);
 
   return (
-    <div className="lg:hidden w-full max-w-full bg-black/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+    <div className="lg:hidden w-full max-w-full bg-black/80 backdrop-blur-md border-b border-white/10 sticky top-16 z-50">
       <div className="overflow-x-auto no-scrollbar py-2">
         <nav
           ref={scrollRef}

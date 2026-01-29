@@ -52,10 +52,6 @@ export default function FolderManager({
   const [folderName, setFolderName] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchFolders();
-  }, [fetchFolders]);
-
   const fetchFolders = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -70,6 +66,10 @@ export default function FolderManager({
       setLoading(false);
     }
   }, [collectionId, currentFolder]);
+
+  useEffect(() => {
+    fetchFolders();
+  }, [fetchFolders]);
 
   const handleCreateFolder = async () => {
     if (!folderName.trim()) return;

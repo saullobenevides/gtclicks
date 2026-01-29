@@ -99,7 +99,18 @@ export async function POST(request) {
     }
 
     // Construct Base URL cleanly (remove trailing slash)
-    let baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // Priority: 1. Env Var (NEXT_PUBLIC_APP_URL) -> 2. Vercel URL (VERCEL_URL) -> 3. Localhost
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+    if (!baseUrl && process.env.VERCEL_URL) {
+      // Vercel URL usually comes without https://
+      baseUrl = `https://${process.env.VERCEL_URL}`;
+    }
+
+    if (!baseUrl) {
+      baseUrl = "http://localhost:3000";
+    }
+
     if (baseUrl.endsWith("/")) {
       baseUrl = baseUrl.slice(0, -1);
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,11 +20,7 @@ export default function CollectionsModeration() {
   const page = Number(searchParams.get("page")) || 1;
   const router = useRouter();
 
-  useEffect(() => {
-    fetchCollections();
-  }, [statusFilter, page]);
-
-  const fetchCollections = async () => {
+  const fetchCollections = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(
@@ -53,7 +49,11 @@ export default function CollectionsModeration() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, page]);
+
+  useEffect(() => {
+    fetchCollections();
+  }, [fetchCollections]);
 
   const toggleDescription = (collectionId) => {
     setExpandedDescriptions((prev) => ({
