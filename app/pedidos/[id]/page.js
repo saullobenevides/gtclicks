@@ -198,7 +198,7 @@ export default async function PedidoDetalhesPage(props) {
                 </div>
               </CardContent>
               <CardFooter className="bg-white/5 pt-6 flex flex-col gap-3">
-                {!isPaid && (
+                {pedido.status === "PENDENTE" && (
                   <RetryPaymentButton
                     orderId={pedido.id}
                     items={pedido.itens.map((item) => ({

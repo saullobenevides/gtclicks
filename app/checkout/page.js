@@ -1,125 +1,213 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@stackframe/stack";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/features/cart/context/CartContext";
-import { useCheckout } from "@/features/cart/hooks/useCheckout";
-import { Button } from "@/components/ui/button";
+import { useStackApp } from "@stackframe/stack";
+import PaymentBrick from "@/components/checkout/PaymentBrick";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import ImageWithFallback from "@/components/shared/ImageWithFallback";
+import { Loader2, ShieldCheck, Lock } from "lucide-react";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const user = useUser();
-  const { items, getTotalPrice, getItemPrice, getSavings } = useCart();
-  const { processCheckout, loading, error } = useCheckout();
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("orderId");
+
+  const { items: cartItems, getTotalPrice, clearCart } = useCart();
+  const app = useStackApp();
+  const [user, setUser] = useState(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+  // State for Order Retry Mode
+  const [orderItems, setOrderItems] = useState(null);
+  const [orderTotal, setOrderTotal] = useState(0);
+  const [loadingOrder, setLoadingOrder] = useState(!!orderId);
 
   useEffect(() => {
-    if (items.length === 0) {
-      router.push("/carrinho");
-    }
-  }, [items, router]);
+    // Check user authentication
+    const checkUser = async () => {
+      const currentUser = await app.getUser();
+      if (!currentUser) {
+        // Redirect to login if not authenticated
+        const currentPath = window.location.pathname;
+        const queryString = window.location.search;
+        router.push(`/handler/sign-in?redirect=${currentPath}${queryString}`);
+        return;
+      }
+      setUser(currentUser);
+      setIsLoadingUser(false);
+    };
+    checkUser();
+  }, [app, router]);
 
-  if (items.length === 0) {
-    return null; // Will redirect via useEffect
+  // Fetch Order if retrying
+  useEffect(() => {
+    if (orderId && user) {
+      fetch(`/api/pedidos/${orderId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.itens) {
+            const mappedItems = data.itens.map((item) => ({
+              fotoId: item.fotoId,
+              licencaId: item.licencaId,
+              titulo: item.foto?.titulo || "Foto",
+              previewUrl: item.foto?.previewUrl || "",
+              preco: Number(item.precoPago),
+              licenca: item.licenca?.nome || "Padrão",
+            }));
+            setOrderItems(mappedItems);
+            setOrderTotal(Number(data.total));
+          }
+        })
+        .catch((err) => console.error("Error loading order:", err))
+        .finally(() => setLoadingOrder(false));
+    }
+  }, [orderId, user]);
+
+  const handlePaymentResult = (result) => {
+    console.log("Payment Result:", result);
+
+    if (
+      result.status === "approved" ||
+      result.status === "PAGO" ||
+      result.status === "in_process"
+    ) {
+      // Success!
+      if (!orderId) {
+        clearCart(); // Only clear cart if this was a new purchase
+      }
+      router.push(
+        `/checkout/sucesso?orderId=${result.id || result.orderId || orderId || "pending"}&status=${result.status}`,
+      );
+    } else if (result.error) {
+      alert(
+        "Erro no pagamento: " + (result.error.message || "Tente novamente"),
+      );
+    }
+  };
+
+  if (isLoadingUser || !user || loadingOrder) {
+    return (
+      <div className="flex h-[60vh] w-full items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Determine items and total based on mode (Cart or Order Retry)
+  const displayItems = orderId ? orderItems : cartItems;
+  const displayTotal = orderId ? orderTotal : getTotalPrice();
+
+  if (!displayItems || displayItems.length === 0) {
+    router.push("/carrinho");
+    return null;
   }
 
   return (
-    <div className="container mx-auto py-16">
-      <div className="mb-12 text-center">
-        <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
-          Finalizar Compra
+    <div className="container-wide py-12 md:py-20">
+      <div className="mb-10 text-center">
+        <h1 className="heading-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2">
+          {orderId ? "Finalizar Pagamento" : "Finalizar Compra"}
         </h1>
-        <p className="text-lg text-muted-foreground">
-          Revise seu pedido e prossiga para o pagamento
+        <p className="text-muted-foreground flex items-center justify-center gap-2">
+          <Lock className="w-4 h-4" /> Ambiente Seguro
         </p>
       </div>
 
-      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-12 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Resumo do Pedido</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            {items.map((item) => (
-              <div
-                key={`${item.fotoId}-${item.licencaId}`}
-                className="flex items-center justify-between border-b pb-4"
-              >
-                <div>
-                  <h4 className="font-semibold">{item.titulo}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {item.licenca}
-                  </p>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-12">
+        {/* Left Column: Review Order */}
+        <div className="space-y-6">
+          <Card className="glass-panel border-white/10 bg-black/40">
+            <CardHeader>
+              <CardTitle className="text-xl text-white">
+                Itens do Pedido{" "}
+                {orderId && `#${orderId.slice(-8).toUpperCase()}`}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {displayItems.map((item) => (
+                <div
+                  key={`${item.fotoId}-${item.licencaId}`}
+                  className="flex gap-4 items-start"
+                >
+                  <div className="relative w-24 aspect-video rounded-md overflow-hidden bg-white/5 shrink-0">
+                    <ImageWithFallback
+                      src={item.previewUrl}
+                      alt={item.titulo}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <h4 className="font-bold text-white text-sm sm:text-base">
+                      {item.titulo}
+                    </h4>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <ShieldCheck className="h-3 w-3 text-primary" />
+                      <span>
+                        {typeof item.licenca === "object"
+                          ? item.licenca.nome
+                          : item.licenca}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-bold text-white text-sm sm:text-base">
+                      R$ {(item.preco || 0).toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-                <div className="font-medium">
-                  R$ {Number(getItemPrice(item)).toFixed(2)}
-                </div>
-              </div>
-            ))}
-          </CardContent>
-          <CardFooter className="text-xl font-bold">
-            <div className="flex w-full justify-between">
-              <span>Total</span>
-              <span>R$ {getTotalPrice().toFixed(2)}</span>
-            </div>
-            {getSavings() > 0 && (
-              <div className="flex w-full justify-between text-sm font-medium text-green-600 mt-2">
-                <span>Economia aplicada</span>
-                <span>- R$ {getSavings().toFixed(2)}</span>
-              </div>
-            )}
-          </CardFooter>
-        </Card>
+              ))}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Pagamento</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-6 text-muted-foreground">
-              Você será redirecionado para o Mercado Pago para completar o
-              pagamento de forma segura. Aceitamos cartão de crédito, débito e
-              PIX.
+              <Separator className="bg-white/10 my-4" />
+
+              <div className="flex justify-between items-center text-lg font-bold text-white">
+                <span>Total a Pagar</span>
+                <span>R$ {displayTotal.toFixed(2)}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="hidden lg:block bg-primary/5 border border-primary/20 rounded-xl p-6">
+            <h3 className="text-green-400 font-bold mb-2 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5" /> Garantia GTClicks
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Ao finalizar a compra, você receberá acesso imediato aos arquivos
+              em alta resolução. Todas as transações são criptografadas e
+              processadas de forma segura.
             </p>
+          </div>
+        </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Erro no Checkout</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-          <CardFooter className="flex flex-col items-stretch">
-            <Button
-              onClick={processCheckout}
-              disabled={loading || !user}
-              size="lg"
-            >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? "Processando..." : "Ir para Pagamento"}
-            </Button>
-
-            {!user && (
-              <p className="mt-4 text-center text-sm text-muted-foreground">
-                <a href="/login?redirect=/checkout" className="underline">
-                  Faça login
-                </a>{" "}
-                para finalizar a compra.
-              </p>
-            )}
-          </CardFooter>
-        </Card>
+        {/* Right Column: Payment Brick */}
+        <div className="relative">
+          <Card className="glass-panel border-white/10 bg-black/40 sticky top-24">
+            <CardHeader>
+              <CardTitle className="text-xl text-white">Pagamento</CardTitle>
+              <CardDescription>
+                Escolha sua forma de pagamento preferida
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="min-h-[400px]">
+                <PaymentBrick
+                  amount={displayTotal}
+                  onPaymentResult={handlePaymentResult}
+                  orderId={orderId}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

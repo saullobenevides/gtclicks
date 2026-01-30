@@ -30,6 +30,7 @@ model User {
   suspendedAt   DateTime?
   suspendedBy   String?
   adminNotes    String?
+  mercadopagoCustomerId String? @unique
   
   fotografo     Fotografo?
   pedidos       Pedido[]

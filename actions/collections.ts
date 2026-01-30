@@ -26,8 +26,14 @@ const updateCollectionSchema = z.object({
   precoFoto: z.number().min(0).optional(),
   status: z.enum(["RASCUNHO", "PUBLICADA"]).optional(),
   capaUrl: z.string().optional(),
-  dataInicio: z.coerce.date().optional(),
-  dataFim: z.coerce.date().optional(),
+  dataInicio: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.coerce.date().optional(),
+  ),
+  dataFim: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.coerce.date().optional(),
+  ),
   cidade: z.string().optional(),
   estado: z.string().optional(),
   local: z.string().optional(),
