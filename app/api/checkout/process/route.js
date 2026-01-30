@@ -4,8 +4,15 @@ import { getAuthenticatedUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 // Initialize Mercado Pago client
+const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+if (!accessToken) {
+  console.error(
+    "CRITICAL: MERCADOPAGO_ACCESS_TOKEN is missing in environment variables.",
+  );
+}
+
 const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
+  accessToken: accessToken || "TEST-00000000-0000-0000-0000-000000000000", // Preventing crash, but WILL fail payment
 });
 
 /**

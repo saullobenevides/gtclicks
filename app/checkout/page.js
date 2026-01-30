@@ -15,6 +15,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { Loader2, ShieldCheck, Lock } from "lucide-react";
+import { toast } from "sonner";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -73,24 +74,28 @@ export default function CheckoutPage() {
   }, [orderId, user]);
 
   const handlePaymentResult = (result) => {
-    console.log("Payment Result:", result);
+    console.log("Payment Result Full:", result);
 
     if (
       result.status === "approved" ||
       result.status === "PAGO" ||
-      result.status === "in_process"
+      result.status === "in_process" ||
+      result.status === "pending"
     ) {
-      // Success!
       if (!orderId) {
-        clearCart(); // Only clear cart if this was a new purchase
+        clearCart();
       }
       router.push(
         `/checkout/sucesso?orderId=${result.id || result.orderId || orderId || "pending"}&status=${result.status}`,
       );
-    } else if (result.error) {
-      alert(
-        "Erro no pagamento: " + (result.error.message || "Tente novamente"),
-      );
+    } else {
+      // Handle explicit errors or unknown states
+      const errorMessage =
+        result.error?.message || "Ocorreu um erro ao processar o pagamento.";
+      console.error("Payment Failed:", result);
+      toast.error("Erro no Pagamento", {
+        description: errorMessage + " Verifique os dados e tente novamente.",
+      });
     }
   };
 
