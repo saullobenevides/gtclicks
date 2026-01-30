@@ -39,9 +39,10 @@ export default function CollectionCard({
     0;
 
   // Format info
-  const date = collection.createdAt
-    ? formatDateShort(collection.createdAt)
-    : null;
+  const date =
+    collection.dataInicio || collection.createdAt
+      ? formatDateShort(collection.dataInicio || collection.createdAt)
+      : null;
 
   const isFeatured = variant === "featured";
   const isCompact = variant === "compact";

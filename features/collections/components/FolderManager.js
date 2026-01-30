@@ -228,6 +228,7 @@ export default function FolderManager({
               value={folderName}
               onChange={(e) => setFolderName(e.target.value)}
               placeholder="Nome da pasta"
+              className="h-11 bg-transparent border-2 border-border-default rounded-radius-lg"
               onKeyDown={(e) =>
                 e.key === "Enter" &&
                 (editingFolder ? handleUpdateFolder() : handleCreateFolder())

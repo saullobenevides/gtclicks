@@ -9,13 +9,20 @@ jest.mock("@/lib/auth", () => ({
 }));
 
 jest.mock("@/lib/prisma", () => ({
-  fotografo: {
-    findUnique: jest.fn(),
-  },
-  foto: {
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
+  __esModule: true,
+  default: {
+    fotografo: {
+      findUnique: jest.fn(),
+    },
+    foto: {
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      findFirst: jest.fn(),
+    },
+    colecao: {
+      findUnique: jest.fn(),
+    },
   },
 }));
 
@@ -33,8 +40,14 @@ describe("POST /api/photos/process", () => {
   });
 
   it("should rollback creation if processing fails", async () => {
-    getAuthenticatedUser.mockResolvedValue({ id: "user-1" });
+    const validCuid = "cl0p123456789012345678901";
+    const validColId = "cl0p987654321098765432109";
+    getAuthenticatedUser.mockResolvedValue({ id: validCuid });
     prisma.fotografo.findUnique.mockResolvedValue({ id: "photographer-1" });
+    prisma.colecao.findUnique.mockResolvedValue({
+      id: validColId,
+      nome: "Test Col",
+    });
 
     prisma.foto.create.mockResolvedValue({ id: "photo-1", status: "PENDENTE" });
     prisma.foto.delete.mockResolvedValue({ id: "photo-1" });
@@ -45,7 +58,7 @@ describe("POST /api/photos/process", () => {
       method: "POST",
       body: JSON.stringify({
         s3Key: "uploads/test.jpg",
-        colecaoId: "col-1",
+        colecaoId: validColId,
         width: 100,
         height: 100,
       }),
@@ -62,8 +75,14 @@ describe("POST /api/photos/process", () => {
   });
 
   it("should complete successfully if processing works", async () => {
-    getAuthenticatedUser.mockResolvedValue({ id: "user-1" });
+    const validCuid = "cl0p123456789012345678901";
+    const validColId = "cl0p987654321098765432109";
+    getAuthenticatedUser.mockResolvedValue({ id: validCuid });
     prisma.fotografo.findUnique.mockResolvedValue({ id: "photographer-1" });
+    prisma.colecao.findUnique.mockResolvedValue({
+      id: validColId,
+      nome: "Test Col",
+    });
     prisma.foto.create.mockResolvedValue({ id: "photo-1", status: "PENDENTE" });
     processUploadedImage.mockResolvedValue({
       previewUrl: "http://cdn/preview.jpg",
@@ -78,7 +97,7 @@ describe("POST /api/photos/process", () => {
       method: "POST",
       body: JSON.stringify({
         s3Key: "uploads/test.jpg",
-        colecaoId: "col-1",
+        colecaoId: validColId,
         width: 100,
         height: 100,
       }),
@@ -93,6 +112,8 @@ describe("POST /api/photos/process", () => {
       data: {
         status: "PUBLICADA",
         previewUrl: "http://cdn/preview.jpg",
+        titulo: "Test Col IMG_0001",
+        dataCaptura: undefined,
       },
       include: {
         colecao: {

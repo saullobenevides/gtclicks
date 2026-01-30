@@ -2,6 +2,7 @@ import { getHomepageData } from "@/lib/data/marketplace";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturedCollections from "@/components/home/FeaturedCollections";
 import PhotographerSpotlight from "@/components/home/PhotographerSpotlight";
+import BuyerRanking from "@/components/home/BuyerRanking";
 import dynamic from "next/dynamic";
 
 const FAQSection = dynamic(() => import("@/components/home/FAQSection"));
@@ -14,6 +15,7 @@ export default async function Home() {
     featuredCollections = [],
     recentCollections = [],
     photographers = [],
+    topBuyers = [],
   } = await getHomepageData();
 
   return (
@@ -27,6 +29,8 @@ export default async function Home() {
       />
 
       <PhotographerSpotlight photographers={photographers} />
+
+      <BuyerRanking buyers={topBuyers} />
 
       <FeaturedCollections
         collections={recentCollections}

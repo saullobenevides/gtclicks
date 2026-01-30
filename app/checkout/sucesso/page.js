@@ -10,9 +10,15 @@ import {
   ArrowRight,
   Clock,
   AlertCircle,
+  Copy,
+  QrCode,
+  FileText,
 } from "lucide-react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
+import { getPaymentDetails } from "@/actions/checkout";
+import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
@@ -25,7 +31,10 @@ export default function CheckoutSuccessPage() {
     status === "in_process" || status === "pending" || status === "PENDENTE";
 
   const [showConfetti, setShowConfetti] = useState(isApproved);
-  const { width, height } = useWindowSize();
+  const { width, height } = useWindowSize(); // Hooks should be at top level
+  const [pixData, setPixData] = useState(null);
+  const [boletoData, setBoletoData] = useState(null);
+  const [loadingPayment, setLoadingPayment] = useState(isPending && !!orderId);
 
   useEffect(() => {
     if (isApproved) {
@@ -33,6 +42,28 @@ export default function CheckoutSuccessPage() {
       return () => clearTimeout(timer);
     }
   }, [isApproved]);
+
+  // Fetch Pix/Boleto Data if pending
+  useEffect(() => {
+    if (isPending && orderId) {
+      getPaymentDetails(orderId)
+        .then((res) => {
+          if (res.success) {
+            if (res.pix) setPixData(res.pix);
+            if (res.boleto) setBoletoData(res.boleto);
+          }
+        })
+        .catch((err) => console.error("Error loading payment details:", err))
+        .finally(() => setLoadingPayment(false));
+    }
+  }, [isPending, orderId]);
+
+  const copyToClipboard = () => {
+    if (pixData?.qrCode) {
+      navigator.clipboard.writeText(pixData.qrCode);
+      toast.success("Código Pix copiado!");
+    }
+  };
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center container-wide text-center py-20 relative overflow-hidden">
@@ -45,7 +76,7 @@ export default function CheckoutSuccessPage() {
         />
       )}
 
-      <div className="z-10 animate-fade-in-up">
+      <div className="z-10 animate-fade-in-up w-full max-w-2xl mx-auto">
         {/* Status Icon */}
         <div
           className={`mb-6 flex h-24 w-24 items-center justify-center rounded-full mx-auto ${
@@ -77,9 +108,117 @@ export default function CheckoutSuccessPage() {
           {isApproved
             ? "Sua compra foi processada com sucesso. Você já pode baixar suas fotos em alta resolução."
             : isPending
-              ? "Estamos aguardando a confirmação do pagamento. Assim que aprovado, enviaremos um e-mail com o link para download."
+              ? "Estamos aguardando a confirmação do pagamento. Finalize o Pix abaixo para liberar seus downloads."
               : "Houve um problema com a confirmação. Verifique seus pedidos ou tente novamente."}
         </p>
+
+        {/* PIX DISPLAY SECTION */}
+        {isPending && pixData && (
+          <Card className="glass-panel border-yellow-500/20 bg-yellow-500/5 mb-8 overflow-hidden">
+            <CardContent className="p-6 sm:p-8">
+              <div className="flex flex-col items-center gap-6">
+                <div className="flex items-center gap-2 text-yellow-400 font-bold text-lg">
+                  <QrCode className="w-6 h-6" />
+                  Escaneie para pagar
+                </div>
+
+                {/* QR Code Image */}
+                <div className="bg-white p-4 rounded-xl">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`data:image/png;base64,${pixData.qrCodeBase64}`}
+                    alt="QR Code Pix"
+                    className="w-48 h-48 sm:w-64 sm:h-64 object-contain"
+                  />
+                </div>
+
+                <div className="w-full max-w-md space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Ou copie e cole o código abaixo:
+                  </p>
+                  <div className="flex gap-2">
+                    <code className="flex-1 bg-black/40 border border-white/10 rounded-lg p-3 text-xs sm:text-sm text-white/70 overflow-hidden text-nowrap text-ellipsis font-mono">
+                      {pixData.qrCode}
+                    </code>
+                    <Button
+                      onClick={copyToClipboard}
+                      variant="secondary"
+                      size="icon"
+                      className="shrink-0"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="text-xs text-yellow-500/70">
+                  ⚠️ O pagamento pode levar alguns segundos para ser confirmado
+                  automaticamente.
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* BOLETO DISPLAY SECTION */}
+        {isPending && boletoData && (
+          <Card className="glass-panel border-white/10 bg-white/5 mb-8">
+            <CardContent className="p-6 sm:p-8">
+              <div className="flex flex-col items-center gap-6">
+                <div className="flex items-center gap-2 text-white font-bold text-lg">
+                  <FileText className="w-6 h-6" />
+                  Boleto Bancário Gerado
+                </div>
+
+                <p className="text-muted-foreground max-w-md">
+                  Seu boleto foi gerado com sucesso. Clique abaixo para
+                  visualizar e imprimir, ou copie o código de barras.
+                </p>
+
+                <div className="flex flex-col gap-3 w-full max-w-sm">
+                  {boletoData.ticketUrl && (
+                    <Button
+                      asChild
+                      className="w-full bg-white text-black hover:bg-white/90"
+                    >
+                      <a
+                        href={boletoData.ticketUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Baixar / Visualizar Boleto
+                      </a>
+                    </Button>
+                  )}
+
+                  {boletoData.barcode && (
+                    <div className="flex gap-2">
+                      <code className="flex-1 bg-black/40 border border-white/10 rounded-lg p-3 text-xs text-white/70 overflow-hidden text-nowrap text-ellipsis font-mono flex items-center">
+                        {boletoData.barcode}
+                      </code>
+                      <Button
+                        onClick={() => {
+                          navigator.clipboard.writeText(boletoData.barcode);
+                          toast.success("Código de barras copiado!");
+                        }}
+                        variant="secondary"
+                        size="icon"
+                        className="shrink-0"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-xs text-white/50 bg-white/5 p-3 rounded-md border border-white/5">
+                  ⏳ A compensação de boletos pode levar de 1 a 3 dias úteis.
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -89,7 +228,7 @@ export default function CheckoutSuccessPage() {
               size="lg"
               className="bg-primary hover:bg-primary/90 text-white w-full sm:w-auto"
             >
-              <Link href={orderId ? `/meus-pedidos` : "/meus-downloads"}>
+              <Link href={orderId ? `/pedidos/${orderId}` : "/meus-downloads"}>
                 <Download className="mr-2 h-5 w-5" />
                 Baixar Fotos
               </Link>
@@ -102,7 +241,7 @@ export default function CheckoutSuccessPage() {
               size="lg"
               className="bg-primary hover:bg-primary/90 text-white w-full sm:w-auto"
             >
-              <Link href="/meus-pedidos">
+              <Link href="/pedidos">
                 <Clock className="mr-2 h-5 w-5" />
                 Acompanhar Pedido
               </Link>

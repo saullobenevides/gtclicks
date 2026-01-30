@@ -146,7 +146,7 @@ export default function SearchFilters({ filters }) {
           <CardFooter className="p-0 mt-4">
             <Button
               type="submit"
-              className="w-full bg-black border-2 border-destructive text-white font-bold h-10 text-sm rounded-xl hover:bg-destructive hover:text-white transition-all duration-300"
+              className="w-full h-12 font-black uppercase tracking-widest text-xs scale-100 hover:scale-[1.02] transition-all"
             >
               Aplicar Filtros
             </Button>

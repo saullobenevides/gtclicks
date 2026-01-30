@@ -35,21 +35,24 @@ export default function PricingTab({
           >
             Preço Unitário da Foto
           </Label>
-          <div className="relative max-w-[200px] w-full">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xl">
-              R$
-            </span>
-            <Input
-              id="price-base"
-              type="number"
-              className="pl-12 h-14 text-2xl font-bold text-center bg-background border-primary/30 focus-visible:ring-primary shadow-sm"
-              value={collectionData.precoFoto}
-              onChange={(e) => onDataChange("precoFoto", e.target.value)}
-            />
+          <div className="space-y-1.5 max-w-xs">
+            <Label htmlFor="price">Preço por Foto (R$)</Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold z-10">
+                R$
+              </span>
+              <Input
+                id="price-base"
+                type="number"
+                className="pl-12 h-14 text-2xl font-bold text-center bg-background border-2 border-primary/30 focus-visible:ring-primary shadow-sm rounded-radius-lg"
+                value={collectionData.precoFoto}
+                onChange={(e) => onDataChange("precoFoto", e.target.value)}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Valor unitário padrão para cada foto.
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Este é o valor padrão para uma única foto.
-          </p>
         </div>
 
         <div className="border-t pt-6">
@@ -102,47 +105,34 @@ export default function PricingTab({
                   <Trash2 className="h-4 w-4" />
                 </Button>
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 sm:gap-4 mt-6 sm:mt-0">
-                  <div className="space-y-2 flex-1 w-full min-w-0">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
                     <Label className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                      Qtd Mínima
+                      Qtd. Mínima
                     </Label>
-                    <div className="flex items-center gap-3">
-                      <Input
-                        type="number"
-                        className="h-12 font-black text-lg w-full min-w-0 bg-black/40 border-white/10 rounded-none"
-                        value={discount.min}
-                        onChange={(e) =>
-                          updateDiscount(index, "min", e.target.value)
-                        }
-                      />
-                      <span className="text-xs font-bold uppercase tracking-widest shrink-0">
-                        fotos
-                      </span>
-                    </div>
+                    <Input
+                      type="number"
+                      className="h-11 bg-transparent border-2 border-border-default rounded-radius-lg"
+                      value={discount.min}
+                      onChange={(e) =>
+                        updateDiscount(index, "min", e.target.value)
+                      }
+                      min="2"
+                    />
                   </div>
-
-                  <div className="hidden sm:flex items-center justify-center p-2 mt-6">
-                    <ArrowLeft className="h-4 w-4 text-muted-foreground/40 rotate-180" />
-                  </div>
-
-                  <div className="space-y-2 flex-1 w-full">
-                    <Label className="text-[10px] font-bold text-primary uppercase tracking-widest">
-                      Novo Preço Unit.
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+                      Preço Individual (R$)
                     </Label>
-                    <div className="relative w-full min-w-0">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-muted-foreground">
-                        R$
-                      </span>
-                      <Input
-                        type="number"
-                        className="h-12 pl-10 font-black text-lg text-primary bg-black/40 border-primary/20 focus-visible:ring-primary rounded-none w-full min-w-0 text-right"
-                        value={discount.price}
-                        onChange={(e) =>
-                          updateDiscount(index, "price", e.target.value)
-                        }
-                      />
-                    </div>
+                    <Input
+                      type="number"
+                      className="h-11 bg-transparent border-2 border-border-default rounded-radius-lg"
+                      value={discount.price}
+                      step="0.50"
+                      onChange={(e) =>
+                        updateDiscount(index, "price", e.target.value)
+                      }
+                    />
                   </div>
                 </div>
                 <div className="text-[10px] font-bold uppercase tracking-widest text-center bg-black/40 py-2 border border-white/5">

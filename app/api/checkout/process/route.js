@@ -73,7 +73,12 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { formData, orderId } = body; // Recieve orderId if retry
+    const { formData, orderId } = body;
+    // Fetch fresh user data to check for customer ID and photographer profile
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: { fotografo: true },
+    });
 
     let total;
     let itemsForPayment;
@@ -104,7 +109,18 @@ export async function POST(request) {
       // --- NEW CHECKOUT FLOW (CART) ---
       const cart = await prisma.carrinho.findUnique({
         where: { userId: user.id },
-        include: { itens: { include: { foto: true, licenca: true } } },
+        include: {
+          itens: {
+            include: {
+              foto: {
+                include: {
+                  colecao: true, // Needed for discounts
+                },
+              },
+              licenca: true,
+            },
+          },
+        },
       });
 
       if (!cart || cart.itens.length === 0) {
@@ -112,35 +128,107 @@ export async function POST(request) {
       }
 
       itemsForPayment = cart.itens;
-      total = cart.itens.reduce((sum, item) => {
-        const price = item.licencaId ? Number(item.licenca.preco) : 10;
-        return sum + price;
+
+      // Duplicate Logic from CartContext to ensure Backend Safety & Consistency
+      const calculateItemPrice = (item, allItems) => {
+        // 1. If License is selected, use License Price (Standard Override)
+        if (item.licencaId && item.licenca) {
+          return Number(item.licenca.preco);
+        }
+
+        // 2. If no Collection or Discounts, use Base Price (default 10 if missing)
+        // Note: item.foto.colecao.precoFoto is the base price in DB
+        const basePrice = item.foto.colecao?.precoFoto
+          ? Number(item.foto.colecao.precoFoto)
+          : 10;
+
+        if (
+          !item.foto.colecaoId ||
+          !item.foto.colecao?.descontos ||
+          !Array.isArray(item.foto.colecao.descontos) ||
+          item.foto.colecao.descontos.length === 0
+        ) {
+          return basePrice;
+        }
+
+        // 3. Progressive Discount Logic
+        // Count items from the SAME collection in the cart
+        const collectionItemsCount = allItems.filter(
+          (i) => i.foto.colecaoId === item.foto.colecaoId,
+        ).length;
+
+        const discounts = item.foto.colecao.descontos;
+
+        // Find applicable discount (highest min that fits count)
+        const applicableDiscounts = discounts
+          .filter((d) => collectionItemsCount >= d.min)
+          .sort((a, b) => b.min - a.min); // Descending order
+
+        if (applicableDiscounts.length > 0) {
+          return Number(applicableDiscounts[0].price);
+        }
+
+        return basePrice;
+      };
+
+      // Calculate Total
+      total = itemsForPayment.reduce((sum, item) => {
+        return sum + calculateItemPrice(item, itemsForPayment);
       }, 0);
+
+      // Attach calculated price to items for later use in creating Order Items
+      itemsForPayment = itemsForPayment.map((item) => ({
+        ...item,
+        finalPrice: calculateItemPrice(item, itemsForPayment),
+      }));
+    }
+
+    // 0. Prepare Order Data
+    let finalOrderId = orderId;
+    let orderToUpdate = null;
+
+    if (orderId) {
+      // Retry - Order already exists
+      // ... existing validation checks are fine above
+    } else {
+      // New Order - Create it NOW as PENDING to get an ID
+      const newOrder = await prisma.pedido.create({
+        data: {
+          userId: user.id,
+          total: total,
+          status: "PENDENTE",
+          itens: {
+            create: itemsForPayment.map((item) => ({
+              fotoId: item.fotoId,
+              licencaId: item.licencaId,
+              precoPago: item.finalPrice, // Uses the correctly calculated price with discounts
+            })),
+          },
+        },
+      });
+      finalOrderId = newOrder.id;
     }
 
     // 1. Get or Create Customer for Saved Cards
-    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
-    const customerId = await getOrCreateCustomer(dbUser); // Pass fresh user data
+    const customerId = await getOrCreateCustomer(dbUser);
 
     // 2. Create Payment in Mercado Pago
     const payment = new Payment(client);
 
-    // items validation for Brick... actually brick sends total amount in formData
-
     const paymentData = {
       ...formData,
-      description: `GTClicks Purchase${orderId ? ` Retry #${orderId.slice(-8)}` : ""}`,
+      description: `GTClicks # ${finalOrderId.slice(-8)}`,
       payer: {
         ...formData.payer,
         email: user.email,
         ...(customerId && { id: customerId }),
-        // If we want to save card, we must force type 'customer' if id is present?
-        // SDK usually handles it if we pass 'id'.
       },
       metadata: {
         user_id: user.id,
-        order_id: orderId || null, // Track orderId in metadata
+        order_id: finalOrderId,
       },
+      external_reference: finalOrderId, // CRITICAL FOR WEBHOOK
+      notification_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://gtclicks.com.br"}/api/webhooks/mercadopago`,
     };
 
     console.log("Creating payment:", JSON.stringify(paymentData, null, 2));
@@ -150,40 +238,17 @@ export async function POST(request) {
 
     console.log(`Payment created: ${paymentId} (${status})`);
 
-    let finalOrderId = orderId;
-
     if (paymentId) {
       const statusEnum = status === "approved" ? "PAGO" : "PENDENTE";
 
-      if (orderId) {
-        // Update Existing Order
-        await prisma.pedido.update({
-          where: { id: orderId },
-          data: {
-            status: statusEnum,
-            paymentId: paymentId.toString(),
-            // Optionally update total/items if they changed (unlikely for retry)
-          },
-        });
-      } else {
-        // Create New Order
-        const newOrder = await prisma.pedido.create({
-          data: {
-            userId: user.id,
-            total: total,
-            status: statusEnum,
-            paymentId: paymentId.toString(),
-            itens: {
-              create: itemsForPayment.map((item) => ({
-                fotoId: item.fotoId,
-                licencaId: item.licencaId,
-                precoPago: item.licencaId ? item.licenca.preco : 0,
-              })),
-            },
-          },
-        });
-        finalOrderId = newOrder.id;
-      }
+      // Update the Order (Created or Existing) with PaymentId
+      await prisma.pedido.update({
+        where: { id: finalOrderId },
+        data: {
+          status: statusEnum,
+          paymentId: paymentId.toString(),
+        },
+      });
 
       return NextResponse.json({
         id: paymentId,
@@ -192,11 +257,6 @@ export async function POST(request) {
         orderId: finalOrderId,
       });
     }
-
-    return NextResponse.json(
-      { error: "Payment creation failed" },
-      { status: 500 },
-    );
   } catch (error) {
     console.error("Checkout Error:", error);
     return NextResponse.json(

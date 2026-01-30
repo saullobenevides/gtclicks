@@ -4,9 +4,9 @@ export const siteConfig = {
     "Marketplace multi-fotógrafo para vender coleções exclusivas e licenças com entrega segura.",
   navItems: [
     { href: "/busca", label: "Explorar" },
-    { href: "/cadastro", label: "Venda suas Fotos" },
+    { href: "/categorias", label: "Categorias" },
+    { href: "/fotografos", label: "Fotógrafos" },
     { href: "/como-funciona", label: "Como Funciona" },
-    { href: "/faq", label: "Dúvidas" },
   ],
   footerParams: {
     platform: [

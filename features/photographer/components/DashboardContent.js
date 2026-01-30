@@ -98,7 +98,7 @@ export default function DashboardContent() {
       {/* Header & Main Action */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl">
+          <h1 className="heading-display font-display text-2xl md:text-3xl font-black text-white sm:text-4xl">
             Visão Geral
           </h1>
           <p className="text-muted-foreground">

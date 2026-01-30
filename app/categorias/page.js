@@ -145,6 +145,7 @@ export default function CategoriesPage() {
   return (
     <PageSection variant="default" containerWide>
       <SectionHeader
+        isLanding
         badge="Categorias"
         title="Explore por temas"
         description="Navegue por nossas categorias selecionadas e encontre exatamente o que você procura para o seu projeto."

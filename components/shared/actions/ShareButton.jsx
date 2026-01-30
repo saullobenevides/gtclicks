@@ -88,33 +88,33 @@ export default function ShareButton({
           </Button>
         </DialogTrigger>
         <DialogContent
-          className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white z-150"
+          className="sm:max-w-md bg-surface-elevated border-border-default text-text-primary z-150 shadow-shadow-lg backdrop-blur-xl"
           overlayClassName="z-[149]"
         >
           <DialogHeader>
             <DialogTitle>Compartilhar Coleção</DialogTitle>
-            <DialogDescription className="text-zinc-400">
+            <DialogDescription className="text-text-muted">
               Escaneie o QR Code ou escolha uma opção abaixo.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-6 gap-6">
-            <div className="bg-white p-4 rounded-xl">
+            <div className="bg-white p-4 rounded-radius-lg">
               <QRCodeSVG value={finalUrl} size={200} />
             </div>
 
             <div className="grid grid-cols-2 gap-4 w-full">
               <Button
                 onClick={shareToWhatsApp}
-                variant="outline"
-                className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800 gap-2"
+                variant="secondary"
+                className="gap-2 h-11"
               >
                 <MessageCircle className="h-4 w-4 text-green-500" />
                 WhatsApp
               </Button>
               <Button
                 onClick={copyToClipboard}
-                variant="outline"
-                className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800 gap-2"
+                variant="secondary"
+                className="gap-2 h-11"
               >
                 {copied ? (
                   <Check className="h-4 w-4 text-green-500" />

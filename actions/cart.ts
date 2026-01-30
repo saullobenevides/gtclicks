@@ -182,7 +182,12 @@ export async function getCartItems() {
             foto: {
               include: {
                 colecao: {
-                  select: { precoFoto: true, nome: true, slug: true },
+                  select: {
+                    precoFoto: true,
+                    nome: true,
+                    slug: true,
+                    descontos: true, // Needed for frontend price calculation
+                  },
                 },
               },
             },

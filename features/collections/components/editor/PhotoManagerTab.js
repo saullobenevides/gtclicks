@@ -65,7 +65,7 @@ export default function PhotoManagerTab({
                     variant="outline"
                     size="sm"
                     onClick={onDeleteAllInFolder}
-                    className="flex-1 sm:flex-none text-red-500 hover:text-red-400 hover:bg-red-500/5 border-red-500/20 rounded-none h-10 uppercase tracking-widest text-[10px]"
+                    className="flex-1 sm:flex-none text-red-500 hover:text-red-400 hover:bg-red-500/5 border-2 border-red-500/20 rounded-radius-lg h-11 uppercase tracking-widest text-[10px]"
                   >
                     <Trash2 className="mr-2 h-3 w-3" /> Limpar Pasta
                   </Button>
@@ -74,7 +74,7 @@ export default function PhotoManagerTab({
             </div>
 
             {/* Bulk Upload Area - Radical Polish */}
-            <div className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-none p-4 md:p-6 transition-all duration-300 text-center cursor-pointer relative h-32 sm:h-40 flex flex-col items-center justify-center w-full max-w-full min-w-0 group overflow-hidden">
+            <div className="border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-radius-lg p-4 md:p-6 transition-all duration-300 text-center cursor-pointer relative h-32 sm:h-40 flex flex-col items-center justify-center w-full max-w-full min-w-0 group overflow-hidden">
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               <input
                 type="file"
@@ -84,7 +84,7 @@ export default function PhotoManagerTab({
                 onChange={onBulkUpload}
               />
               <div className="flex flex-col items-center gap-2 w-full max-w-full overflow-hidden relative z-0">
-                <div className="h-10 w-10 md:h-12 md:w-12 rounded-none bg-primary flex items-center justify-center mb-1 md:mb-2 group-hover:scale-110 transition-transform">
+                <div className="h-10 w-10 md:h-11 md:w-11 rounded-radius-lg bg-primary flex items-center justify-center mb-1 md:mb-2 group-hover:scale-110 transition-transform">
                   <UploadCloud className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
                 <h4 className="font-black text-xs sm:text-lg uppercase tracking-widest text-white">

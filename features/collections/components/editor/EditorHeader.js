@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Save, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function EditorHeader({ submitting, onSave }) {
+export default function EditorHeader({ submitting, onSave, isDirty, title }) {
   const router = useRouter();
 
   return (
     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 min-w-0">
       <h1 className="heading-display font-display font-black text-2xl md:text-4xl text-white tracking-tight px-1 wrap-break-word w-full">
-        Editar Coleção
+        {title || "Editar Coleção"}
       </h1>
       <div className="hidden md:flex flex-row gap-2 w-auto mt-0 px-1">
         <Button
@@ -24,7 +24,7 @@ export default function EditorHeader({ submitting, onSave }) {
         <Button
           type="button"
           onClick={onSave}
-          disabled={submitting}
+          disabled={submitting || !isDirty}
           className="w-auto bg-primary hover:bg-primary/90"
         >
           {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

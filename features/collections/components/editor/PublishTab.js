@@ -44,19 +44,22 @@ export default function PublishTab({
       </CardHeader>
       <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-          <Label className="font-medium">Status Atual:</Label>
-          <Select
-            value={collectionData.status}
-            onValueChange={(value) => onDataChange("status", value)}
-          >
-            <SelectTrigger className="w-full sm:w-[180px] min-w-0">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="RASCUNHO">Rascunho (Privado)</SelectItem>
-              <SelectItem value="PUBLICADA">Publicada (Visível)</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="space-y-1.5 w-full md:w-1/2">
+            <Label>Status da Coleção</Label>
+            <Select
+              value={collectionData.status}
+              onValueChange={(value) => onDataChange("status", value)}
+            >
+              <SelectTrigger className="h-11 bg-transparent border-2 border-border-default rounded-radius-lg">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="RASCUNHO">Rascunho (Oculta)</SelectItem>
+                <SelectItem value="PUBLICADA">Publicada (Visível)</SelectItem>
+                <SelectItem value="PRIVADA">Privada (Exclusiva)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {initialCollection.slug && (
@@ -66,7 +69,7 @@ export default function PublishTab({
               <Input
                 readOnly
                 value={getPublicUrl()}
-                className="font-mono text-sm flex-1 min-w-0 w-full"
+                className="font-mono text-sm flex-1 min-w-0 w-full h-11 bg-surface-subtle/50 border-2 border-border-default rounded-radius-lg"
               />
               <Button
                 size="icon"

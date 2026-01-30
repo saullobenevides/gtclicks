@@ -37,7 +37,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
             <Label htmlFor="collection-name">Título da Coleção</Label>
             <Input
               id="collection-name"
-              className="w-full min-w-0"
+              className="w-full min-w-0 h-11 bg-transparent border-2 border-border-default rounded-radius-lg"
               value={collectionData.nome}
               onChange={(e) => onDataChange("nome", e.target.value)}
               placeholder="Adicione um título para a coleção"
@@ -51,7 +51,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
             >
               <SelectTrigger
                 id="collection-category"
-                className="w-full min-w-0"
+                className="w-full min-w-0 h-11 bg-transparent border-2 border-border-default rounded-radius-lg"
               >
                 <SelectValue placeholder="Selecione..." />
               </SelectTrigger>
@@ -73,7 +73,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
             value={collectionData.descricao}
             onChange={(e) => onDataChange("descricao", e.target.value)}
             placeholder="Conte mais sobre como foi o evento..."
-            className="h-24 w-full min-w-0"
+            className="h-24 w-full min-w-0 bg-transparent border-2 border-border-default rounded-radius-lg"
           />
         </div>
 
@@ -82,7 +82,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
             <Label htmlFor="collection-date-start">Início do Evento</Label>
             <Input
               id="collection-date-start"
-              className="w-full min-w-0 date-icon-right"
+              className="w-full min-w-0 h-11 bg-transparent border-2 border-border-default rounded-radius-lg date-icon-right"
               type="date"
               value={collectionData.dataInicio}
               onChange={(e) => onDataChange("dataInicio", e.target.value)}
@@ -92,7 +92,7 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
             <Label htmlFor="collection-date-end">Fim do Evento</Label>
             <Input
               id="collection-date-end"
-              className="w-full min-w-0 date-icon-right"
+              className="w-full min-w-0 h-11 bg-transparent border-2 border-border-default rounded-radius-lg date-icon-right"
               type="date"
               value={collectionData.dataFim}
               onChange={(e) => onDataChange("dataFim", e.target.value)}

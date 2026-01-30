@@ -20,7 +20,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 -z-10 bg-linear-to-b from-surface-page/70 via-surface-page/60 to-surface-page" />
 
       <div className="z-10 flex max-w-5xl flex-col items-center gap-space-8 animate-in fade-in zoom-in duration-700 pt-space-12 md:pt-32 px-space-4">
-        <h1 className="heading-display font-display text-text-4xl sm:text-text-4xl md:text-text-5xl lg:text-text-6xl uppercase tracking-tighter leading-tight sm:leading-[0.85]">
+        <h1 className="heading-display font-display text-2xl sm:text-4xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-tight sm:leading-[0.85]">
           FOTOS DE ESPORTES,
           <br />
           <span className="text-action-primary">JOGOS E CAMPEONATOS</span>
@@ -36,7 +36,7 @@ export default function HeroSection() {
           <Button
             asChild
             size="lg"
-            className="h-14 px-6 sm:px-10 uppercase tracking-wider"
+            className="h-16 px-10 rounded-full font-black uppercase tracking-widest text-sm shadow-shadow-button-primary scale-100 hover:scale-105 transition-all"
           >
             <Link href="/busca">Comprar fotos</Link>
           </Button>
@@ -44,11 +44,9 @@ export default function HeroSection() {
             asChild
             variant="secondary"
             size="lg"
-            className="h-14 px-6 sm:px-10 uppercase tracking-wider backdrop-blur-sm"
+            className="h-16 px-10 rounded-full font-black uppercase tracking-widest text-sm backdrop-blur-md border-2 border-white/10 hover:bg-white/10 scale-100 hover:scale-105 transition-all"
           >
-            <Link href="/cadastro?callbackUrl=/dashboard/fotografo/onboarding">
-              Vender fotos
-            </Link>
+            <Link href="/como-funciona">Vender fotos</Link>
           </Button>
         </div>
       </div>

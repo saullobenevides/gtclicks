@@ -31,6 +31,7 @@ export default function CheckoutPage() {
   const [orderItems, setOrderItems] = useState(null);
   const [orderTotal, setOrderTotal] = useState(0);
   const [loadingOrder, setLoadingOrder] = useState(!!orderId);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     // Check user authentication
@@ -82,11 +83,12 @@ export default function CheckoutPage() {
       result.status === "in_process" ||
       result.status === "pending"
     ) {
+      setIsRedirecting(true); // Prevent redirect to empty cart
       if (!orderId) {
         clearCart();
       }
       router.push(
-        `/checkout/sucesso?orderId=${result.id || result.orderId || orderId || "pending"}&status=${result.status}`,
+        `/checkout/sucesso?orderId=${result.orderId || orderId || "pending"}&status=${result.status}`,
       );
     } else {
       // Handle explicit errors or unknown states
@@ -99,6 +101,21 @@ export default function CheckoutPage() {
     }
   };
 
+  // Determine items and total based on mode (Cart or Order Retry)
+  const displayItems = orderId ? orderItems : cartItems;
+  const displayTotal = orderId ? orderTotal : getTotalPrice();
+
+  useEffect(() => {
+    if (
+      !isLoadingUser &&
+      !loadingOrder &&
+      !isRedirecting &&
+      (!displayItems || displayItems.length === 0)
+    ) {
+      router.push("/carrinho");
+    }
+  }, [isLoadingUser, loadingOrder, displayItems, router, isRedirecting]);
+
   if (isLoadingUser || !user || loadingOrder) {
     return (
       <div className="flex h-[60vh] w-full items-center justify-center">
@@ -107,12 +124,7 @@ export default function CheckoutPage() {
     );
   }
 
-  // Determine items and total based on mode (Cart or Order Retry)
-  const displayItems = orderId ? orderItems : cartItems;
-  const displayTotal = orderId ? orderTotal : getTotalPrice();
-
   if (!displayItems || displayItems.length === 0) {
-    router.push("/carrinho");
     return null;
   }
 

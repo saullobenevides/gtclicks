@@ -15,7 +15,7 @@ function PhotoEditorCard({
 }) {
   return (
     <Card
-      className={`flex flex-col relative rounded-none border-white/10 overflow-hidden ${isCover ? "ring-2 ring-primary z-10" : "bg-black/40"}`}
+      className={`flex flex-col relative rounded-radius-lg border-border-subtle overflow-hidden ${isCover ? "ring-2 ring-primary z-10" : "bg-surface-card"}`}
     >
       <div className="aspect-square relative group">
         {photo.previewUrl ? (

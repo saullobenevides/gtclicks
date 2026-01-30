@@ -1,11 +1,19 @@
 import { cn } from "@/lib/utils";
+import { formatDateLong } from "@/lib/utils/formatters";
 import Image from "next/image";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { User } from "lucide-react";
-import { formatDateLong } from "@/lib/utils/formatters";
+import { MapPin, Calendar, Info } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import ShareButton from "@/components/shared/actions/ShareButton";
 
 export default function CollectionHero({ collection }) {
@@ -29,40 +37,78 @@ export default function CollectionHero({ collection }) {
       {/* Content */}
       <div className="relative z-10 container-wide w-full flex flex-col items-center justify-center text-center gap-4 px-4">
         {/* Title */}
-        <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl mb-2">
+        <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl mb-2 drop-shadow-lg">
           {collection.title}
         </h1>
 
-        {/* Location */}
-        {collection.location && (
-          <div className="flex items-center gap-2 text-sm md:text-base text-gray-200">
-            <Image
-              src="/icons/icon-location.png"
-              alt="Localização"
-              width={20}
-              height={20}
-              className="h-5 w-5 object-contain"
-            />
-            <span>{collection.location}</span>
-          </div>
+        {/* Info Row */}
+        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm md:text-base text-gray-200">
+          {/* Location */}
+          {collection.location && (
+            <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/5">
+              <MapPin className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+              <span>{collection.location}</span>
+            </div>
+          )}
+
+          {/* Date */}
+          {collection.eventDate && (
+            <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/5">
+              <Calendar className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+              <span>{formatDateLong(collection.eventDate)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* View Details Button (Description) */}
+        {collection.description && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-2 text-white/80 hover:text-white hover:bg-white/10 gap-2 h-auto py-1 px-3 rounded-full"
+              >
+                <Info className="h-4 w-4" />
+                Ver detalhes
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>{collection.title}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                <p className="text-text-secondary leading-relaxed whitespace-pre-line">
+                  {collection.description}
+                </p>
+
+                <div className="grid grid-cols-2 gap-4 text-sm mt-4 pt-4 border-t border-border-subtle">
+                  <div>
+                    <span className="text-text-muted text-xs uppercase tracking-wider block mb-1">
+                      Data
+                    </span>
+                    <span className="font-medium">
+                      {collection.eventDate
+                        ? formatDateLong(collection.eventDate)
+                        : "Data não disponível"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-text-muted text-xs uppercase tracking-wider block mb-1">
+                      Local
+                    </span>
+                    <span className="font-medium">
+                      {collection.location || "Local não informado"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
 
-        {/* Date */}
-        {collection.eventDate && (
-          <div className="flex items-center gap-2 text-sm md:text-base text-gray-200">
-            <Image
-              src="/icons/icon-calendar.png"
-              alt="Data"
-              width={20}
-              height={20}
-              className="h-5 w-5 object-contain"
-            />
-            <span>{formatDateLong(collection.eventDate)}</span>
-          </div>
-        )}
-
-        {/* Photographer Pill */}
-        <div className="mt-4 flex flex-col md:flex-row items-center gap-4">
+        {/* Photographer Pill & Actions */}
+        <div className="mt-6 flex flex-col md:flex-row items-center gap-4">
           <Link
             href={
               collection.photographerUsername
@@ -93,7 +139,7 @@ export default function CollectionHero({ collection }) {
           <ShareButton
             title={collection.title}
             text={`Confira as fotos de ${collection.title} no GT Clicks!`}
-            className="bg-black/50 hover:bg-black/80 text-white border-white/10 h-14 w-14 rounded-2xl backdrop-blur-md"
+            className="bg-black/50 hover:bg-black/80 text-white border-white/10 h-14 w-14 rounded-2xl backdrop-blur-md transition-all hover:scale-105"
           />
         </div>
       </div>

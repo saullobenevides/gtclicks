@@ -63,10 +63,10 @@ export default function NavUserActions({ mobile = false }) {
     if (mobile) {
       return (
         <div className="grid grid-cols-2 gap-space-4">
-          <Button variant="outline" className="w-full h-12" asChild>
+          <Button variant="outline" className="w-full h-11" asChild>
             <Link href="/login">Entrar</Link>
           </Button>
-          <Button className="w-full h-12" asChild>
+          <Button className="w-full h-11" asChild>
             <Link href="/login">Criar Conta</Link>
           </Button>
         </div>

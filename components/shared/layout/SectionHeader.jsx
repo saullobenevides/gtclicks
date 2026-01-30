@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * SectionHeader - Cabeçalho padronizado para seções
- * 
+ *
  * @param {Object} props
  * @param {string} props.title - Título da seção
  * @param {string} props.description - Descrição opcional
@@ -18,40 +18,53 @@ export default function SectionHeader({
   title,
   description,
   badge,
-  align = 'center',
-  size = 'default',
-  className
+  align = "center",
+  size = "default",
+  isLanding = false,
+  uppercase = true,
+  className,
 }) {
-  const alignClass = align === 'center' ? 'text-center items-center' : 'text-left items-start';
-  
-  const titleSize = size === 'large' 
-    ? 'text-4xl sm:text-5xl lg:text-6xl' 
-    : 'text-3xl sm:text-4xl lg:text-5xl';
+  const alignClass =
+    align === "center" ? "text-center items-center" : "text-left items-start";
+
+  const titleSize = isLanding
+    ? "text-2xl sm:text-5xl md:text-6xl lg:text-7xl"
+    : size === "large"
+      ? "text-xl sm:text-4xl lg:text-6xl"
+      : "text-lg sm:text-3xl lg:text-5xl";
+
+  const TitleTag = isLanding ? "h1" : "h2";
 
   return (
-    <div 
+    <div
       className={cn(
-        "mb-12 md:mb-16 flex flex-col gap-3",
+        "mb-16 md:mb-20 flex flex-col gap-4",
         alignClass,
-        className
+        className,
       )}
       data-testid="section-header"
     >
       {badge && (
-        <Badge variant="outline" className="mb-2 w-fit">
+        <Badge
+          variant="secondary"
+          className="px-4 py-1 text-[10px] uppercase font-black tracking-widest bg-surface-subtle text-text-secondary border-border-subtle mb-2"
+        >
           {badge}
         </Badge>
       )}
-      
-      <h2 className={cn(
-        "font-display font-black text-white tracking-tight",
-        titleSize
-      )}>
+
+      <TitleTag
+        className={cn(
+          "font-display font-black text-white tracking-tighter leading-tight sm:leading-[0.85]",
+          uppercase && "uppercase",
+          titleSize,
+        )}
+      >
         {title}
-      </h2>
-      
+      </TitleTag>
+
       {description && (
-        <p className="max-w-2xl text-base md:text-lg text-gray-400 leading-relaxed">
+        <p className="max-w-2xl text-lg md:text-xl text-text-secondary font-medium leading-relaxed mt-2">
           {description}
         </p>
       )}

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X, Heart } from "lucide-react";
+import { X, Heart, Search as SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import NavUserActions from "./NavUserActions";
@@ -20,7 +20,7 @@ export default function MobileMenu({ isOpen, onClose }) {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[60] bg-surface-page/60 backdrop-blur-xl transition-all duration-300 md:hidden",
+        "fixed inset-0 z-60 bg-surface-page/60 backdrop-blur-xl transition-all duration-300 md:hidden",
         isOpen
           ? "opacity-100 pointer-events-auto"
           : "opacity-0 pointer-events-none",
@@ -46,6 +46,29 @@ export default function MobileMenu({ isOpen, onClose }) {
         </div>
 
         <div className="flex-1 overflow-y-auto py-space-6 px-space-4 flex flex-col gap-space-2">
+          {/* Mobile Search Input */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const query = e.target.search.value;
+              if (query) {
+                window.location.href = `/busca?q=${encodeURIComponent(query)}`;
+                onClose();
+              }
+            }}
+            className="mb-2"
+          >
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-secondary" />
+              <input
+                name="search"
+                type="search"
+                placeholder="Buscar fotos..."
+                className="w-full h-11 pl-10 pr-4 rounded-radius-lg bg-surface-subtle border-2 border-transparent focus:border-border-default focus:bg-surface-page transition-all text-sm outline-none placeholder:text-text-muted text-text-primary"
+              />
+            </div>
+          </form>
+
           {mainNavItems.map((item) => (
             <Link
               key={item.href}

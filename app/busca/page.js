@@ -10,6 +10,8 @@ import SelfieSearch from "@/components/search/SelfieSearch";
 import { Camera, Grid } from "lucide-react";
 import AppPagination from "@/components/shared/AppPagination";
 
+import { PageSection, SectionHeader } from "@/components/shared/layout";
+
 // Revalidate every 10 minutes
 export const revalidate = 600;
 
@@ -29,36 +31,34 @@ export default async function SearchPage(props) {
   const { data: results, metadata } = await searchCollections(filters);
 
   return (
-    <div className="container-wide py-12 md:py-24">
-      <div className="mb-12 flex flex-col items-center text-center">
-        <Badge variant="secondary" className="mb-4 px-4 py-1 text-[10px]">
-          Explorar
-        </Badge>
-        <h1 className="heading-display font-display text-4xl font-black text-white sm:text-5xl md:text-6xl lg:text-7xl max-w-5xl mx-auto uppercase tracking-tighter leading-tight sm:leading-[0.85]">
-          Encontre sua <span className="text-primary">performance</span>
-        </h1>
-        <p className="mt-4 max-w-2xl text-lg text-gray-400">
-          Busque por eventos ou use nossa IA para encontrar suas fotos
-          instantaneamente através de uma selfie.
-        </p>
-      </div>
+    <PageSection variant="default" containerWide>
+      <SectionHeader
+        isLanding
+        badge="Explorar"
+        title={
+          <>
+            Encontre sua <span className="text-primary">performance</span>
+          </>
+        }
+        description="Busque por eventos ou use nossa IA para encontrar suas fotos instantaneamente através de uma selfie."
+      />
 
-      <Tabs defaultValue="colecoes" className="space-y-12">
-        <div className="flex justify-center overflow-x-auto no-scrollbar pb-2 px-4">
-          <TabsList className="bg-white/5 border border-white/10 p-1 h-14 rounded-full shrink-0">
+      <Tabs defaultValue="colecoes" className="space-y-16">
+        <div className="flex justify-center px-4">
+          <TabsList className="bg-surface-subtle border border-border-subtle p-1 h-16 rounded-full w-full max-w-md md:w-auto flex">
             <TabsTrigger
               value="colecoes"
-              className="rounded-full px-8 h-12 border-2 border-transparent data-[state=active]:bg-black data-[state=active]:border-primary data-[state=active]:text-white font-bold gap-2"
+              className="flex-1 md:flex-none rounded-full px-4 md:px-10 h-14 border-2 border-transparent data-[state=active]:bg-surface-page data-[state=active]:border-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] md:text-xs gap-2 md:gap-3 transition-all"
             >
               <Grid className="h-4 w-4" />
-              Ver Coleções
+              <span className="hidden sm:inline">Ver </span>Coleções
             </TabsTrigger>
             <TabsTrigger
               value="selfie"
-              className="rounded-full px-8 h-12 border-2 border-transparent data-[state=active]:bg-black data-[state=active]:border-primary data-[state=active]:text-white font-bold gap-2"
+              className="flex-1 md:flex-none rounded-full px-4 md:px-10 h-14 border-2 border-transparent data-[state=active]:bg-surface-page data-[state=active]:border-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] md:text-xs gap-2 md:gap-3 transition-all"
             >
               <Camera className="h-4 w-4" />
-              Busca por Selfie
+              <span className="hidden sm:inline">Busca por </span>Selfie
             </TabsTrigger>
           </TabsList>
         </div>
@@ -117,6 +117,6 @@ export default async function SearchPage(props) {
           <SelfieSearch />
         </TabsContent>
       </Tabs>
-    </div>
+    </PageSection>
   );
 }

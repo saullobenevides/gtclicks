@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * PageSection - Wrapper padronizado para seções de página
- * 
+ *
  * @param {Object} props
  * @param {React.ReactNode} props.children - Conteúdo da seção
  * @param {'default'|'hero'|'compact'} props.variant - Variante de espaçamento
@@ -13,29 +13,24 @@ import { cn } from "@/lib/utils";
  */
 export default function PageSection({
   children,
-  variant = 'default',
+  variant = "default",
   containerWide = true,
-  className
+  className,
 }) {
   const paddingClasses = {
-    hero: 'py-32 md:py-40',
-    default: 'py-16 md:py-24',
-    compact: 'py-8 md:py-12'
+    hero: "py-32 md:py-40",
+    default: "py-16 md:py-32",
+    compact: "py-8 md:py-12",
   };
 
-  const containerClass = containerWide ? 'container-wide' : 'container';
+  const containerClass = containerWide ? "container-wide" : "container";
 
   return (
-    <section 
-      className={cn(
-        paddingClasses[variant],
-        className
-      )}
+    <section
+      className={cn(paddingClasses[variant], className)}
       data-testid="page-section"
     >
-      <div className={containerClass}>
-        {children}
-      </div>
+      <div className={containerClass}>{children}</div>
     </section>
   );
 }

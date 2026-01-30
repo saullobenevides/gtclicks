@@ -39,11 +39,13 @@ const blankPhoto = () => ({
   orientacao: "HORIZONTAL",
 });
 
-export default function CollectionEditor({ collection: initialCollection }) {
+export default function CollectionEditor({ collection: initialData }) {
   const router = useRouter();
+  const initialCollection = initialData || {};
 
   const [collectionData, setCollectionData] = useState({
     nome: initialCollection.nome || "",
+    slug: initialCollection.slug || "",
     descricao: initialCollection.descricao || "",
     categoria: initialCollection.categoria || "",
     status: initialCollection.status || "RASCUNHO",
@@ -78,6 +80,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
   );
   const [submitting, setSubmitting] = useState(false);
   const [deletedPhotoIds, setDeletedPhotoIds] = useState([]);
+  const [isDirty, setIsDirty] = useState(false); // Track changes
 
   const { uploadState, handleFileSelect } = usePhotoUpload(
     initialCollection.id,
@@ -93,8 +96,41 @@ export default function CollectionEditor({ collection: initialCollection }) {
     });
   }, [allPhotos, currentFolder]);
 
+  // Warning check for unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty]);
+
+  // Auto-update slug when name changes
+  const slugify = (text) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/[^\w\-]+/g, "")
+      .replace(/\-\-+/g, "-")
+      .replace(/^-+/, "")
+      .replace(/-+$/, "");
+  };
+
   const handleCollectionDataChange = (field, value) => {
-    setCollectionData((prev) => ({ ...prev, [field]: value }));
+    setCollectionData((prev) => {
+      const updates = { [field]: value };
+      if (field === "nome" && !initialCollection.id) {
+        updates.slug = slugify(value);
+      }
+      return { ...prev, ...updates };
+    });
+    setIsDirty(true);
   };
 
   const handleSetCover = useCallback(
@@ -112,6 +148,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
         setCollectionData((prev) => ({ ...prev, capaUrl: result.coverUrl }));
         toast.dismiss(toastId);
         toast.success("Capa definida com sucesso!");
+        setIsDirty(true);
       } catch (error) {
         console.error(error);
         toast.dismiss(toastId);
@@ -148,6 +185,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
         setCollectionData((prev) => ({ ...prev, capaUrl: "" }));
       }
       toast.success("Foto removida.");
+      setIsDirty(true);
     },
     [collectionData.capaUrl],
   );
@@ -158,6 +196,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
         p.tempId === photoToUpdate.tempId ? { ...p, [field]: value } : p,
       ),
     );
+    setIsDirty(true);
   }, []);
 
   const handleBulkUpload = async (e) => {
@@ -201,6 +240,12 @@ export default function CollectionEditor({ collection: initialCollection }) {
       }
     }
     toast.success("Upload em massa concluído!");
+  };
+
+  const handleFolderUpload = async (e) => {
+    // Currently reuses bulk upload logic.
+    // In the future, we can use file.webkitRelativePath to create subfolders automatically.
+    await handleBulkUpload(e);
   };
 
   const [analyzingId, setAnalyzingId] = useState(null);
@@ -278,17 +323,38 @@ export default function CollectionEditor({ collection: initialCollection }) {
   };
 
   const handleSaveChanges = async () => {
+    // Validation: Check min price
+    if (Number(collectionData.precoFoto) < 5) {
+      toast.error("O preço mínimo por foto deve ser R$ 5,00");
+      return;
+    }
+
+    // Validation: Check status and photos
+    const validPhotosCount = allPhotos.filter(
+      (p) => !deletedPhotoIds.includes(p.id) || !p.id,
+    ).length; // Check strictly non-deleted photos
+
+    // Simplification: Check if we have visible photos remaining
+    const remainingPhotos = allPhotos.filter(
+      (p) =>
+        !deletedPhotoIds.includes(p.tempId) && !deletedPhotoIds.includes(p.id),
+    );
+
+    if (collectionData.status === "PUBLICADA" && remainingPhotos.length === 0) {
+      toast.error("Não é possível publicar uma coleção sem fotos.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       let finalCapaUrl = collectionData.capaUrl;
-      if (!finalCapaUrl) {
-        const validPhotos = allPhotos.filter(
-          (p) => p.previewUrl && !deletedPhotoIds.includes(p.id),
-        );
-        if (validPhotos.length > 0) {
-          finalCapaUrl = validPhotos[validPhotos.length - 1].previewUrl;
-          setCollectionData((prev) => ({ ...prev, capaUrl: finalCapaUrl }));
-        }
+      const validPhotos = allPhotos.filter(
+        (p) => p.previewUrl && !deletedPhotoIds.includes(p.id),
+      );
+
+      if (!finalCapaUrl && validPhotos.length > 0) {
+        finalCapaUrl = validPhotos[validPhotos.length - 1].previewUrl;
+        setCollectionData((prev) => ({ ...prev, capaUrl: finalCapaUrl }));
       }
 
       /* Refactored to use Server Action */
@@ -296,35 +362,48 @@ export default function CollectionEditor({ collection: initialCollection }) {
       // or refactor action to expect FormData. I implemented action to accept 'data' as any (JSON object).
       // So we can check actions/collections.ts: export async function updateCollection(collectionId: string, data: any)
 
-      const updateRes = await updateCollection(initialCollection.id, {
-        ...collectionData,
-        capaUrl: finalCapaUrl,
-      });
+      let result;
+      if (initialCollection.id) {
+        // UPDATE EXISTING
+        result = await updateCollection(initialCollection.id, {
+          ...collectionData,
+          capaUrl: finalCapaUrl,
+        });
+      } else {
+        // CREATE NEW
+        const formData = new FormData();
+        // Append all fields to FormData for createCollection
+        Object.entries(collectionData).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            if (key === "descontos") {
+              formData.append(key, JSON.stringify(value));
+            } else {
+              formData.append(key, value);
+            }
+          }
+        });
+        // CreateCollection expects FormData
+        const { createCollection } = await import("@/actions/collections");
+        result = await createCollection(formData);
+      }
 
-      if (updateRes.error) {
-        throw new Error(updateRes.error || "Erro ao salvar coleção.");
+      if (result.error) {
+        throw new Error(result.error || "Erro ao salvar coleção.");
+      }
+
+      setIsDirty(false); // Reset dirty status on success
+
+      if (!initialCollection.id && result.data?.id) {
+        toast.success("Coleção criada com sucesso!");
+        // Redirect to edit page
+        router.push(`/dashboard/fotografo/colecoes/${result.data.id}/editar`);
+        return;
       }
 
       const payload = {
         fotografoId: initialCollection.fotografoId,
-        fotos: allPhotos
-          .filter((p) => p.id)
-          .map((p) => ({
-            id: p.id,
-            titulo: p.titulo,
-            descricao: p.descricao,
-            tags:
-              typeof p.tags === "string"
-                ? p.tags
-                    .split(",")
-                    .map((tag) => tag.trim())
-                    .filter(Boolean)
-                : p.tags || [],
-            licencas: p.licencas || [],
-            orientacao: p.orientacao,
-            folderId: p.folderId,
-            colecaoId: initialCollection.id,
-          })),
+        collectionId: initialCollection.id,
+        fotos: allPhotos,
         deletedPhotoIds,
       };
 
@@ -424,7 +503,12 @@ export default function CollectionEditor({ collection: initialCollection }) {
     <div className="w-full max-w-full overflow-x-hidden">
       <div className="block space-y-8 pb-32 md:pb-8 w-full px-0 sm:px-0">
         <div className="px-4 md:px-0 w-full min-w-0">
-          <EditorHeader submitting={submitting} onSave={handleSaveChanges} />
+          <EditorHeader
+            title={initialCollection.id ? "Editar Coleção" : "Nova Coleção"}
+            submitting={submitting}
+            onSave={handleSaveChanges}
+            isDirty={isDirty}
+          />
         </div>
 
         <Tabs defaultValue="detalhes" className="w-full">
@@ -439,6 +523,7 @@ export default function CollectionEditor({ collection: initialCollection }) {
               <TabsTrigger
                 value="fotos"
                 className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px]"
+                disabled={!initialCollection.id}
               >
                 Fotos ({currentPhotos.length})
               </TabsTrigger>
@@ -470,28 +555,43 @@ export default function CollectionEditor({ collection: initialCollection }) {
           </div>
 
           <div className="px-0 md:px-0">
-            <TabsContent
-              value="fotos"
-              className="mt-6 w-full overflow-x-hidden"
-            >
-              <PhotoManagerTab
-                collectionId={initialCollection.id}
-                currentFolder={currentFolder}
-                folderPath={folderPath}
-                currentPhotos={currentPhotos}
-                collectionData={collectionData}
-                uploadState={uploadState}
-                analyzingId={analyzingId}
-                analyzingCollection={analyzingCollection}
-                onNavigate={handleNavigate}
-                onAnalyzeCollection={handleAnalyzeCollection}
-                onDeleteAllInFolder={handleDeleteAllInFolder}
-                onBulkUpload={handleBulkUpload}
-                onSetCover={handleSetCover}
-                onRemovePhoto={removePhoto}
-                onUpdatePhoto={updatePhoto}
-                onAnalyzePhoto={handleAnalyzePhoto}
-              />
+            <TabsContent value="fotos" className="space-y-6">
+              {!initialCollection.id ? (
+                <div className="text-center py-12 border border-dashed rounded-lg bg-surface-subtle">
+                  <p className="text-text-secondary mb-4">
+                    Salvel a coleção para começar a adicionar fotos.
+                  </p>
+                  <Button
+                    onClick={handleSaveChanges}
+                    disabled={!isDirty || submitting}
+                  >
+                    Salvar Rascunho
+                  </Button>
+                </div>
+              ) : (
+                <PhotoManagerTab
+                  collectionId={initialCollection.id}
+                  currentFolder={currentFolder}
+                  folderPath={folderPath}
+                  currentPhotos={currentPhotos}
+                  collectionData={collectionData}
+                  uploadState={uploadState}
+                  // analyzingId={analyzingId}
+                  // analyzingCollection={analyzingCollection}
+                  onNavigate={handleNavigate}
+                  // onAnalyzeCollection={handleAnalyzeCollection}
+                  // onDeleteAllInFolder={handleDeleteAllInFolder}
+                  onBulkUpload={handleBulkUpload}
+                  onSetCover={handleSetCover}
+                  onRemovePhoto={removePhoto}
+                  onUpdatePhoto={updatePhoto}
+                  // onAnalyzePhoto={handleAnalyzePhoto}
+
+                  // Add missing props if they were used in the original PhotoManagerTab
+                  onFolderUpload={handleFolderUpload}
+                  // onFolderCreated -> likely internal or via prop if needed
+                />
+              )}
             </TabsContent>
           </div>
 
