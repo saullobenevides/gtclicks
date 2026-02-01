@@ -47,6 +47,8 @@ const nextConfig = {
   // Optimize package imports
   experimental: {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
+    // Desative se o cache do Turbopack continuar corrompendo (erro .sst)
+    turbopackFileSystemCacheForDev: false,
   },
 };
 

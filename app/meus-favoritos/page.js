@@ -44,12 +44,14 @@ export default function MyFavoritesPage() {
           gap={6}
           empty={
             <EmptyState
+              icon={ImageIcon}
               title="Nenhum favorito ainda"
-              description="Você ainda não curtiu nenhuma foto."
+              description="Você ainda não curtiu nenhuma foto. Explore as coleções e salve suas favoritas!"
               action={{
                 label: "Explorar fotos",
                 href: "/busca",
               }}
+              variant="dashboard"
             />
           }
         >

@@ -75,9 +75,10 @@ export default function PublishTab({
                 size="icon"
                 variant="outline"
                 onClick={copyToClipboard}
-                className="shrink-0"
+                className="shrink-0 min-h-[44px] min-w-[44px] touch-manipulation"
+                aria-label="Copiar link da coleção"
               >
-                <Share2 className="h-4 w-4" />
+                <Share2 className="h-4 w-4 shrink-0" aria-hidden />
               </Button>
             </div>
           </div>
@@ -86,11 +87,12 @@ export default function PublishTab({
         <div className="pt-8 border-t">
           <Button
             type="button"
-            variant="danger"
-            className="h-auto py-3 px-5 whitespace-normal text-left gap-3"
+            variant="destructive"
+            className="h-auto min-h-[48px] py-3 px-5 whitespace-normal text-left gap-3 touch-manipulation"
             onClick={() => setDeleteOpen(true)}
+            aria-label="Excluir coleção permanentemente"
           >
-            <Trash2 className="h-5 w-5 shrink-0" />
+            <Trash2 className="h-5 w-5 shrink-0" aria-hidden />
             Excluir Coleção Permanentemente
           </Button>
         </div>

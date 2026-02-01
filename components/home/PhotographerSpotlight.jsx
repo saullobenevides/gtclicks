@@ -20,7 +20,7 @@ export default function PhotographerSpotlight({ photographers = [] }) {
         description="Conheça os fotógrafos por trás das lentes"
       />
 
-      <div className="mx-auto max-w-5xl px-8">
+      <div className="mx-auto max-w-5xl px-4 sm:px-8">
         <Carousel
           opts={{
             align: "start",
@@ -36,7 +36,8 @@ export default function PhotographerSpotlight({ photographers = [] }) {
               >
                 <Link
                   href={`/fotografo/${photographer.username}`}
-                  className="group flex flex-col items-center gap-4 transition-all duration-300 border border-border-default rounded-radius-2xl p-6 hover:bg-surface-subtle hover:border-border-subtle h-full"
+                  className="group flex flex-col items-center gap-4 transition-all duration-300 border border-white/10 rounded-2xl p-5 sm:p-6 hover:bg-white/5 hover:border-white/20 h-full min-h-[180px] touch-manipulation active:scale-[0.99]"
+                  aria-label={`Ver perfil de ${photographer.name}`}
                 >
                   <div className="relative">
                     <div className="h-24 w-24 rounded-radius-full p-[2px] bg-action-primary shadow-shadow-md">
@@ -67,8 +68,14 @@ export default function PhotographerSpotlight({ photographers = [] }) {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
+          <CarouselPrevious
+            className="min-h-11 min-w-11 h-11 w-11 -left-2 sm:-left-4 md:-left-12"
+            aria-label="Fotógrafo anterior"
+          />
+          <CarouselNext
+            className="min-h-11 min-w-11 h-11 w-11 -right-2 sm:-right-4 md:-right-12"
+            aria-label="Próximo fotógrafo"
+          />
         </Carousel>
       </div>
     </PageSection>

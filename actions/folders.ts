@@ -38,9 +38,13 @@ export async function createFolder(data: {
   const validation = createFolderSchema.safeParse(data);
 
   if (!validation.success) {
+    const fieldErrors = validation.error.flatten().fieldErrors;
+    const msg = Object.entries(fieldErrors)
+      .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
+      .join("; ");
     return {
-      error: "Dados inválidos",
-      details: validation.error.flatten().fieldErrors,
+      error: msg || "Dados inválidos",
+      details: fieldErrors,
     };
   }
 
@@ -121,7 +125,7 @@ export async function getFolders(colecaoId: string, parentId?: string | null) {
  */
 export async function updateFolder(
   folderId: string,
-  data: { nome?: string; parentId?: string | null },
+  data: { nome?: string; parentId?: string | null }
 ) {
   const user = await getAuthenticatedUser();
   if (!user) {

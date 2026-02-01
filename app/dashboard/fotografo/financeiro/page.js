@@ -23,7 +23,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2, Wallet } from "lucide-react";
+import { cn } from "@/lib/utils";
 import AppPagination from "@/components/shared/AppPagination";
 import { getFinancialData, updatePixKey } from "@/actions/photographers";
 import { requestWithdrawal } from "@/actions/payouts";
@@ -32,47 +33,51 @@ import { requestWithdrawal } from "@/actions/payouts";
 
 function FinanceiroSkeleton() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <Card>
+    <div className="flex flex-col gap-6 md:gap-8 p-0">
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-40 bg-white/10" />
+        <Skeleton className="h-4 w-64 bg-white/5" />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+        <Card className="bg-black/20 border-white/10">
           <CardHeader>
-            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-5 w-32 bg-white/10" />
           </CardHeader>
           <CardContent>
-            <Skeleton className="mb-4 h-12 w-48" />
-            <Skeleton className="h-4 w-24" />
+            <Skeleton className="mb-4 h-12 w-48 bg-white/10" />
+            <Skeleton className="h-4 w-24 bg-white/5" />
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-black/20 border-white/10">
           <CardHeader>
-            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-5 w-24 bg-white/10" />
           </CardHeader>
           <CardContent className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-full bg-white/5" />
+            <Skeleton className="h-10 w-36 bg-white/5" />
           </CardContent>
         </Card>
       </div>
-      <Card>
+      <Card className="bg-black/20 border-white/10">
         <CardHeader>
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-64" />
+          <Skeleton className="h-5 w-40 bg-white/10" />
+          <Skeleton className="h-4 w-64 bg-white/5" />
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
-            <Skeleton className="h-10 flex-1" />
-            <Skeleton className="h-10 w-32" />
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Skeleton className="h-10 flex-1 bg-white/5" />
+            <Skeleton className="h-10 w-40 bg-white/10" />
           </div>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="bg-black/20 border-white/10">
         <CardHeader>
-          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-5 w-48 bg-white/10" />
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="mt-2 h-10 w-full" />
-          <Skeleton className="mt-2 h-10 w-full" />
+          <Skeleton className="h-10 w-full bg-white/5" />
+          <Skeleton className="mt-2 h-10 w-full bg-white/5" />
+          <Skeleton className="mt-2 h-10 w-full bg-white/5" />
         </CardContent>
       </Card>
     </div>
@@ -232,12 +237,15 @@ export default function FinanceiroPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-0">
-      <div>
-        <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl">
+    <div className="flex flex-col gap-6 md:gap-8 p-0">
+      {/* Header */}
+      <div className="space-y-1">
+        <h1 className="heading-display font-display text-2xl md:text-3xl font-black text-white tracking-tight">
           Financeiro
         </h1>
-        <p className="text-muted-foreground">Gerencie seus ganhos e saques.</p>
+        <p className="text-sm md:text-base text-muted-foreground">
+          Gerencie seus ganhos e saques
+        </p>
       </div>
 
       {message.text && (
@@ -254,8 +262,8 @@ export default function FinanceiroPage() {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <Card className="bg-black/20 border-white/10">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-colors">
           <CardHeader>
             <CardTitle>Saldo Disponível</CardTitle>
           </CardHeader>
@@ -271,7 +279,7 @@ export default function FinanceiroPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-black/20 border-white/10">
+        <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-colors">
           <CardHeader>
             <CardTitle>CPF (Chave PIX)</CardTitle>
             <CardDescription className="text-xs text-muted-foreground">
@@ -339,7 +347,7 @@ export default function FinanceiroPage() {
         </Card>
       </div>
 
-      <Card className="bg-black/20 border-white/10">
+      <Card className="bg-black/20 border-white/10 hover:bg-black/30 transition-colors">
         <CardHeader>
           <CardTitle>Solicitar Saque</CardTitle>
           <CardDescription>
@@ -377,22 +385,29 @@ export default function FinanceiroPage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-black/20 border-white/10">
+      <Card className="bg-black/20 border-white/10 overflow-hidden">
         <CardHeader>
           <CardTitle>Histórico de Transações</CardTitle>
+          <CardDescription>Últimas transações da sua conta</CardDescription>
         </CardHeader>
         <CardContent>
           {/* Mobile View */}
-          <div className="md:hidden space-y-4">
+          <div className="md:hidden space-y-3">
             {transacoes.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Nenhuma transação ainda.
+              <div className="flex flex-col items-center gap-3 py-12 text-muted-foreground">
+                <Wallet className="h-10 w-10 opacity-20" />
+                <div className="text-center space-y-1">
+                  <p className="font-medium text-white">
+                    Nenhuma transação ainda
+                  </p>
+                  <p className="text-xs">As vendas e saques aparecerão aqui</p>
+                </div>
               </div>
             ) : (
               transacoes.map((t) => (
                 <div
                   key={t.id}
-                  className="flex justify-between items-center py-4 border-b border-white/10 last:border-0"
+                  className="flex justify-between items-center py-4 px-3 rounded-lg border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors"
                 >
                   <div className="flex flex-col gap-1.5">
                     <span className="font-semibold text-sm text-white">
@@ -421,16 +436,29 @@ export default function FinanceiroPage() {
           <Table className="hidden md:table">
             <TableHeader>
               <TableRow className="border-white/10 hover:bg-transparent">
-                <TableHead>Descrição</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead className="text-right">Valor</TableHead>
+                <TableHead className="text-muted-foreground">
+                  Descrição
+                </TableHead>
+                <TableHead className="text-muted-foreground">Data</TableHead>
+                <TableHead className="text-right text-muted-foreground">
+                  Valor
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {transacoes.length === 0 ? (
-                <TableRow className="border-white/10 hover:bg-white/5">
-                  <TableCell colSpan={3} className="h-24 text-center">
-                    Nenhuma transação ainda.
+                <TableRow>
+                  <TableCell
+                    colSpan={3}
+                    className="h-24 text-center text-muted-foreground"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Wallet className="h-8 w-8 opacity-20" />
+                      <p>Nenhuma transação ainda</p>
+                      <p className="text-xs">
+                        As vendas e saques aparecerão aqui
+                      </p>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
@@ -439,16 +467,19 @@ export default function FinanceiroPage() {
                     key={t.id}
                     className="border-white/10 hover:bg-white/5"
                   >
-                    <TableCell>{t.descricao || t.tipo}</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium">
+                      {t.descricao || t.tipo}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground whitespace-nowrap">
                       {new Date(t.createdAt).toLocaleDateString("pt-BR")}
                     </TableCell>
                     <TableCell
-                      className={`text-right font-bold ${
+                      className={cn(
+                        "text-right font-bold",
                         Number(t.valor) > 0
-                          ? "text-green-500"
+                          ? "text-emerald-500"
                           : "text-muted-foreground"
-                      }`}
+                      )}
                     >
                       {Number(t.valor) > 0 ? "+" : ""}R${" "}
                       {Number(t.valor).toFixed(2)}

@@ -1,9 +1,5 @@
-import CollectionEditor from "@/features/collections/components/CollectionEditor";
+import NewCollectionClient from "./NewCollectionClient";
 
 export default function NewCollectionPage() {
-  return (
-    <div className="w-full">
-      <CollectionEditor />
-    </div>
-  );
+  return <NewCollectionClient />;
 }

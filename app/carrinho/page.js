@@ -26,7 +26,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="container-wide flex min-h-[60vh] flex-col items-center justify-center py-24 text-center">
+      <div className="container-wide px-4 flex min-h-[60vh] flex-col items-center justify-center py-16 sm:py-24 text-center">
         <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10">
           <ShoppingCart className="h-10 w-10 text-muted-foreground" />
         </div>
@@ -37,11 +37,7 @@ export default function CartPage() {
           Explore nossa galeria de fotos exclusivas e encontre a imagem perfeita
           para o seu projeto.
         </p>
-        <Button
-          asChild
-          size="lg"
-          className="bg-primary hover:bg-primary/90 text-white"
-        >
+        <Button asChild size="lg" className="min-h-[48px] w-full sm:w-auto">
           <Link href="/busca">Explorar Fotos</Link>
         </Button>
       </div>
@@ -49,7 +45,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container-wide py-16 md:py-24">
+    <div className="container-wide px-4 py-12 sm:py-16 md:py-24">
       <div className="mb-12">
         <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
           Seu Carrinho
@@ -59,7 +55,7 @@ export default function CartPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_400px]">
+      <div className="grid grid-cols-1 gap-8 sm:gap-12 lg:grid-cols-[1fr_400px]">
         {/* Cart Items List */}
         <div className="space-y-6">
           {items.map((item) => (
@@ -113,11 +109,11 @@ export default function CartPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-muted-foreground hover:bg-red-500/10 hover:text-red-500"
+                    className="min-h-11 min-w-11 text-muted-foreground hover:bg-red-500/10 hover:text-red-500 touch-manipulation"
                     onClick={() => removeFromCart(item.fotoId, item.licencaId)}
+                    aria-label={`Remover ${item.titulo} do carrinho`}
                   >
                     <Trash2 className="h-5 w-5" />
-                    <span className="sr-only">Remover</span>
                   </Button>
                 </div>
               </div>
@@ -164,7 +160,7 @@ export default function CartPage() {
               {(() => {
                 // Get items from first collection to check next discount tier
                 const collectionItems = items.filter(
-                  (i) => i.colecaoId === items[0]?.colecaoId,
+                  (i) => i.colecaoId === items[0]?.colecaoId
                 );
                 const count = collectionItems.length;
                 const firstItem = collectionItems[0];
@@ -216,7 +212,7 @@ export default function CartPage() {
             <CardFooter className="flex flex-col gap-3">
               <Button
                 asChild
-                className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-12 text-lg"
+                className="w-full font-bold min-h-[48px] h-12 text-base sm:text-lg touch-manipulation"
                 size="lg"
               >
                 <Link

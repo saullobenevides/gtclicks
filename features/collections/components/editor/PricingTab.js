@@ -59,7 +59,10 @@ export default function PricingTab({
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
             <div className="space-y-1">
               <h3 className="font-semibold text-lg flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-green-500" />
+                <DollarSign
+                  className="h-5 w-5 text-status-success shrink-0"
+                  aria-hidden
+                />
                 Pacotes de Desconto
               </h3>
               <p className="text-sm text-muted-foreground">
@@ -71,9 +74,11 @@ export default function PricingTab({
               variant="outline"
               size="sm"
               onClick={addDiscount}
-              className="w-full sm:w-auto border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
+              className="w-full sm:w-auto min-h-[44px] border-status-success/30 text-status-success hover:bg-status-success/10 touch-manipulation"
+              aria-label="Adicionar novo pacote de desconto"
             >
-              <PlusCircle className="mr-2 h-4 w-4" /> Novo Pacote
+              <PlusCircle className="mr-2 h-4 w-4 shrink-0" aria-hidden />
+              Novo Pacote
             </Button>
           </div>
 
@@ -99,10 +104,11 @@ export default function PricingTab({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute top-0 right-0 h-12 w-12 text-muted-foreground hover:text-red-500 rounded-none bg-black/40"
+                  className="absolute top-2 right-2 h-10 w-10 min-h-[44px] min-w-[44px] text-muted-foreground hover:text-status-error rounded-radius-lg bg-black/40 touch-manipulation"
                   onClick={() => removeDiscount(index)}
+                  aria-label={`Remover pacote ${index + 1}`}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4 shrink-0" aria-hidden />
                 </Button>
 
                 <div className="grid grid-cols-2 gap-4">

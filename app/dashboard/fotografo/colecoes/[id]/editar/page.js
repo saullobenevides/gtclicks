@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCollectionByIdForEditSafe } from "@/lib/data/marketplace";
-import CollectionEditor from "@/features/collections/components/CollectionEditor";
+import EditCollectionClient from "./EditCollectionClient";
 
 export default async function EditCollectionPage(props) {
   const params = await props.params;
@@ -12,9 +12,5 @@ export default async function EditCollectionPage(props) {
     notFound();
   }
 
-  return (
-    <div className="w-full">
-      <CollectionEditor collection={collection} />
-    </div>
-  );
+  return <EditCollectionClient collection={collection} />;
 }

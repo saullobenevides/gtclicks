@@ -156,7 +156,8 @@ export default function CategoriesPage() {
           <Link
             key={category}
             href={`/busca?categoria=${category}`}
-            className="group relative border-0 rounded-xl overflow-hidden min-h-[220px] flex items-end shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
+            className="group relative border-0 rounded-xl overflow-hidden min-h-[180px] sm:min-h-[220px] flex items-end shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 active:scale-[0.99] touch-manipulation"
+            aria-label={`Explorar categoria ${category}`}
           >
             {/* Background Image */}
             <Image
@@ -169,7 +170,7 @@ export default function CategoriesPage() {
             />
 
             {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
 
             {/* Content */}
             <div className="relative z-10 p-6 w-full transform transition-transform duration-300 translate-y-2 group-hover:translate-y-0">

@@ -1,20 +1,26 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { stackServerApp } from '@/stack/server';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { getAuthenticatedUser } from "@/lib/auth";
+import { carrinhoItemBodySchema } from "@/lib/validations";
 
 export async function DELETE(request) {
-  const user = await stackServerApp.getUser();
-
+  const user = await getAuthenticatedUser();
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const { fotoId } = await request.json();
-
-    if (!fotoId) {
-      return NextResponse.json({ error: 'Foto ID required' }, { status: 400 });
+    const rawBody = await request.json();
+    const parseResult = carrinhoItemBodySchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const first = parseResult.error.flatten().fieldErrors;
+      const message =
+        Object.values(first)[0]?.[0] ||
+        parseResult.error.message ||
+        "Dados inválidos";
+      return NextResponse.json({ error: message }, { status: 400 });
     }
+    const { fotoId } = parseResult.data;
 
     // Find user's cart
     const cart = await prisma.carrinho.findUnique({
@@ -32,7 +38,10 @@ export async function DELETE(request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error removing item from cart:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error("Error removing item from cart:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@stackframe/stack";
 import { useRouter, usePathname } from "next/navigation";
+import { Home, Folder, Images, Wallet, User } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import LoadingSkeleton from "./loading";
 
@@ -13,10 +14,19 @@ export default function PhotographerLayout({ children }) {
   const [checking, setChecking] = useState(true);
 
   const navItems = [
-    { href: "/dashboard/fotografo", label: "Início" },
-    { href: "/dashboard/fotografo/colecoes", label: "Minhas Coleções" },
-    { href: "/dashboard/fotografo/financeiro", label: "Financeiro" },
-    { href: "/dashboard/fotografo/perfil", label: "Meu Perfil" },
+    { href: "/dashboard/fotografo", label: "Início", icon: Home },
+    {
+      href: "/dashboard/fotografo/colecoes",
+      label: "Minhas Coleções",
+      icon: Folder,
+    },
+    { href: "/dashboard/fotografo/fotos", label: "Minhas Fotos", icon: Images },
+    {
+      href: "/dashboard/fotografo/financeiro",
+      label: "Financeiro",
+      icon: Wallet,
+    },
+    { href: "/dashboard/fotografo/perfil", label: "Meu Perfil", icon: User },
   ];
 
   useEffect(() => {
@@ -30,6 +40,23 @@ export default function PhotographerLayout({ children }) {
       try {
         if (pathname === "/dashboard/fotografo/onboarding") {
           setChecking(false);
+          return;
+        }
+
+        // Validar role: apenas FOTOGRAFO ou ADMIN acedem ao dashboard (Manual v3.0)
+        const meRes = await fetch("/api/users/me", {
+          headers: {
+            "x-stack-auth-email": user.primaryEmail || user.email || "",
+          },
+        });
+        if (!meRes.ok) {
+          setChecking(false);
+          return;
+        }
+        const meData = await meRes.json();
+        const role = meData?.role;
+        if (role !== "FOTOGRAFO" && role !== "ADMIN") {
+          router.push("/?error=unauthorized");
           return;
         }
 

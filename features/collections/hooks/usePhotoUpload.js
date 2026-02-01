@@ -8,7 +8,12 @@ export function usePhotoUpload(collectionId, currentFolder) {
     label: "",
   });
 
-  const uploadFromDevice = async (photoToUpload, file) => {
+  const uploadFromDevice = async (
+    photoToUpload,
+    file,
+    effectiveCollectionId
+  ) => {
+    const cId = effectiveCollectionId ?? collectionId;
     if (!file) return;
     setUploadState({
       photoTempId: photoToUpload.tempId,
@@ -34,7 +39,7 @@ export function usePhotoUpload(collectionId, currentFolder) {
 
       if (originalPresign.error)
         throw new Error(
-          originalPresign.error || "Falha ao gerar URL de upload",
+          originalPresign.error || "Falha ao gerar URL de upload"
         );
 
       await fetch(originalPresign.uploadUrl, {
@@ -63,7 +68,7 @@ export function usePhotoUpload(collectionId, currentFolder) {
           height: img.height,
           // titulo: null (Let backend generate it)
           ...metadata,
-          colecaoId: collectionId,
+          colecaoId: cId,
           folderId: currentFolder?.id || null,
         }),
       });
@@ -93,7 +98,12 @@ export function usePhotoUpload(collectionId, currentFolder) {
     }
   };
 
-  const handleFileSelect = async (photo, file, onUpdatePhoto) => {
+  const handleFileSelect = async (
+    photo,
+    file,
+    onUpdatePhoto,
+    collectionIdOverride
+  ) => {
     if (!file) return;
     const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
@@ -109,7 +119,8 @@ export function usePhotoUpload(collectionId, currentFolder) {
     };
     img.src = URL.createObjectURL(file);
 
-    return await uploadFromDevice(photo, file);
+    const effectiveId = collectionIdOverride ?? collectionId;
+    return await uploadFromDevice(photo, file, effectiveId);
   };
 
   return {

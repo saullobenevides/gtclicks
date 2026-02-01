@@ -1,0 +1,36 @@
+# Ignorar no upload da Vercel (reduz tamanho e tempo de deploy)
+# https://vercel.com/docs/build-step#ignoring-files
+
+# Pastas de desenvolvimento e testes
+.agent
+.cursor
+__tests__
+e2e
+coverage
+playwright-report
+test-results
+logs
+
+# Config e setup de testes (não usados no build)
+jest.config.js
+jest.setup.js
+jest.env.js
+playwright.config.js
+
+# Docs de revisão (opcional; manter README e DESIGN_SYSTEM no repo)
+COMPONENTS_REVIEW.md
+DASHBOARD_REVIEW.md
+HEADER_FOOTER_REVIEW.md
+PAGES_REVIEW.md
+REVIEW_COMPLETA.md
+REVIEW.md
+project-cleanup.md
+ANALISE_COMPLETA.md
+REVISAO_UI_UX_FLUXOS.md
+
+# Logs e debug
+*.log
+e2e_network_debug.log
+
+# IDE
+.vscode

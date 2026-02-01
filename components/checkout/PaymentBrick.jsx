@@ -39,7 +39,8 @@ export default function PaymentBrick({
       style: {
         theme: "dark",
         customVariables: {
-          formBackgroundColor: "#1a1a1a",
+          // DESIGN_SYSTEM: surface-card–like (#0a0a0a) / text-on-dark (#ffffff); SDK exige hex
+          formBackgroundColor: "#0a0a0a",
           baseColor: "#ffffff",
         },
       },

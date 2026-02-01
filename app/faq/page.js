@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function FAQPage() {
   return (
-    <div className="container-wide py-12 md:py-24">
+    <div className="container-wide px-4 py-12 md:py-24">
       <div className="mx-auto max-w-3xl space-y-8">
         <div className="text-center space-y-4 mb-12">
           <h1 className="heading-display font-display text-3xl font-black text-white sm:text-4xl md:text-5xl">
@@ -53,7 +53,7 @@ export default function FAQPage() {
         <div className="flex justify-center pt-12">
           <div className="text-center space-y-4">
             <p className="text-muted-foreground">Ainda tem dúvidas?</p>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="min-h-[48px] w-full sm:w-auto">
               <Link href="/contato">Fale Conosco</Link>
             </Button>
           </div>

@@ -67,7 +67,7 @@ export default function NavUserActions({ mobile = false }) {
             <Link href="/login">Entrar</Link>
           </Button>
           <Button className="w-full h-11" asChild>
-            <Link href="/login">Criar Conta</Link>
+            <Link href="/registrar">Criar Conta</Link>
           </Button>
         </div>
       );
@@ -235,7 +235,7 @@ function DropdownItem({ href, icon: Icon, children, className }) {
       asChild
       className={cn(
         "cursor-pointer rounded-radius-md px-space-3 py-space-2 focus:bg-surface-subtle focus:text-text-primary flex items-center gap-space-2 text-text-secondary transition-colors",
-        className,
+        className
       )}
     >
       <Link href={href}>

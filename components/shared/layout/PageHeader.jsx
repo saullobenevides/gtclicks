@@ -14,7 +14,7 @@ export default function PageHeader({
       className={cn(
         "relative w-full overflow-hidden flex flex-col",
         variant === "profile" ? "min-h-[450px] md:h-[400px]" : "min-h-[60vh]",
-        className,
+        className
       )}
     >
       {/* Background Layer */}
@@ -27,7 +27,7 @@ export default function PageHeader({
             priority={true}
           />
         ) : (
-          <div className="h-full w-full bg-linear-to-br from-indigo-900/50 via-purple-900/50 to-background" />
+          <div className="h-full w-full bg-linear-to-br from-surface-page via-surface-section to-background" />
         )}
 
         {/* Overlays */}
@@ -37,8 +37,8 @@ export default function PageHeader({
             overlayOpacity === "heavy"
               ? "from-black/80 via-black/80 to-background"
               : overlayOpacity === "light"
-                ? "from-black/40 via-black/40 to-black/80"
-                : "from-black/60 via-black/70 to-background",
+              ? "from-black/40 via-black/40 to-black/80"
+              : "from-black/60 via-black/70 to-background"
           )}
         />
 
@@ -52,7 +52,7 @@ export default function PageHeader({
           "relative flex-1 container-wide flex flex-col z-10",
           variant === "profile"
             ? "justify-end pb-8 pt-20 md:pb-12"
-            : "items-center justify-center text-center pt-32 pb-32",
+            : "items-center justify-center text-center pt-32 pb-32"
         )}
       >
         {children}

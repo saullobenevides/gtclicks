@@ -38,12 +38,19 @@ export default function AnalyticsOverview({ stats }) {
     stats.views > 0 ? ((stats.sales / stats.views) * 100).toFixed(1) : 0;
 
   return (
-    <div className="space-y-4">
-      <span className="heading-display font-display font-black text-xl md:text-2xl text-white">
-        Desempenho
-      </span>
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="space-y-2">
+        <h2 className="heading-display font-display font-black text-xl md:text-2xl text-white tracking-tight">
+          Desempenho
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Métricas e análise de performance das suas coleções
+        </p>
+      </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Grid */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Vendas Totais */}
         <Card className="bg-black/20 border-white/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -113,25 +120,29 @@ export default function AnalyticsOverview({ stats }) {
         </Card>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
-        <Card className="col-span-4 bg-black/20 border-white/10">
+      {/* Charts Grid */}
+      <div className="grid gap-4 lg:grid-cols-7">
+        <Card className="lg:col-span-4 bg-black/20 border-white/10">
           <CardHeader>
             <CardTitle className="text-white">Vendas Recentes</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Histórico dos últimos 7 dias
+            </p>
           </CardHeader>
-          <CardContent className="pl-2">
-            <div className="h-[200px] w-full">
+          <CardContent className="pl-2 pr-2">
+            <div className="h-[220px] md:h-[250px] w-full">
               {/* Placeholder Chart */}
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
                   <XAxis
                     dataKey="name"
-                    stroke="#888888"
+                    stroke="#a1a1aa"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                   />
                   <YAxis
-                    stroke="#888888"
+                    stroke="#a1a1aa"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
@@ -139,13 +150,13 @@ export default function AnalyticsOverview({ stats }) {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#1f2937",
+                      backgroundColor: "#1c1c1c",
                       border: "none",
-                      color: "#fff",
+                      color: "#ffffff",
                       borderRadius: "8px",
                       boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                     }}
-                    itemStyle={{ color: "#fff" }}
+                    itemStyle={{ color: "#ffffff" }}
                   />
                   <Bar
                     dataKey="vendas"
@@ -159,17 +170,18 @@ export default function AnalyticsOverview({ stats }) {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 bg-black/20 border-white/10">
+        <Card className="lg:col-span-3 bg-black/20 border-white/10">
           <CardHeader>
             <CardTitle className="text-white">Fotos Populares</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Suas fotos com mais visualizações.
+              Suas fotos com mais visualizações
             </p>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-center h-[150px] text-muted-foreground border-2 border-dashed border-white/10 rounded-md">
-                Ainda não há dados suficientes
+            <div className="flex items-center justify-center h-[200px] md:h-[230px] text-muted-foreground border-2 border-dashed border-white/10 rounded-md">
+              <div className="text-center space-y-2">
+                <Images className="h-8 w-8 mx-auto opacity-20" />
+                <p className="text-sm">Ainda não há dados suficientes</p>
               </div>
             </div>
           </CardContent>

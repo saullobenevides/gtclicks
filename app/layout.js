@@ -94,7 +94,7 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ef233c",
+  themeColor: "#ef233c", // action-primary (DESIGN_SYSTEM)
 };
 
 export default function RootLayout({ children }) {
@@ -130,7 +130,9 @@ export default function RootLayout({ children }) {
         />
         <AppProviders>
           <Header />
-          <main className="flex-1 w-full pt-20 pb-24 md:pb-0">{children}</main>
+          <main className="flex-1 w-full pt-16 pb-24 md:pt-[76px] md:pb-0">
+            {children}
+          </main>
           <Footer />
           <LazyClientComponents />
           <NavigationController>

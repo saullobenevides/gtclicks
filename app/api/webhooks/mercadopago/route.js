@@ -1,10 +1,41 @@
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { sendOrderConfirmationEmail } from "@/lib/mail";
+import { validateWebhookSignature } from "@/lib/mercadopago-webhook";
+import { logError, logWarn, logInfo } from "@/lib/logger";
 
 export async function POST(request) {
   try {
     const body = await request.json();
+
+    // Validação de assinatura (quando MERCADOPAGO_WEBHOOK_SECRET configurado)
+    const webhookSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+    if (webhookSecret) {
+      const dataId =
+        body.data?.id ?? (body.type === "payment" ? body.data?.id : null);
+      if (dataId) {
+        const headers = request.headers;
+        const xSignature = headers?.get?.("x-signature") ?? null;
+        const xRequestId = headers?.get?.("x-request-id") ?? "";
+        const result = validateWebhookSignature({
+          xSignature,
+          xRequestId,
+          dataId: String(dataId),
+          secret: webhookSecret,
+        });
+        if (!result.valid) {
+          logWarn(
+            `Assinatura inválida: ${result.reason} (data.id=${dataId})`,
+            "Webhook MP"
+          );
+          return NextResponse.json(
+            { error: "Invalid signature", reason: result.reason },
+            { status: 401 }
+          );
+        }
+      }
+    }
 
     // Mercado Pago sends notifications for different events
     // We filter for "payment" type or "payment.updated" action (depending on API version, but 'payment' is safer)
@@ -40,22 +71,23 @@ export async function POST(request) {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      },
+      }
     );
 
     if (!paymentResponse.ok) {
-      console.error(`Failed to fetch payment ${paymentId} from Mercado Pago`);
+      logError(new Error(`Failed to fetch payment ${paymentId}`), "Webhook MP");
       return NextResponse.json(
         { error: "Failed to fetch payment" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     const payment = await paymentResponse.json();
     const pedidoId = payment.external_reference;
 
-    console.log(
+    logInfo(
       `Payment ${paymentId} status: ${payment.status} for order ${pedidoId}`,
+      "Webhook MP"
     );
 
     if (payment.status === "approved") {
@@ -73,7 +105,7 @@ export async function POST(request) {
       });
 
       if (!pedido) {
-        console.error(`Order ${pedidoId} not found`);
+        logError(new Error(`Order ${pedidoId} not found`), "Webhook MP");
         return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
 
@@ -114,11 +146,11 @@ export async function POST(request) {
         // Fetch platform fee from config
         const { getConfigNumber, CONFIG_KEYS } = await import("@/lib/config");
         const taxaPlataformaPct = await getConfigNumber(
-          CONFIG_KEYS.TAXA_PLATAFORMA,
+          CONFIG_KEYS.TAXA_PLATAFORMA
         );
         // Photographer gets (100 - fee)%
         const photographerShare = new Prisma.Decimal(1).sub(
-          new Prisma.Decimal(taxaPlataformaPct).div(100),
+          new Prisma.Decimal(taxaPlataformaPct).div(100)
         );
 
         for (const item of items) {
@@ -169,8 +201,9 @@ export async function POST(request) {
 
           // --- NOTIFICATION: Photo Sold ---
           try {
-            const { notifyPhotographerSale } =
-              await import("@/actions/notifications");
+            const { notifyPhotographerSale } = await import(
+              "@/actions/notifications"
+            );
             await notifyPhotographerSale({
               fotografoUserId: item.foto.fotografo.user.id,
               photoTitle: item.foto.titulo,
@@ -178,24 +211,25 @@ export async function POST(request) {
               orderId: pedidoId,
             });
           } catch (nErr) {
-            console.error("Failed to send photographer notification:", nErr);
+            logError(nErr, "Webhook MP photographer notification");
           }
 
-          console.log(
-            `💰 Fotógrafo ${fotografoId} creditado: R$ ${valorFotografo.toString()}`,
+          logInfo(
+            `💰 Fotógrafo ${fotografoId} creditado: R$ ${valorFotografo.toString()}`
           );
         }
 
         // --- NOTIFICATION: Order Approved ---
         try {
-          const { notifyOrderApproved } =
-            await import("@/actions/notifications");
+          const { notifyOrderApproved } = await import(
+            "@/actions/notifications"
+          );
           await notifyOrderApproved({
             userId: pedido.userId,
             orderId: pedidoId,
           });
         } catch (nErr) {
-          console.error("Failed to send order approval notification:", nErr);
+          logError(nErr, "Webhook MP order approval notification");
         }
 
         // --- EMAIL NOTIFICATION: Order Confirmation with Links ---
@@ -215,27 +249,32 @@ export async function POST(request) {
             items: emailItems,
             total: pedido.total,
           });
-          console.log(
-            `📧 Confirmation email sent to ${pedido.user.email} for order ${pedidoId}`,
+          logInfo(
+            `Confirmation email sent to ${pedido.user.email} for order ${pedidoId}`,
+            "Webhook MP"
           );
         } catch (eErr) {
-          console.error("Failed to send order confirmation email:", eErr);
+          logError(eErr, "Webhook MP order confirmation email");
         }
 
         return { processed: true };
       });
 
       if (!result.processed) {
-        console.log(`Order ${pedidoId} was already processed (Atomic Check).`);
+        logInfo(
+          `Order ${pedidoId} was already processed (Atomic Check).`,
+          "Webhook MP"
+        );
         return NextResponse.json({
           received: true,
           message: "Already processed",
         });
       }
 
-      console.log(`✅ Order ${pedidoId} successfully processed and paid.`);
-
-      console.log(`✅ Order ${pedidoId} successfully processed and paid.`);
+      logInfo(
+        `Order ${pedidoId} successfully processed and paid.`,
+        "Webhook MP"
+      );
     } else if (
       payment.status === "rejected" ||
       payment.status === "cancelled"
@@ -246,16 +285,18 @@ export async function POST(request) {
           status: "CANCELADO",
         },
       });
-      console.log(
-        `❌ Order ${pedidoId} marked as CANCELADO (Payment Rejected/Cancelled)`,
+      logInfo(
+        `Order ${pedidoId} marked as CANCELADO (Payment Rejected/Cancelled)`,
+        "Webhook MP"
       );
     } else if (
       payment.status === "refunded" ||
       payment.status === "charged_back"
     ) {
       // --- SECURITY FIX: Handle Refunds/Chargebacks ---
-      console.log(
-        `⚠️ Payment ${paymentId} was REFUNDED/CHARGED_BACK. Reversing funds...`,
+      logWarn(
+        `Payment ${paymentId} was REFUNDED/CHARGED_BACK. Reversing funds...`,
+        "Webhook MP"
       );
 
       const pedido = await prisma.pedido.findUnique({
@@ -264,7 +305,10 @@ export async function POST(request) {
       });
 
       if (!pedido) {
-        console.error(`Order ${pedidoId} not found during refund`);
+        logError(
+          new Error(`Order ${pedidoId} not found during refund`),
+          "Webhook MP"
+        );
         return NextResponse.json({ received: true });
       }
 
@@ -286,10 +330,10 @@ export async function POST(request) {
           // Fetch platform fee from config
           const { getConfigNumber, CONFIG_KEYS } = await import("@/lib/config");
           const taxaPlataformaPct = await getConfigNumber(
-            CONFIG_KEYS.TAXA_PLATAFORMA,
+            CONFIG_KEYS.TAXA_PLATAFORMA
           );
           const photographerShare = new Prisma.Decimal(1).sub(
-            new Prisma.Decimal(taxaPlataformaPct).div(100),
+            new Prisma.Decimal(taxaPlataformaPct).div(100)
           );
 
           // Re-calculate original commission to reverse it
@@ -318,21 +362,22 @@ export async function POST(request) {
             },
           });
 
-          console.log(
-            `💸 Estorno aplicado para fotógrafo ${fotografoId}: -R$ ${valorEstorno}`,
+          logInfo(
+            `Estorno aplicado para fotógrafo ${fotografoId}: -R$ ${valorEstorno}`,
+            "Webhook MP"
           );
         }
       });
 
-      console.log(`✅ Order ${pedidoId} fully refunded in DB.`);
+      logInfo(`Order ${pedidoId} fully refunded in DB.`, "Webhook MP");
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Webhook error:", error);
+    logError(error, "Webhook MP");
     return NextResponse.json(
       { error: "Webhook processing failed", details: error.message },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -156,7 +156,7 @@ export default function SelfieSearch() {
                   <Button
                     onClick={handleSearch}
                     disabled={loading || !file}
-                    className="w-full h-12 rounded-full font-bold text-lg bg-primary hover:bg-primary/90"
+                    className="w-full h-12 rounded-full font-bold text-lg"
                   >
                     {loading ? "Processando..." : "Buscar minhas fotos"}
                   </Button>

@@ -28,7 +28,7 @@ export default function PaymentSuccessPage() {
                 `/api/pedidos/${pedidoId}/verificar-pagamento`,
                 {
                   method: "POST",
-                },
+                }
               );
               if (verifyRes.ok) {
                 const verifyData = await verifyRes.json();
@@ -54,9 +54,9 @@ export default function PaymentSuccessPage() {
   }, [pedidoId]);
 
   return (
-    <div className="container">
-      <section className="py-24">
-        <div className="text-center max-w-2xl mx-auto p-12 bg-card border rounded-lg">
+    <div className="container-wide px-4">
+      <section className="py-12 sm:py-24">
+        <div className="text-center max-w-2xl mx-auto p-6 sm:p-12 bg-card border border-white/10 rounded-xl">
           <div className="w-20 h-20 mx-auto mb-8 rounded-full flex items-center justify-center text-5xl font-bold text-white bg-green-500">
             ✓
           </div>
@@ -91,10 +91,18 @@ export default function PaymentSuccessPage() {
           )}
 
           <div className="flex flex-col gap-4 mt-8">
-            <Button asChild size="lg" className="h-12 text-lg">
+            <Button
+              asChild
+              size="lg"
+              className="min-h-[48px] h-12 text-base sm:text-lg w-full sm:w-auto"
+            >
               <Link href="/meus-downloads">Baixar Minhas Fotos Agora</Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button
+              asChild
+              variant="outline"
+              className="min-h-[48px] w-full sm:w-auto"
+            >
               <Link href="/busca">Continuar Comprando</Link>
             </Button>
           </div>

@@ -63,7 +63,7 @@ export default function PhotographerProfileForm({ photographer }) {
       // Append especialidades
       if (Array.isArray(formData.especialidades)) {
         formData.especialidades.forEach((spec) =>
-          payload.append("especialidades", spec),
+          payload.append("especialidades", spec)
         );
       }
 
@@ -87,7 +87,7 @@ export default function PhotographerProfileForm({ photographer }) {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-black/20 border-white/10">
         <CardHeader>
           <CardTitle>Identidade Visual</CardTitle>
           <CardDescription>
@@ -300,7 +300,7 @@ export default function PhotographerProfileForm({ photographer }) {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-end sticky bottom-0 bg-background/95 backdrop-blur py-4 border-t z-10">
+          <CardFooter className="flex justify-end sticky bottom-0 bg-background/95 backdrop-blur py-4 border-t border-white/10 z-10">
             <Button type="submit" disabled={loading} size="lg">
               {loading ? (
                 <>

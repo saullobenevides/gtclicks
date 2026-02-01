@@ -16,8 +16,8 @@ export const metadata = {
 
 export default function ContatoPage() {
   return (
-    <div className="container-wide py-12 md:py-24">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+    <div className="container-wide px-4 py-12 md:py-24">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-start">
         <div className="space-y-8">
           <div className="space-y-4">
             <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
@@ -37,7 +37,7 @@ export default function ContatoPage() {
                 </div>
                 <div>
                   <CardTitle className="text-white">E-mail</CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription className="text-muted-foreground">
                     Suporte geral e parcerias
                   </CardDescription>
                 </div>
@@ -59,7 +59,7 @@ export default function ContatoPage() {
                 </div>
                 <div>
                   <CardTitle className="text-white">WhatsApp</CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription className="text-muted-foreground">
                     Atendimento rápido (Seg-Sex, 9h-18h)
                   </CardDescription>
                 </div>
@@ -141,7 +141,7 @@ export default function ContatoPage() {
               </div>
               <Button
                 type="button"
-                className="w-full bg-primary hover:bg-primary/90 text-white font-bold"
+                className="w-full min-h-[48px] font-bold touch-manipulation"
               >
                 Enviar Mensagem
               </Button>

@@ -1,5 +1,6 @@
 import {
   Pagination,
+  PaginationButton,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
@@ -8,19 +9,42 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
+/**
+ * Paginação unificada: URL (Server) ou client-side (onClick).
+ *
+ * Modo URL (padrão): baseUrl + searchParams → usa Link/href.
+ * Modo client: onPageChange(page) → usa button onClick (ex.: CollectionSearchClient).
+ */
 export default function AppPagination({
   currentPage,
   totalPages,
   baseUrl,
-  searchParams,
+  searchParams = {},
+  onPageChange,
+  className,
+  "aria-label": ariaLabel,
 }) {
   if (totalPages <= 1) return null;
+
+  const isClientMode = typeof onPageChange === "function";
 
   const createPageURL = (pageNumber) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", pageNumber.toString());
     return `${baseUrl}?${params.toString()}`;
   };
+
+  const handlePageClick = (page) => {
+    onPageChange?.(page);
+    typeof window !== "undefined" &&
+      window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const PageLink = isClientMode ? PaginationButton : PaginationLink;
+  const pageLinkProps = (page) =>
+    isClientMode
+      ? { onClick: () => handlePageClick(page) }
+      : { href: createPageURL(page) };
 
   const renderPageLinks = () => {
     const items = [];
@@ -33,48 +57,43 @@ export default function AppPagination({
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    // First page
     if (startPage > 1) {
       items.push(
         <PaginationItem key="1">
-          <PaginationLink href={createPageURL(1)}>1</PaginationLink>
-        </PaginationItem>,
+          <PageLink {...pageLinkProps(1)}>1</PageLink>
+        </PaginationItem>
       );
       if (startPage > 2) {
         items.push(
           <PaginationItem key="ellipsis-start">
             <PaginationEllipsis />
-          </PaginationItem>,
+          </PaginationItem>
         );
       }
     }
 
-    // Middle pages
     for (let i = startPage; i <= endPage; i++) {
       items.push(
         <PaginationItem key={i}>
-          <PaginationLink href={createPageURL(i)} isActive={currentPage === i}>
+          <PageLink {...pageLinkProps(i)} isActive={currentPage === i}>
             {i}
-          </PaginationLink>
-        </PaginationItem>,
+          </PageLink>
+        </PaginationItem>
       );
     }
 
-    // Last page
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
         items.push(
           <PaginationItem key="ellipsis-end">
             <PaginationEllipsis />
-          </PaginationItem>,
+          </PaginationItem>
         );
       }
       items.push(
         <PaginationItem key={totalPages}>
-          <PaginationLink href={createPageURL(totalPages)}>
-            {totalPages}
-          </PaginationLink>
-        </PaginationItem>,
+          <PageLink {...pageLinkProps(totalPages)}>{totalPages}</PageLink>
+        </PaginationItem>
       );
     }
 
@@ -82,11 +101,18 @@ export default function AppPagination({
   };
 
   return (
-    <Pagination className="mt-8">
+    <Pagination className={className ?? "mt-8"} aria-label={ariaLabel}>
       <PaginationContent>
         {currentPage > 1 && (
           <PaginationItem>
-            <PaginationPrevious href={createPageURL(currentPage - 1)} />
+            {isClientMode ? (
+              <PaginationPrevious
+                as="button"
+                onClick={() => handlePageClick(currentPage - 1)}
+              />
+            ) : (
+              <PaginationPrevious href={createPageURL(currentPage - 1)} />
+            )}
           </PaginationItem>
         )}
 
@@ -94,7 +120,14 @@ export default function AppPagination({
 
         {currentPage < totalPages && (
           <PaginationItem>
-            <PaginationNext href={createPageURL(currentPage + 1)} />
+            {isClientMode ? (
+              <PaginationNext
+                as="button"
+                onClick={() => handlePageClick(currentPage + 1)}
+              />
+            ) : (
+              <PaginationNext href={createPageURL(currentPage + 1)} />
+            )}
           </PaginationItem>
         )}
       </PaginationContent>

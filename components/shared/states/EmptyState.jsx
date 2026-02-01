@@ -17,7 +17,7 @@ import Image from "next/image";
  * @param {Function} props.action.onClick - Callback do botão
  * @param {string} props.action.href - Link do botão (alternativo ao onClick)
  * @param {string} props.illustration - URL de ilustração opcional
- * @param {'default'|'minimal'|'illustrated'} props.variant - Variante visual
+ * @param {'default'|'minimal'|'illustrated'|'dashboard'} props.variant - Variante visual (dashboard = tema escuro)
  * @param {string} props.className - Classes CSS adicionais
  */
 export default function EmptyState({
@@ -31,12 +31,14 @@ export default function EmptyState({
 }) {
   const isMinimal = variant === "minimal";
   const isIllustrated = variant === "illustrated";
+  const isDashboard = variant === "dashboard";
 
   const content = (
     <div
       className={cn(
         "flex flex-col items-center justify-center text-center",
         isMinimal ? "py-8" : "py-16",
+        isDashboard && "py-12",
         className
       )}
       data-testid="empty-state"
@@ -55,14 +57,16 @@ export default function EmptyState({
         Icon && (
           <div
             className={cn(
-              "rounded-full bg-muted flex items-center justify-center mb-6",
-              isMinimal ? "h-12 w-12" : "h-16 w-16"
+              "rounded-full flex items-center justify-center mb-6",
+              isDashboard ? "h-16 w-16 bg-white/10" : "bg-muted",
+              !isDashboard && (isMinimal ? "h-12 w-12" : "h-16 w-16")
             )}
           >
             <Icon
               className={cn(
                 "text-muted-foreground",
-                isMinimal ? "h-6 w-6" : "h-8 w-8"
+                isMinimal ? "h-6 w-6" : "h-8 w-8",
+                isDashboard && "opacity-90"
               )}
             />
           </div>
@@ -72,8 +76,9 @@ export default function EmptyState({
       {/* Title */}
       <h3
         className={cn(
-          "font-semibold text-foreground mb-2",
-          isMinimal ? "text-base" : "text-xl"
+          "font-semibold mb-2",
+          isDashboard ? "text-xl text-white" : "text-foreground",
+          isMinimal && "text-base"
         )}
       >
         {title}
@@ -83,7 +88,7 @@ export default function EmptyState({
       {description && (
         <p
           className={cn(
-            "text-muted-foreground max-w-md",
+            "max-w-md text-muted-foreground",
             isMinimal ? "text-sm mb-4" : "text-base mb-6"
           )}
         >
@@ -94,11 +99,25 @@ export default function EmptyState({
       {/* Action Button */}
       {action &&
         (action.href ? (
-          <Button asChild size={isMinimal ? "default" : "lg"}>
+          <Button
+            asChild
+            size={isMinimal ? "default" : "lg"}
+            className={
+              isDashboard &&
+              "bg-[var(--button-primary-bg)] hover:bg-[var(--button-primary-hover)] text-white"
+            }
+          >
             <Link href={action.href}>{action.label}</Link>
           </Button>
         ) : (
-          <Button onClick={action.onClick} size={isMinimal ? "default" : "lg"}>
+          <Button
+            onClick={action.onClick}
+            size={isMinimal ? "default" : "lg"}
+            className={
+              isDashboard &&
+              "bg-[var(--button-primary-bg)] hover:bg-[var(--button-primary-hover)] text-white"
+            }
+          >
             {action.label}
           </Button>
         ))}

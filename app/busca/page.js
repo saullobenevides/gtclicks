@@ -72,14 +72,14 @@ export default async function SearchPage(props) {
 
             <div className="min-w-0">
               {results.length === 0 ? (
-                <div className="col-span-full py-24 px-8 text-center glass-panel border-dashed border-white/10 bg-transparent rounded-xl">
-                  <h2 className="text-2xl font-bold text-white mb-4">
+                <div className="col-span-full py-16 sm:py-24 px-4 sm:px-8 text-center glass-panel border-dashed border-white/10 bg-transparent rounded-xl">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
                     Nenhuma coleção encontrada
                   </h2>
-                  <p className="text-gray-400 text-lg mb-6">
+                  <p className="text-muted-foreground text-base sm:text-lg mb-6 max-w-md mx-auto">
                     Tente buscar por local ou categoria do evento.
                   </p>
-                  <Button asChild variant="outline">
+                  <Button asChild variant="outline" className="min-h-[44px]">
                     <Link href="/busca">Ver tudo</Link>
                   </Button>
                 </div>

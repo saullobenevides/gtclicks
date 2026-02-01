@@ -44,7 +44,7 @@ export default function FeatureCard({
       </CardHeader>
       
       <CardContent className="p-0">
-        <p className="text-gray-400 leading-relaxed">
+        <p className="text-muted-foreground leading-relaxed">
           {description}
         </p>
       </CardContent>

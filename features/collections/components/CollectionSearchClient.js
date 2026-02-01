@@ -5,9 +5,7 @@ import { createPortal } from "react-dom";
 import {
   Search,
   X,
-  CheckSquare,
   ShoppingCart,
-  PlusCircle,
   Calendar,
   Clock,
   FilterX,
@@ -25,6 +23,8 @@ import { useCart } from "@/features/cart/context/CartContext";
 import { toast } from "sonner";
 import { SelectionContext } from "../context/SelectionContext";
 import PhotoCard from "@/components/shared/cards/PhotoCard";
+import AppPagination from "@/components/shared/AppPagination";
+import { LICENSE_MVP_LABEL } from "@/lib/constants";
 
 export default function CollectionSearchClient({
   allPhotos = [],
@@ -96,7 +96,7 @@ export default function CollectionSearchClient({
           preco: photo.colecao?.precoFoto || photo.preco || 0,
           precoBase: photo.colecao?.precoFoto || photo.preco || 0,
           descontos: photo.colecao?.descontos || [],
-          licenca: "Uso Padrão",
+          licenca: LICENSE_MVP_LABEL,
           previewUrl: photo.previewUrl,
         });
         count++;
@@ -159,10 +159,7 @@ export default function CollectionSearchClient({
     return photosToDisplay.slice(start, start + ITEMS_PER_PAGE);
   }, [currentPage, photosToDisplay]);
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "auto" });
-  };
+  const handlePageChange = (page) => setCurrentPage(page);
 
   const clearFilters = () => {
     setQuery("");
@@ -184,7 +181,7 @@ export default function CollectionSearchClient({
           ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
           : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`),
       preco: photo.colecao?.precoFoto || 0,
-      licenca: "Uso Padrão",
+      licenca: LICENSE_MVP_LABEL,
       previewUrl: photo.previewUrl,
     });
     toast.success("Foto adicionada ao carrinho");
@@ -245,7 +242,7 @@ export default function CollectionSearchClient({
                     {availableFilters.dates.map((date) => (
                       <SelectItem key={date} value={date}>
                         {new Date(date + "T12:00:00Z").toLocaleDateString(
-                          "pt-BR",
+                          "pt-BR"
                         )}
                       </SelectItem>
                     ))}
@@ -329,28 +326,15 @@ export default function CollectionSearchClient({
                 ))}
               </div>
 
-              {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 md:gap-4 mt-12 pb-12">
-                  <Button
-                    variant="outline"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="h-8 w-20 md:h-10 md:w-24 text-xs md:text-sm border-[#480000]/20 text-foreground hover:border-[#480000] hover:text-[#480000] disabled:opacity-50"
-                  >
-                    Anterior
-                  </Button>
-                  <span className="text-xs md:text-sm font-medium text-current whitespace-nowrap">
-                    Página {currentPage} de {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="h-8 w-20 md:h-10 md:w-24 text-xs md:text-sm border-[#480000]/20 text-foreground hover:border-[#480000] hover:text-[#480000] disabled:opacity-50"
-                  >
-                    Próxima
-                  </Button>
+                <div className="mt-12 pb-12">
+                  <AppPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    className="mt-0"
+                    aria-label="Navegação das fotos da coleção"
+                  />
                 </div>
               )}
             </>
@@ -375,47 +359,69 @@ export default function CollectionSearchClient({
           )}
         </div>
 
-        {/* Floating Action Bar - Use Portal to escape any parent transforms */}
+        {/* Floating Action Bar - pill layout conforme design (desktop + mobile) */}
         {typeof document !== "undefined" &&
           createPortal(
             <div
-              className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-100 transition-all duration-300 w-[95%] md:w-auto ${
+              role="toolbar"
+              aria-label={`${selectedIds.size} foto${
+                selectedIds.size !== 1 ? "s" : ""
+              } selecionada${selectedIds.size !== 1 ? "s" : ""}`}
+              className={`fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-100 transition-all duration-300 w-[95%] max-w-md md:max-w-none md:min-w-[360px] ${
                 selectedIds.size > 0
                   ? "translate-y-0 opacity-100"
                   : "translate-y-24 opacity-0 pointer-events-none"
               }`}
+              style={{
+                paddingBottom: "env(safe-area-inset-bottom)",
+              }}
             >
-              <div className="bg-zinc-900/95 text-white pl-4 pr-2 py-2 md:pl-6 md:pr-2 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.5)] flex items-center justify-between gap-3 md:gap-4 md:min-w-[320px] border border-white/10 ring-1 ring-white/10 backdrop-blur-md">
-                <div className="flex items-center gap-2 md:gap-3">
-                  <span className="flex items-center justify-center bg-white/20 h-6 w-6 md:h-8 md:w-8 rounded-full text-xs md:text-sm font-bold shadow-inner">
+              <div className="bg-zinc-900/95 text-white pl-4 pr-2 py-2.5 md:pl-6 md:pr-3 md:py-2 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.5)] flex items-center justify-between gap-3 md:gap-4 border border-white/10 backdrop-blur-md">
+                <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                  <span
+                    className="flex shrink-0 items-center justify-center bg-white/20 h-7 w-7 md:h-8 md:w-8 rounded-full text-xs md:text-sm font-bold"
+                    aria-hidden
+                  >
                     {selectedIds.size}
                   </span>
-                  <span className="font-medium text-xs md:text-sm tracking-wide">
-                    <span className="hidden md:inline">fotos selecionadas</span>
-                    <span className="md:hidden">selecionadas</span>
+                  <span className="font-medium text-xs md:text-sm tracking-wide truncate">
+                    <span className="md:hidden">
+                      {selectedIds.size} selecionadas
+                    </span>
+                    <span className="hidden md:inline">
+                      {selectedIds.size} fotos selecionadas
+                    </span>
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <Button
                     onClick={() => setSelectedIds(new Set())}
                     variant="ghost"
                     size="sm"
-                    className="h-8 md:h-9 px-2 md:px-3 hover:bg-white/10 hover:text-white rounded-full text-[10px] md:text-xs uppercase tracking-wide opacity-70 hover:opacity-100 transition-all font-semibold"
+                    className="h-9 md:h-10 min-h-[44px] px-3 md:px-4 rounded-full text-[10px] md:text-xs uppercase tracking-wide opacity-80 hover:opacity-100 hover:bg-white/10 transition-all font-semibold touch-manipulation"
+                    aria-label="Cancelar seleção"
                   >
-                    Cancelar
+                    CANCELAR
                   </Button>
                   <Button
                     onClick={handleBulkAddToCart}
                     size="sm"
-                    className="h-8 md:h-10 px-4 md:px-6 bg-white text-black hover:bg-gray-200 rounded-full font-bold shadow-lg hover:scale-105 transition-all text-xs md:text-sm"
+                    variant="strong"
+                    className="h-9 md:h-10 min-h-[44px] px-4 md:px-6 bg-white text-black hover:bg-gray-100 border-2 !border-action-primary rounded-full font-bold transition-all text-xs md:text-sm touch-manipulation active:scale-[0.98]"
+                    aria-label={`Adicionar ${selectedIds.size} foto${
+                      selectedIds.size !== 1 ? "s" : ""
+                    } ao carrinho`}
                   >
-                    <ShoppingCart className="h-3 w-3 md:h-4 md:w-4 mr-2" />
-                    Adicionar
+                    <ShoppingCart
+                      className="h-3.5 w-3.5 md:h-4 md:w-4 shrink-0"
+                      aria-hidden
+                    />
+                    ADICIONAR
                   </Button>
                 </div>
               </div>
             </div>,
-            document.body,
+            document.body
           )}
       </div>
     </SelectionContext.Provider>

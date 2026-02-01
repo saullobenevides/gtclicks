@@ -25,9 +25,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, ExternalLink, Edit } from "lucide-react";
+import {
+  PlusCircle,
+  ExternalLink,
+  Edit,
+  Eye,
+  ShoppingCart,
+  TrendingUp,
+} from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils/formatters";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 const AnalyticsOverview = dynamic(() => import("./AnalyticsOverview"), {
   ssr: false,
@@ -94,24 +102,20 @@ export default function DashboardContent() {
       : formatCurrency(0);
 
   return (
-    <div className="flex flex-col gap-8 p-0 md:p-0">
+    <div className="flex flex-col gap-6 md:gap-8 p-0">
       {/* Header & Main Action */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="heading-display font-display text-2xl md:text-3xl font-black text-white sm:text-4xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="heading-display font-display text-2xl md:text-3xl font-black text-white tracking-tight">
             Visão Geral
           </h1>
-          <p className="text-muted-foreground">
-            Acompanhe o desempenho das suas coleções e vendas.
+          <p className="text-sm md:text-base text-muted-foreground">
+            Acompanhe o desempenho das suas coleções e vendas
           </p>
         </div>
-        <Button
-          asChild
-          size="lg"
-          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
-        >
+        <Button asChild size="default" className="w-full sm:w-auto shadow-lg">
           <Link href="/dashboard/fotografo/colecoes">
-            <PlusCircle className="mr-2 h-5 w-5" />
+            <PlusCircle className="mr-2 h-4 w-4" />
             Nova Coleção
           </Link>
         </Button>
@@ -120,36 +124,65 @@ export default function DashboardContent() {
       {/* Analytics Section */}
       <AnalyticsOverview stats={{ ...stats, avgTicket, conversionRate }} />
 
-      {/* Recent Events Table */}
-      <div className="space-y-4">
+      {/* Recent Collections Table */}
+      <div className="space-y-3 md:space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="heading-display font-display font-black text-xl md:text-2xl text-white">
-            Coleções Recentes
-          </h2>
-          <Link
-            href="/dashboard/fotografo/colecoes"
-            className="text-sm text-primary hover:underline"
+          <div className="space-y-1">
+            <h2 className="heading-display font-display font-black text-xl md:text-2xl text-white tracking-tight">
+              Coleções Recentes
+            </h2>
+            <p className="text-sm text-muted-foreground hidden sm:block">
+              Suas últimas 5 coleções publicadas
+            </p>
+          </div>
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-primary hover:text-primary/80"
           >
-            Ver todas
-          </Link>
+            <Link href="/dashboard/fotografo/colecoes">
+              Ver todas
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
 
         {/* Mobile View: Cards */}
-        <div className="md:hidden space-y-4">
+        <div className="md:hidden space-y-3">
           {(fotografo.colecoes || []).length === 0 ? (
             <Card className="bg-black/20 border-white/10">
-              <CardContent className="py-8 text-center text-muted-foreground">
-                Nenhuma coleção encontrada.
+              <CardContent className="py-12 text-center">
+                <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                  <Images className="h-10 w-10 opacity-20" />
+                  <div className="space-y-1">
+                    <p className="font-medium">Nenhuma coleção encontrada</p>
+                    <p className="text-xs">
+                      Crie sua primeira coleção para começar
+                    </p>
+                  </div>
+                  <Button asChild size="sm" className="mt-2" variant="outline">
+                    <Link href="/dashboard/fotografo/colecoes">
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Nova Coleção
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (
             fotografo.colecoes.map((col) => (
-              <Card key={col.id} className="bg-black/20 border-white/10">
-                <CardContent className="p-4 flex flex-col gap-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium text-white">{col.nome}</h3>
-                      <p className="text-xs text-muted-foreground">
+              <Card
+                key={col.id}
+                className="bg-black/20 border-white/10 hover:bg-black/30 transition-colors"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base font-semibold text-white truncate">
+                        {col.nome}
+                      </CardTitle>
+                      <p className="text-xs text-muted-foreground mt-1">
                         {formatDate(col.createdAt)}
                       </p>
                     </div>
@@ -157,66 +190,77 @@ export default function DashboardContent() {
                       variant={
                         col.status === "PUBLICADA" ? "default" : "secondary"
                       }
-                      className={
-                        col.status === "PUBLICADA"
-                          ? "bg-green-500/10 text-green-500"
-                          : ""
-                      }
+                      className={cn(
+                        "shrink-0",
+                        col.status === "PUBLICADA" &&
+                          "bg-green-500/10 text-green-500 border-green-500/20"
+                      )}
                     >
                       {col.status === "PUBLICADA" ? "Ativo" : "Rascunho"}
                     </Badge>
                   </div>
+                </CardHeader>
 
-                  <div className="grid grid-cols-3 gap-2 text-sm">
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground text-xs">
+                <CardContent className="pb-3">
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-white/5">
+                      <Eye className="h-4 w-4 text-blue-400" />
+                      <span className="text-xs text-muted-foreground">
                         Views
                       </span>
-                      <span>{col.views}</span>
+                      <span className="text-sm font-bold text-white">
+                        {col.views}
+                      </span>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground text-xs">
+                    <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-white/5">
+                      <ShoppingCart className="h-4 w-4 text-orange-400" />
+                      <span className="text-xs text-muted-foreground">
                         Carrinho
                       </span>
-                      <span>{col.carrinhoCount}</span>
+                      <span className="text-sm font-bold text-white">
+                        {col.carrinhoCount}
+                      </span>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground text-xs">
+                    <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-green-500/10">
+                      <TrendingUp className="h-4 w-4 text-green-400" />
+                      <span className="text-xs text-muted-foreground">
                         Vendas
                       </span>
-                      <span className="text-green-400 font-bold">
+                      <span className="text-sm font-bold text-green-400">
                         {col.vendas}
                       </span>
                     </div>
                   </div>
+                </CardContent>
 
-                  <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+                <CardFooter className="pt-0 pb-3 flex justify-end gap-2">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 text-muted-foreground hover:text-white"
+                  >
+                    <Link
+                      href={`/dashboard/fotografo/colecoes/${col.id}/editar`}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Editar
+                    </Link>
+                  </Button>
+                  {col.status === "PUBLICADA" && (
                     <Button
                       asChild
                       variant="ghost"
-                      size="icon"
-                      className="h-11 w-11 text-muted-foreground hover:text-white bg-white/5"
+                      size="sm"
+                      className="h-9 text-muted-foreground hover:text-white"
                     >
-                      <Link
-                        href={`/dashboard/fotografo/colecoes/${col.id}/editar`}
-                      >
-                        <Edit className="h-5 w-5" />
+                      <Link href={`/colecoes/${col.slug}`} target="_blank">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Ver
                       </Link>
                     </Button>
-                    {col.status === "PUBLICADA" && (
-                      <Button
-                        asChild
-                        variant="ghost"
-                        size="icon"
-                        className="h-11 w-11 text-muted-foreground hover:text-white bg-white/5"
-                      >
-                        <Link href={`/colecoes/${col.slug}`} target="_blank">
-                          <ExternalLink className="h-5 w-5" />
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
+                  )}
+                </CardFooter>
               </Card>
             ))
           )}
@@ -325,10 +369,8 @@ export default function DashboardContent() {
         </Card>
       </div>
 
-      {/* Financials */}
-      <div className="mt-4">
-        <FinancialSummary />
-      </div>
+      {/* Financials Summary */}
+      <FinancialSummary />
     </div>
   );
 }

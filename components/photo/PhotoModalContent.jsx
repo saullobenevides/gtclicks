@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ShareButton from "@/components/shared/actions/ShareButton";
+import { LICENSE_MVP_LABEL } from "@/lib/constants";
 
 export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
   const { items, addToCart } = useCart();
@@ -50,7 +51,7 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
       preco: price,
       precoBase: price,
       descontos: photo.colecao?.descontos || [],
-      licenca: "Uso Padrão",
+      licenca: LICENSE_MVP_LABEL,
       previewUrl: photo.previewUrl,
     });
   };
@@ -71,47 +72,53 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
         }}
       />
 
-      {/* Close Button - Always visible top right */}
-      <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
+      {/* Close Button - Always visible top right (min 44px touch target) */}
+      <div
+        className="absolute top-4 right-4 z-50 flex items-center gap-2"
+        style={{ top: "max(1rem, env(safe-area-inset-top))" }}
+      >
         <ShareButton
           title="Foto GTClicks"
           text="Olha essa foto incrível!"
           variant="ghost"
-          className="bg-black/40 text-white hover:bg-black/60 backdrop-blur-md rounded-full border border-white/10 h-10 w-10 md:h-12 md:w-12"
+          className="bg-black/40 text-white hover:bg-black/60 backdrop-blur-md rounded-full border border-white/10 min-h-11 min-w-11 h-11 w-11 md:h-12 md:w-12 shrink-0"
         />
         <Button
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="bg-black/40 text-white hover:bg-black/60 backdrop-blur-md rounded-full border border-white/10 h-10 w-10 md:h-12 md:w-12"
+          className="bg-black/40 text-white hover:bg-black/60 backdrop-blur-md rounded-full border border-white/10 min-h-11 min-w-11 h-11 w-11 md:h-12 md:w-12 shrink-0"
+          aria-label="Fechar"
         >
           <X className="h-5 w-5 md:h-6 md:w-6" />
         </Button>
       </div>
 
-      {/* Navigation - Left */}
+      {/* Navigation - Left (min 44px touch target) */}
       {onPrev && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             onPrev();
           }}
-          className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-40 p-2 md:p-4 rounded-full bg-black/20 text-white/70 hover:text-white hover:bg-black/60 hover:scale-110 transition-all backdrop-blur-sm border border-white/5 flex items-center justify-center group/nav"
+          className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-40 min-h-11 min-w-11 h-11 w-11 md:h-14 md:w-14 p-0 rounded-full bg-black/20 text-white/70 hover:text-white hover:bg-black/60 active:scale-95 transition-all backdrop-blur-sm border border-white/5 flex items-center justify-center group/nav touch-manipulation"
+          aria-label="Foto anterior"
         >
-          <ChevronLeft className="h-6 w-6 md:h-10 md:w-10 group-hover/nav:-translate-x-0.5 transition-transform" />
+          <ChevronLeft className="h-6 w-6 md:h-8 md:w-8 group-hover/nav:-translate-x-0.5 transition-transform" />
         </button>
       )}
 
-      {/* Navigation - Right */}
+      {/* Navigation - Right (min 44px touch target) */}
       {onNext && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             onNext();
           }}
-          className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-40 p-2 md:p-4 rounded-full bg-black/20 text-white/70 hover:text-white hover:bg-black/60 hover:scale-110 transition-all backdrop-blur-sm border border-white/5 flex items-center justify-center group/nav"
+          className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-40 min-h-11 min-w-11 h-11 w-11 md:h-14 md:w-14 p-0 rounded-full bg-black/20 text-white/70 hover:text-white hover:bg-black/60 active:scale-95 transition-all backdrop-blur-sm border border-white/5 flex items-center justify-center group/nav touch-manipulation"
+          aria-label="Próxima foto"
         >
-          <ChevronRight className="h-6 w-6 md:h-10 md:w-10 group-hover/nav:translate-x-0.5 transition-transform" />
+          <ChevronRight className="h-6 w-6 md:h-8 md:w-8 group-hover/nav:translate-x-0.5 transition-transform" />
         </button>
       )}
 
@@ -126,8 +133,11 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
         />
       </div>
 
-      {/* Floating Bottom Bar (Cart & Price) */}
-      <div className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4 w-[90%] md:w-auto">
+      {/* Floating Bottom Bar (Cart & Price) - safe area for home indicator */}
+      <div
+        className="absolute bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 sm:gap-4 w-[90%] max-w-md md:w-auto px-2"
+        style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
+      >
         {/* Simple Title/Price Tag */}
         <div className="bg-black/60 backdrop-blur-md border border-white/10 px-4 py-1.5 rounded-full flex items-center gap-3 shadow-xl">
           <span className="text-white/90 text-sm font-medium">
@@ -139,16 +149,16 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
           </span>
         </div>
 
-        {/* Big Add Button */}
+        {/* Big Add Button (min 48px height for touch) */}
         <Button
           onClick={handleAddToCart}
           disabled={isAdded}
           size="lg"
           className={cn(
-            "h-14 px-8 md:px-12 text-lg font-bold shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all duration-300 rounded-full border border-white/10 backdrop-blur-sm",
+            "min-h-[48px] h-14 w-full sm:w-auto px-8 md:px-12 text-base sm:text-lg font-bold shadow-[0_8px_30px_rgb(0,0,0,0.5)] transition-all duration-300 rounded-full border border-white/10 backdrop-blur-sm touch-manipulation active:scale-[0.98]",
             isAdded
               ? "bg-zinc-800/90 text-zinc-300 hover:bg-zinc-800 cursor-default"
-              : "bg-[#480000] hover:bg-[#5a0000] text-white hover:scale-105 hover:shadow-[#480000]/30",
+              : "bg-primary hover:bg-action-primary-hover text-white hover:scale-105 shadow-button-primary hover:shadow-card"
           )}
         >
           {isAdded ? (

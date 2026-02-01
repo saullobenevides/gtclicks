@@ -14,8 +14,10 @@ import {
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import RetryPaymentButton from "@/components/pedidos/RetryPaymentButton";
 import AppPagination from "@/components/shared/AppPagination";
+import EmptyState from "@/components/shared/states/EmptyState";
 
 export const metadata = {
   title: "Meus Pedidos",
@@ -82,7 +84,7 @@ export default async function PedidosPage(props) {
       case "CANCELADO":
         return "bg-red-500/10 text-red-500 border-red-500/20";
       default:
-        return "bg-gray-500/10 text-gray-400 border-gray-500/20";
+        return "bg-muted/20 text-muted-foreground border-muted/30";
     }
   };
 
@@ -113,7 +115,7 @@ export default async function PedidosPage(props) {
   };
 
   return (
-    <div className="container-wide py-12 md:py-20">
+    <div className="container-wide px-4 py-12 md:py-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
         <div>
           <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2">
@@ -126,21 +128,17 @@ export default async function PedidosPage(props) {
       </div>
 
       {pedidos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-card/50 border border-white/5 rounded-2xl text-center">
-          <div className="h-16 w-16 bg-white/5 rounded-full flex items-center justify-center mb-6">
-            <Package className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h2 className="text-xl font-bold text-white mb-2">
-            Nenhum pedido encontrado
-          </h2>
-          <p className="text-muted-foreground max-w-md mb-8">
-            Você ainda não realizou nenhuma compra. Explore as coleções e
-            encontre suas melhores fotos!
-          </p>
-          <Button asChild>
-            <Link href="/busca">Explorar Fotos</Link>
-          </Button>
-        </div>
+        <Card className="bg-surface-card border-border-subtle rounded-radius-xl overflow-hidden">
+          <CardContent className="p-0">
+            <EmptyState
+              icon={Package}
+              title="Nenhum pedido encontrado"
+              description="Você ainda não realizou nenhuma compra. Explore as coleções e encontre suas melhores fotos!"
+              action={{ label: "Explorar Fotos", href: "/busca" }}
+              variant="dashboard"
+            />
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-6">
           {pedidos.map((pedido) => (
@@ -165,14 +163,16 @@ export default async function PedidosPage(props) {
                             year: "numeric",
                             hour: "2-digit",
                             minute: "2-digit",
-                          },
+                          }
                         )}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge
                         variant="outline"
-                        className={`${getStatusColor(pedido.status)} font-medium`}
+                        className={`${getStatusColor(
+                          pedido.status
+                        )} font-medium`}
                       >
                         {getStatusIcon(pedido.status)}
                         {getStatusLabel(pedido.status)}

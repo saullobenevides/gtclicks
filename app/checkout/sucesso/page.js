@@ -66,7 +66,7 @@ export default function CheckoutSuccessPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center container-wide text-center py-20 relative overflow-hidden">
+    <div className="min-h-[80vh] flex flex-col items-center justify-center container-wide px-4 text-center py-12 sm:py-20 relative overflow-hidden">
       {showConfetti && (
         <Confetti
           width={width}
@@ -83,8 +83,8 @@ export default function CheckoutSuccessPage() {
             isApproved
               ? "bg-green-500/10 ring-1 ring-green-500/20"
               : isPending
-                ? "bg-yellow-500/10 ring-1 ring-yellow-500/20"
-                : "bg-red-500/10 ring-1 ring-red-500/20"
+              ? "bg-yellow-500/10 ring-1 ring-yellow-500/20"
+              : "bg-red-500/10 ring-1 ring-red-500/20"
           }`}
         >
           {isApproved && <CheckCircle2 className="h-12 w-12 text-green-500" />}
@@ -99,8 +99,8 @@ export default function CheckoutSuccessPage() {
           {isApproved
             ? "Pagamento Confirmado!"
             : isPending
-              ? "Pedido Recebido!"
-              : "Atenção no Pedido"}
+            ? "Pedido Recebido!"
+            : "Atenção no Pedido"}
         </h1>
 
         {/* Description */}
@@ -108,8 +108,8 @@ export default function CheckoutSuccessPage() {
           {isApproved
             ? "Sua compra foi processada com sucesso. Você já pode baixar suas fotos em alta resolução."
             : isPending
-              ? "Estamos aguardando a confirmação do pagamento. Finalize o Pix abaixo para liberar seus downloads."
-              : "Houve um problema com a confirmação. Verifique seus pedidos ou tente novamente."}
+            ? "Estamos aguardando a confirmação do pagamento. Finalize o Pix abaixo para liberar seus downloads."
+            : "Houve um problema com a confirmação. Verifique seus pedidos ou tente novamente."}
         </p>
 
         {/* PIX DISPLAY SECTION */}
@@ -223,11 +223,7 @@ export default function CheckoutSuccessPage() {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           {isApproved && (
-            <Button
-              asChild
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-white w-full sm:w-auto"
-            >
+            <Button asChild size="lg" className="w-full sm:w-auto">
               <Link href={orderId ? `/pedidos/${orderId}` : "/meus-downloads"}>
                 <Download className="mr-2 h-5 w-5" />
                 Baixar Fotos
@@ -236,11 +232,7 @@ export default function CheckoutSuccessPage() {
           )}
 
           {isPending && (
-            <Button
-              asChild
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-white w-full sm:w-auto"
-            >
+            <Button asChild size="lg" className="w-full sm:w-auto">
               <Link href="/pedidos">
                 <Clock className="mr-2 h-5 w-5" />
                 Acompanhar Pedido

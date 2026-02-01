@@ -78,7 +78,7 @@ export default async function FotografosPage(props) {
             >
               <Card className="h-full border-2 border-border-subtle hover:border-primary/50 bg-surface-card transition-all duration-300 hover:-translate-y-1 overflow-hidden">
                 <CardContent className="p-0">
-                  <div className="h-32 bg-linear-to-br from-primary/10 via-surface-subtle to-surface-card relative overflow-hidden">
+                  <div className="h-32 bg-gradient-to-br from-primary/10 via-surface-subtle to-surface-card relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-primary to-transparent" />
                   </div>
 

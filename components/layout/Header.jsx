@@ -7,13 +7,13 @@ import { usePathname } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
 import NavUserActions from "./NavUserActions";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { Menu, ShoppingCart, Heart, Search } from "lucide-react";
 import { useCart } from "@/features/cart/context/CartContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
-// Lazy load Mobile Menu to reduce initial bundle size
 const MobileMenu = dynamic(() => import("./MobileMenu"), { ssr: false });
 
 export default function Header() {
@@ -23,14 +23,11 @@ export default function Header() {
   const { setIsCartOpen, itemCount } = useCart();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Simplified Nav Items (Removed Search/Collections if they are redundant or secondary)
   const mainNavItems = siteConfig.navItems.filter(
     (item) => !["/meus-favoritos", "/carrinho"].includes(item.href),
   );
@@ -39,20 +36,25 @@ export default function Header() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out border-b border-transparent flex items-center justify-center",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out border-b flex items-center justify-center",
           scrolled
-            ? "bg-surface-page/80 backdrop-blur-xl border-border-subtle shadow-shadow-lg h-16 md:h-20"
-            : "bg-surface-page h-16 md:h-20",
+            ? "bg-surface-page/95 backdrop-blur-xl border-border-subtle shadow-lg h-16 md:h-[76px]"
+            : "bg-surface-page/90 backdrop-blur-sm border-transparent h-16 md:h-[76px]",
         )}
+        role="banner"
       >
-        <div className="container-wide w-full flex items-center justify-between">
-          {/* COLUMN 1: LOGO (Left aligned) */}
-          <div className="flex-1 flex items-center justify-start">
-            <Link href="/" className="relative z-10 flex items-center group">
-              <div className="relative h-8 w-28 md:h-10 md:w-32 transition-transform duration-300 group-hover:scale-105">
+        <div className="container-wide w-full flex items-center justify-between px-4 md:px-6">
+          {/* Logo */}
+          <div className="flex-1 flex items-center justify-start min-w-0">
+            <Link
+              href="/"
+              className="relative z-10 flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page rounded-radius-md"
+              aria-label="GTClicks - Ir para página inicial"
+            >
+              <div className="relative h-8 w-28 md:h-9 md:w-32 transition-transform duration-200 group-hover:scale-[1.02]">
                 <Image
                   src="/logo.png"
-                  alt="GTClicks Logo"
+                  alt=""
                   fill
                   sizes="(max-width: 768px) 112px, 128px"
                   className="object-contain object-left"
@@ -62,98 +64,110 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* COLUMN 2: NAV PILLS (Centered, Hidden on Mobile) */}
-          <div className="hidden lg:flex items-center justify-center flex-none">
-            <nav className="flex items-center gap-space-2 px-space-2 py-space-2 rounded-radius-full border border-border-subtle bg-black/40 backdrop-blur-md shadow-shadow-sm">
+          {/* Desktop Nav */}
+          <nav
+            className="hidden lg:flex items-center justify-center flex-none"
+            aria-label="Navegação principal"
+          >
+            <div className="flex items-center gap-1 px-2 py-2 rounded-full border border-white/10 bg-black/40 backdrop-blur-md">
               {mainNavItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "text-text-sm font-font-medium px-space-6 py-space-2 rounded-radius-full transition-all duration-300",
+                    "text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 min-h-[40px] flex items-center",
                     pathname === item.href
-                      ? "bg-text-primary text-black font-font-bold shadow-shadow-sm"
-                      : "text-text-secondary hover:text-text-primary hover:bg-surface-subtle",
+                      ? "bg-white text-black font-semibold"
+                      : "text-muted-foreground hover:text-white hover:bg-white/10",
                   )}
+                  aria-current={pathname === item.href ? "page" : undefined}
                 >
                   {item.label}
                 </Link>
               ))}
-            </nav>
-          </div>
+            </div>
+          </nav>
 
-          {/* COLUMN 3: ACTIONS (Right aligned) */}
-          <div className="flex-1 flex items-center justify-end gap-space-1 md:gap-space-2">
-            {/* Search Trigger (Desktop) */}
+          {/* Actions */}
+          <div className="flex-1 flex items-center justify-end gap-1 md:gap-2 min-w-0">
             <Button
               variant="ghost"
               size="icon"
-              className="hidden md:flex text-text-secondary hover:text-text-primary hover:bg-surface-subtle rounded-radius-full transition-all"
+              className="hidden md:flex h-10 w-10 text-muted-foreground hover:text-white hover:bg-white/10 rounded-full shrink-0"
               asChild
             >
-              <Link href="/busca">
+              <Link href="/busca" aria-label="Buscar fotos">
                 <Search className="h-5 w-5" />
               </Link>
             </Button>
 
-            {/* Favorites (Desktop) */}
             <Button
               variant="ghost"
               size="icon"
-              className="hidden md:flex text-text-secondary hover:text-status-error hover:bg-surface-subtle rounded-radius-full transition-all"
+              className="hidden md:flex h-10 w-10 text-muted-foreground hover:text-red-400 hover:bg-white/10 rounded-full shrink-0"
               asChild
             >
-              <Link href="/meus-favoritos">
+              <Link href="/meus-favoritos" aria-label="Meus favoritos">
                 <Heart className="h-5 w-5" />
               </Link>
             </Button>
 
-            {/* Notifications */}
             <NotificationBell />
 
-            {/* Cart Trigger */}
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-text-secondary hover:text-text-primary hover:bg-surface-subtle rounded-radius-full transition-all"
+              className="relative h-10 w-10 text-muted-foreground hover:text-white hover:bg-white/10 rounded-full shrink-0"
               onClick={() => setIsCartOpen(true)}
+              aria-label={
+                itemCount > 0
+                  ? `Carrinho com ${itemCount} ${itemCount === 1 ? "item" : "itens"}`
+                  : "Abrir carrinho"
+              }
             >
               <ShoppingCart className="h-5 w-5" />
               {itemCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 h-4.5 w-4.5 rounded-radius-full bg-action-primary text-[10px] font-font-bold flex items-center justify-center text-text-on-brand border-2 border-surface-page animate-in zoom-in shadow-shadow-sm">
-                  {itemCount}
+                <span
+                  className="absolute -top-0.5 -right-0.5 h-5 w-5 min-w-5 rounded-full bg-primary text-[10px] font-bold flex items-center justify-center text-primary-foreground border-2 border-surface-page"
+                  aria-hidden
+                >
+                  {itemCount > 9 ? "9+" : itemCount}
                 </span>
               )}
             </Button>
 
-            {/* Divider */}
-            <div className="h-6 w-px bg-border-subtle hidden md:block mx-space-1" />
+            <Separator
+              orientation="vertical"
+              className="h-6 hidden md:block mx-1 bg-white/10"
+            />
 
-            {/* User Actions (Auth) */}
-            <div className="hidden md:block">
+            <div className="hidden md:block shrink-0">
               <Suspense
                 fallback={
-                  <div className="w-10 h-10 rounded-radius-full bg-surface-subtle animate-pulse" />
+                  <div className="h-10 w-10 rounded-full bg-white/10 animate-pulse" />
                 }
               >
                 <NavUserActions />
               </Suspense>
             </div>
 
-            {/* Mobile Menu Toggle */}
-            <button
-              className="md:hidden p-space-2 text-text-secondary hover:text-text-primary transition-colors focus:outline-none"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden h-11 w-11 text-muted-foreground hover:text-white hover:bg-white/10 rounded-full shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open Menu"
+              aria-label="Abrir menu"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
             >
-              <Menu size={28} />
-            </button>
+              <Menu className="h-6 w-6" />
+            </Button>
           </div>
         </div>
       </header>
 
-      {/* MOBILE MENU (Lazy Loaded) */}
       <MobileMenu
+        id="mobile-menu"
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
       />

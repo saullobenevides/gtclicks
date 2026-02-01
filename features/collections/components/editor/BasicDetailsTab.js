@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -109,29 +110,36 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
           />
         </div>
 
-        <div className="flex items-start space-x-3 space-y-0 rounded-md border p-4 bg-primary/5 border-primary/20">
-          <div className="flex h-5 items-center">
-            <input
-              id="face-recognition"
-              type="checkbox"
-              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary bg-black/20"
-              checked={collectionData.faceRecognitionEnabled}
-              onChange={(e) =>
-                onDataChange("faceRecognitionEnabled", e.target.checked)
-              }
-            />
-          </div>
-          <div className="space-y-1 leading-none">
+        <div
+          role="group"
+          aria-labelledby="face-recognition-label"
+          aria-describedby="face-recognition-desc"
+          className="flex items-start gap-3 rounded-md border p-4 md:p-5 bg-primary/5 border-primary/20 min-h-[44px] touch-manipulation"
+        >
+          <Checkbox
+            id="face-recognition"
+            checked={collectionData.faceRecognitionEnabled}
+            onCheckedChange={(checked) =>
+              onDataChange("faceRecognitionEnabled", !!checked)
+            }
+            className="mt-0.5 h-5 w-5 shrink-0 rounded border-white/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+            aria-describedby="face-recognition-desc"
+          />
+          <div className="space-y-1 leading-none min-w-0 flex-1">
             <Label
+              id="face-recognition-label"
               htmlFor="face-recognition"
-              className="text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-white flex items-center gap-2"
+              className="text-sm font-bold leading-none cursor-pointer text-white flex items-center gap-2 flex-wrap"
             >
               Ativar Reconhecimento Facial (IA)
-              <span className="text-[10px] bg-primary text-black px-1.5 py-0.5 rounded-full font-black uppercase">
+              <span className="text-[10px] bg-primary text-black px-1.5 py-0.5 rounded-full font-black uppercase shrink-0">
                 Premium
               </span>
             </Label>
-            <p className="text-xs text-muted-foreground">
+            <p
+              id="face-recognition-desc"
+              className="text-xs text-muted-foreground"
+            >
               Permite que os clientes encontrem suas fotos através de uma selfie
               utilizando IA da AWS.
             </p>

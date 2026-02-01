@@ -29,7 +29,7 @@ export async function POST(request) {
   if (!fotografo) {
     return NextResponse.json(
       { error: "Perfil de fotografo nao encontrado" },
-      { status: 403 },
+      { status: 403 }
     );
   }
 
@@ -38,9 +38,16 @@ export async function POST(request) {
     const validation = photoBatchSchema.safeParse(body);
 
     if (!validation.success) {
+      const details = validation.error.format();
+      const msg = Object.entries(details)
+        .filter(([k]) => k !== "_errors")
+        .map(([k, v]) =>
+          typeof v === "object" ? `${k}: ${JSON.stringify(v)}` : `${k}: ${v}`
+        )
+        .join("; ");
       return NextResponse.json(
-        { error: "Dados inválidos", details: validation.error.format() },
-        { status: 400 },
+        { error: msg || "Dados inválidos", details },
+        { status: 400 }
       );
     }
 
@@ -49,7 +56,7 @@ export async function POST(request) {
     if (!fotografoId) {
       return NextResponse.json(
         { error: "Informe o fotografoId." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -59,7 +66,7 @@ export async function POST(request) {
           error:
             "Voce nao tem permissao para alterar fotos de outro fotografo.",
         },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -67,7 +74,7 @@ export async function POST(request) {
     if (deletedPhotoIds.length > 0) {
       try {
         console.log(
-          `[Batch API] Processing ${deletedPhotoIds.length} deletions/unlinks`,
+          `[Batch API] Processing ${deletedPhotoIds.length} deletions/unlinks`
         );
 
         for (const photoId of deletedPhotoIds) {
@@ -103,7 +110,7 @@ export async function POST(request) {
               await deleteManyPhotoFiles([photo.s3Key]).catch((err) => {
                 console.error(
                   `[Batch API] S3 deletion failed for ${photoId}:`,
-                  err,
+                  err
                 );
               });
             }
@@ -116,7 +123,7 @@ export async function POST(request) {
       } catch (deletionError) {
         console.error(
           "[Batch API] Error during photo deletion process:",
-          deletionError,
+          deletionError
         );
         throw deletionError;
       }
@@ -128,7 +135,7 @@ export async function POST(request) {
     ) {
       return NextResponse.json(
         { error: "Nenhuma alteração enviada." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -158,8 +165,8 @@ export async function POST(request) {
         foto.licencas && foto.licencas.length > 0
           ? foto.licencas
           : defaultLicenca
-            ? [{ licencaId: defaultLicenca.id, preco: 0 }]
-            : [];
+          ? [{ licencaId: defaultLicenca.id, preco: 0 }]
+          : [];
 
       const commonData = {
         titulo:
@@ -180,8 +187,8 @@ export async function POST(request) {
         folder: foto.folderId
           ? { connect: { id: foto.folderId } }
           : foto.id
-            ? { disconnect: true }
-            : undefined,
+          ? { disconnect: true }
+          : undefined,
       };
 
       let processedFoto;
@@ -210,8 +217,9 @@ export async function POST(request) {
         }
 
         // Generate Signed URL for preview
-        const { S3Client, GetObjectCommand, HeadObjectCommand } =
-          await import("@aws-sdk/client-s3");
+        const { S3Client, GetObjectCommand, HeadObjectCommand } = await import(
+          "@aws-sdk/client-s3"
+        );
         const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
 
         const s3Client = new S3Client({
@@ -228,11 +236,11 @@ export async function POST(request) {
             new HeadObjectCommand({
               Bucket: process.env.S3_UPLOAD_BUCKET,
               Key: foto.s3Key,
-            }),
+            })
           );
         } catch (error) {
           console.error(
-            `Fraud Check Failed: Object not found in S3 (${foto.s3Key})`,
+            `Fraud Check Failed: Object not found in S3 (${foto.s3Key})`
           );
           // Skip creation for non-existent files
           continue;
@@ -270,14 +278,30 @@ export async function POST(request) {
       processedFotos.push(processedFoto);
     }
 
+    // Não expor s3Key no cliente (Manual v3.0). Retornar apenas campos seguros para a UI.
+    const safeData = processedFotos.map((f) => ({
+      id: f.id,
+      titulo: f.titulo,
+      descricao: f.descricao,
+      orientacao: f.orientacao,
+      previewUrl: f.previewUrl,
+      folderId: f.folderId,
+      colecaoId: f.colecaoId,
+      sequentialId: f.sequentialId,
+      numeroSequencial: f.numeroSequencial,
+      createdAt: f.createdAt,
+    }));
+
     return NextResponse.json({
-      data: processedFotos,
+      data: safeData,
     });
   } catch (error) {
     console.error("[Batch API Error]:", error);
     try {
       const fs = await import("fs");
-      const logMsg = `\n--- ${new Date().toISOString()} ---\nError: ${error.message}\nStack: ${error.stack}\n`;
+      const logMsg = `\n--- ${new Date().toISOString()} ---\nError: ${
+        error.message
+      }\nStack: ${error.stack}\n`;
       fs.appendFileSync("batch_error_debug.log", logMsg);
     } catch (e) {
       // ignore log error
@@ -289,7 +313,7 @@ export async function POST(request) {
         details: error.message,
         stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -5,7 +5,10 @@ import { Badge } from "@/components/ui/badge";
 
 export default function HeroSection() {
   return (
-    <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-space-6 py-space-20 text-center">
+    <section
+      className="relative flex min-h-[85vh] sm:min-h-[90vh] flex-col items-center justify-center overflow-hidden px-4 py-16 sm:px-6 sm:py-20 text-center"
+      style={{ paddingTop: "max(4rem, env(safe-area-inset-top))" }}
+    >
       <div className="absolute inset-0 -z-20">
         <Image
           src="/hero-gtclicks.png"
@@ -17,7 +20,7 @@ export default function HeroSection() {
           sizes="100vw"
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-linear-to-b from-surface-page/70 via-surface-page/60 to-surface-page" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-surface-page/70 via-surface-page/60 to-surface-page" />
 
       <div className="z-10 flex max-w-5xl flex-col items-center gap-space-8 animate-in fade-in zoom-in duration-700 pt-space-12 md:pt-32 px-space-4">
         <h1 className="heading-display font-display text-2xl sm:text-4xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-tight sm:leading-[0.85]">
@@ -27,16 +30,15 @@ export default function HeroSection() {
         </h1>
 
         <p className="max-w-2xl text-text-lg text-text-secondary md:text-text-xl leading-relaxed font-font-medium drop-shadow-md">
-          Encontre seus registros instantaneamente com nossa busca por IA
-          <br className="hidden sm:block" />
-          ou monetize sua arte como fotógrafo profissional.
+          Encontre seus registros ou monetize sua arte como fotógrafo
+          profissional.
         </p>
 
-        <div className="mt-space-8 flex flex-col w-full sm:w-auto sm:flex-row gap-space-6">
+        <div className="mt-8 flex flex-col w-full sm:w-auto sm:flex-row gap-4 sm:gap-6">
           <Button
             asChild
             size="lg"
-            className="h-16 px-10 rounded-full font-black uppercase tracking-widest text-sm shadow-shadow-button-primary scale-100 hover:scale-105 transition-all"
+            className="h-14 sm:h-16 min-h-[48px] px-8 sm:px-10 w-full sm:w-auto rounded-full font-black uppercase tracking-widest text-sm active:scale-[0.98] transition-transform touch-manipulation"
           >
             <Link href="/busca">Comprar fotos</Link>
           </Button>
@@ -44,7 +46,7 @@ export default function HeroSection() {
             asChild
             variant="secondary"
             size="lg"
-            className="h-16 px-10 rounded-full font-black uppercase tracking-widest text-sm backdrop-blur-md border-2 border-white/10 hover:bg-white/10 scale-100 hover:scale-105 transition-all"
+            className="h-14 sm:h-16 min-h-[48px] px-8 sm:px-10 w-full sm:w-auto rounded-full font-black uppercase tracking-widest text-sm active:scale-[0.98] transition-transform touch-manipulation"
           >
             <Link href="/como-funciona">Vender fotos</Link>
           </Button>

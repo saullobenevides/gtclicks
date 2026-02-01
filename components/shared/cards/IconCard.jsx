@@ -22,8 +22,15 @@ export default function IconCard({
   className,
 }) {
   return (
-    <Link href={href} className={cn("group block", className)}>
-      <Card className="flex flex-col items-center gap-space-4 rounded-radius-2xl border border-border-default bg-surface-card/50 p-space-8 transition-all hover:border-action-primary/50 hover:bg-surface-subtle hover:-translate-y-1">
+    <Link
+      href={href}
+      className={cn(
+        "group block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page rounded-2xl",
+        className
+      )}
+      aria-label={`${title}: ${description}`}
+    >
+      <Card className="flex flex-col items-center justify-center gap-3 sm:gap-4 rounded-2xl border border-white/10 bg-black/20 p-5 sm:p-6 min-h-[140px] sm:min-h-[160px] transition-all hover:border-primary/50 hover:bg-white/5 hover:-translate-y-0.5 active:scale-[0.99] touch-manipulation">
         <CardContent className="flex flex-col items-center p-0 w-full">
           <span className="text-text-4xl mb-space-2 grayscale group-hover:grayscale-0 transition-all">
             {icon}

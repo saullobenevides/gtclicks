@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
@@ -81,8 +82,8 @@ export default function ShareButton({
           <Button
             variant={variant}
             size={size}
-            className={className}
-            title="Ver QR Code"
+            className={cn("min-h-[44px] min-w-[44px]", className)}
+            aria-label="Ver QR Code"
           >
             <QrCode className="h-4 w-4" />
           </Button>
@@ -102,19 +103,21 @@ export default function ShareButton({
               <QRCodeSVG value={finalUrl} size={200} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4 w-full">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
               <Button
                 onClick={shareToWhatsApp}
                 variant="secondary"
-                className="gap-2 h-11"
+                className="gap-2 min-h-[44px] h-11 w-full"
+                aria-label="Compartilhar no WhatsApp"
               >
-                <MessageCircle className="h-4 w-4 text-green-500" />
+                <MessageCircle className="h-4 w-4 text-green-500 shrink-0" />
                 WhatsApp
               </Button>
               <Button
                 onClick={copyToClipboard}
                 variant="secondary"
-                className="gap-2 h-11"
+                className="gap-2 min-h-[44px] h-11 w-full"
+                aria-label={copied ? "Link copiado" : "Copiar link"}
               >
                 {copied ? (
                   <Check className="h-4 w-4 text-green-500" />
@@ -131,9 +134,9 @@ export default function ShareButton({
       <Button
         variant={variant}
         size={size}
-        className={className}
+        className={cn("min-h-[44px] min-w-[44px]", className)}
         onClick={handleShare}
-        title="Compartilhar"
+        aria-label="Compartilhar"
       >
         {children ? (
           children

@@ -75,20 +75,24 @@ export default async function ComoFuncionaPage() {
 
       <Tabs defaultValue="fotografo" className="w-full max-w-5xl mx-auto">
         <div className="flex justify-center px-4">
-          <TabsList className="bg-surface-subtle border border-border-subtle p-1 h-16 rounded-full w-full max-w-md md:w-auto flex">
+          <TabsList
+            role="tablist"
+            aria-label="Selecione seu perfil: Fotógrafo ou Atleta"
+            className="bg-surface-elevated/90 border border-white/10 p-1.5 h-14 sm:h-16 rounded-full w-full max-w-md md:w-auto flex gap-1 md:gap-2"
+          >
             <TabsTrigger
               value="fotografo"
-              className="flex-1 md:flex-none rounded-full px-6 md:px-10 h-14 border-2 border-transparent data-[state=active]:bg-surface-page data-[state=active]:border-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] md:text-xs gap-3 transition-all"
+              className="flex-1 md:flex-none rounded-full px-4 sm:px-6 md:px-10 h-11 sm:h-14 min-h-[44px] border-2 border-transparent text-muted-foreground data-[state=active]:bg-black data-[state=active]:border-action-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] sm:text-xs gap-2 md:gap-3 transition-all touch-manipulation"
             >
-              <Camera className="h-5 w-5" />
-              <span className="hidden sm:inline">Sou </span>Fotógrafo
+              <Camera className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" aria-hidden />
+              <span>SOU FOTÓGRAFO</span>
             </TabsTrigger>
             <TabsTrigger
               value="atleta"
-              className="flex-1 md:flex-none rounded-full px-6 md:px-10 h-14 border-2 border-transparent data-[state=active]:bg-surface-page data-[state=active]:border-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] md:text-xs gap-3 transition-all"
+              className="flex-1 md:flex-none rounded-full px-4 sm:px-6 md:px-10 h-11 sm:h-14 min-h-[44px] border-2 border-transparent text-muted-foreground data-[state=active]:bg-black data-[state=active]:border-action-primary data-[state=active]:text-white font-black uppercase tracking-widest text-[10px] sm:text-xs gap-2 md:gap-3 transition-all touch-manipulation"
             >
-              <Search className="h-5 w-5" />
-              <span className="hidden sm:inline">Sou </span>Atleta
+              <Search className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" aria-hidden />
+              <span>SOU ATLETA</span>
             </TabsTrigger>
           </TabsList>
         </div>

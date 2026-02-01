@@ -5,14 +5,14 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-radius-lg text-text-sm font-font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border-2",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-radius-lg text-text-sm font-font-bold tracking-wider uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border-2 border-action-primary",
   {
     variants: {
       variant: {
         default:
-          "bg-action-primary border-action-primary text-text-on-brand hover:bg-action-primary-hover hover:border-action-primary-hover shadow-shadow-button-primary",
+          "bg-[var(--button-primary-bg)] text-white hover:bg-[var(--button-primary-hover)]",
         secondary:
-          "bg-surface-card border-border-default text-text-primary hover:bg-surface-subtle hover:border-border-subtle",
+          "bg-[var(--button-secondary-bg)] text-white hover:bg-[var(--button-secondary-hover)]",
         strong:
           "bg-action-strong border-action-strong text-black hover:bg-action-strong-hover hover:border-action-strong-hover shadow-shadow-lg",
         outline:
@@ -37,7 +37,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  },
+  }
 );
 
 const Button = React.forwardRef(
@@ -50,7 +50,7 @@ const Button = React.forwardRef(
         {...props}
       />
     );
-  },
+  }
 );
 Button.displayName = "Button";
 

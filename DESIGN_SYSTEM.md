@@ -136,6 +136,11 @@ O GTClicks é um marketplace de fotografia esportiva de alto impacto. O design �
 - **Base**: `bg-surface-card` | `border-border-default` | `rounded-radius-sm` | `p-space-3`
 - **Focus**: `focus:border-border-focus` | `focus:ring-1` | `focus:ring-border-focus`
 
+### Utilitários de layout
+
+- **container-wide**: container de largura ampla para páginas (definido em `globals.css` ou Tailwind).
+- **glass-panel**: painel com fundo semitransparente e backdrop-blur para cards modais e seções.
+
 ---
 
 ## Regra de Ouro

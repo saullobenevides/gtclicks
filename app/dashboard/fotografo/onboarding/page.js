@@ -1,10 +1,15 @@
-import clsx from "clsx";
 export const dynamic = "force-dynamic";
+
 import { getAuthenticatedUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import OnboardingWizard from "@/features/photographer/components/FotografoOnboarding";
+import FotografoOnboarding from "@/features/photographer/components/FotografoOnboarding";
 import { redirect } from "next/navigation";
 
+/**
+ * Onboarding inicial do fotógrafo.
+ * Fluxo único: FotografoOnboarding + POST /api/fotografos/create.
+ * Ver REVISAO_UI_UX_FLUXOS.md e FLUXO_AUTH_CADASTRO.md.
+ */
 export default async function OnboardingPage() {
   let user;
   try {
@@ -21,14 +26,11 @@ export default async function OnboardingPage() {
     where: { userId: user.id },
   });
 
-  if (fotografo) redirect("/dashboard/fotografo"); // Already onboarded, go to dashboard
-
-  // If already has key info, maybe redirect to dashboard?
-  // For now let's allow editing by visiting this page manually or via initial flow.
+  if (fotografo) redirect("/dashboard/fotografo");
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-      <OnboardingWizard initialData={fotografo} />
+      <FotografoOnboarding />
     </div>
   );
 }

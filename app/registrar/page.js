@@ -7,20 +7,20 @@ import { redirect } from "next/navigation";
 
 export default async function RegisterPage(props) {
   const searchParams = await props.searchParams;
-  let redirectUrl = searchParams?.callbackUrl;
-
-  if (searchParams?.callbackUrl) {
+  const callbackUrl = searchParams?.callbackUrl;
+  if (callbackUrl) {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete("callbackUrl");
-    newParams.set("after_auth_return_to", searchParams.callbackUrl);
+    newParams.set("after_auth_return_to", callbackUrl);
     redirect(`/registrar?${newParams.toString()}`);
   }
+  const redirectUrl = searchParams?.after_auth_return_to ?? callbackUrl;
 
   return (
-    <section className="w-full max-w-5xl mx-auto px-8 sm:px-10 md:px-12 lg:px-16 py-8 sm:py-10 md:py-12 lg:py-16 flex flex-col gap-10">
-      <div className="flex flex-col gap-3">
+    <section className="container-wide flex flex-col gap-8 px-4 py-8 sm:gap-10 sm:py-10 md:py-12 lg:py-16">
+      <div className="flex max-w-5xl flex-col gap-3">
         <Badge>Criar Conta</Badge>
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">
+        <h1 className="text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
           Comece agora
         </h1>
         <p className="max-w-xl text-muted-foreground leading-relaxed">
@@ -29,7 +29,7 @@ export default async function RegisterPage(props) {
         </p>
       </div>
 
-      <div className="bg-card border text-card-foreground shadow-lg max-w-md mx-auto p-6">
+      <div className="glass-panel border-border/50 w-full max-w-md rounded-radius-xl p-6 shadow-shadow-card">
         <SignUp fullPage={false} redirectUrl={redirectUrl} />
         <div className="mt-4 text-center text-sm text-muted-foreground">
           Já tem uma conta?{" "}

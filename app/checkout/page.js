@@ -38,10 +38,13 @@ export default function CheckoutPage() {
     const checkUser = async () => {
       const currentUser = await app.getUser();
       if (!currentUser) {
-        // Redirect to login if not authenticated
-        const currentPath = window.location.pathname;
-        const queryString = window.location.search;
-        router.push(`/handler/sign-in?redirect=${currentPath}${queryString}`);
+        // Redirect to login (unificado com o resto do app) preservando retorno ao checkout
+        const returnTo =
+          typeof window !== "undefined"
+            ? `${window.location.pathname}${window.location.search || ""}`
+            : "/checkout";
+        const callbackUrl = encodeURIComponent(returnTo);
+        router.push(`/login?callbackUrl=${callbackUrl}`);
         return;
       }
       setUser(currentUser);
@@ -88,7 +91,9 @@ export default function CheckoutPage() {
         clearCart();
       }
       router.push(
-        `/checkout/sucesso?orderId=${result.orderId || orderId || "pending"}&status=${result.status}`,
+        `/checkout/sucesso?orderId=${
+          result.orderId || orderId || "pending"
+        }&status=${result.status}`
       );
     } else {
       // Handle explicit errors or unknown states
@@ -129,7 +134,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container-wide py-12 md:py-20">
+    <div className="container-wide px-4 py-12 md:py-20">
       <div className="mb-10 text-center">
         <h1 className="heading-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2">
           {orderId ? "Finalizar Pagamento" : "Finalizar Compra"}
@@ -207,7 +212,7 @@ export default function CheckoutPage() {
 
         {/* Right Column: Payment Brick */}
         <div className="relative">
-          <Card className="glass-panel border-white/10 bg-black/40 sticky top-24">
+          <Card className="glass-panel border-white/10 bg-black/40 lg:sticky lg:top-24">
             <CardHeader>
               <CardTitle className="text-xl text-white">Pagamento</CardTitle>
               <CardDescription>

@@ -41,6 +41,7 @@ export default function FolderManager({
   currentFolder,
   onNavigate,
   onFolderChange,
+  onEnsureCollection,
 }) {
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +54,11 @@ export default function FolderManager({
   const [submitting, setSubmitting] = useState(false);
 
   const fetchFolders = useCallback(async () => {
+    if (!collectionId) {
+      setFolders([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -73,12 +79,17 @@ export default function FolderManager({
 
   const handleCreateFolder = async () => {
     if (!folderName.trim()) return;
+    if (!collectionId) {
+      setError("Coleção não encontrada. Feche o diálogo e tente novamente.");
+      return;
+    }
     setSubmitting(true);
+    setError(null);
     try {
       const res = await createFolder({
-        nome: folderName,
-        colecaoId: collectionId,
-        parentId: currentFolder?.id || null,
+        nome: folderName.trim(),
+        colecaoId: String(collectionId),
+        parentId: currentFolder?.id ?? null,
       });
 
       if (res.error) throw new Error(res.error);
@@ -124,7 +135,20 @@ export default function FolderManager({
     }
   };
 
-  const openCreateDialog = () => {
+  const openCreateDialog = async () => {
+    let cId = collectionId;
+    if (!cId && onEnsureCollection) {
+      cId = await onEnsureCollection();
+      if (!cId) {
+        setError("Não foi possível criar a coleção. Tente novamente.");
+        return;
+      }
+    }
+    if (!cId) {
+      setError("Crie ou salve a coleção antes de criar pastas.");
+      return;
+    }
+    setError(null);
     setEditingFolder(null);
     setFolderName("");
     setIsDialogOpen(true);
@@ -138,10 +162,16 @@ export default function FolderManager({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Pastas</h3>
-        <Button variant="outline" size="sm" onClick={openCreateDialog}>
-          <FolderPlus className="mr-2 h-4 w-4" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h3 className="text-lg font-medium text-white">Pastas</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={openCreateDialog}
+          className="w-full sm:w-auto min-h-[44px] touch-manipulation"
+          aria-label="Criar nova pasta"
+        >
+          <FolderPlus className="mr-2 h-4 w-4 shrink-0" aria-hidden />
           Nova Pasta
         </Button>
       </div>
@@ -157,8 +187,11 @@ export default function FolderManager({
           <Loader2 className="animate-spin h-6 w-6" />
         </div>
       ) : folders.length === 0 ? (
-        <div className="text-center p-8 border-2 border-dashed rounded-lg text-muted-foreground">
-          <Folder className="mx-auto h-8 w-8 mb-2 opacity-50" />
+        <div
+          role="status"
+          className="text-center p-8 border-2 border-dashed border-white/10 rounded-radius-lg bg-black/20 text-muted-foreground"
+        >
+          <Folder className="mx-auto h-8 w-8 mb-2 opacity-50" aria-hidden />
           <p>Nenhuma pasta aqui.</p>
         </div>
       ) : (
@@ -166,8 +199,17 @@ export default function FolderManager({
           {folders.map((folder) => (
             <Card
               key={folder.id}
-              className="group hover:border-primary transition-colors cursor-pointer"
+              className="group hover:border-primary transition-colors cursor-pointer min-h-[120px] touch-manipulation active:scale-[0.98]"
               onClick={() => onNavigate(folder)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onNavigate(folder);
+                }
+              }}
+              aria-label={`Abrir pasta ${folder.nome}`}
             >
               <CardContent className="p-3 md:p-4 flex flex-col items-center text-center space-y-2 relative">
                 <Folder className="h-10 w-10 md:h-12 md:w-12 text-primary fill-primary/10" />
@@ -183,13 +225,21 @@ export default function FolderManager({
                 </span>
 
                 <div
-                  className="absolute top-1 right-1 md:top-2 md:right-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-6 w-6">
-                        <MoreVertical className="h-3 w-3 md:h-4 md:w-4" />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-10 w-10 min-h-[44px] min-w-[44px] touch-manipulation"
+                        aria-label={`Menu da pasta ${folder.nome}`}
+                      >
+                        <MoreVertical
+                          className="h-4 w-4 shrink-0"
+                          aria-hidden
+                        />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">

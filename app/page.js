@@ -19,7 +19,7 @@ export default async function Home() {
   } = await getHomepageData();
 
   return (
-    <div className="flex flex-col gap-0 pb-24">
+    <div className="flex flex-col gap-0 pb-24 md:pb-0">
       <HeroSection />
 
       <FeaturedCollections

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@stackframe/stack";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -41,6 +42,7 @@ const blankPhoto = () => ({
 
 export default function CollectionEditor({ collection: initialData }) {
   const router = useRouter();
+  const user = useUser();
   const initialCollection = initialData || {};
 
   const [collectionData, setCollectionData] = useState({
@@ -60,8 +62,8 @@ export default function CollectionEditor({ collection: initialData }) {
     dataInicio: initialCollection.dataInicio
       ? new Date(initialCollection.dataInicio).toISOString().split("T")[0]
       : initialCollection.createdAt
-        ? new Date(initialCollection.createdAt).toISOString().split("T")[0]
-        : "",
+      ? new Date(initialCollection.createdAt).toISOString().split("T")[0]
+      : "",
     dataFim: initialCollection.dataFim
       ? new Date(initialCollection.dataFim).toISOString().split("T")[0]
       : "",
@@ -76,16 +78,73 @@ export default function CollectionEditor({ collection: initialData }) {
     (initialCollection.fotos || []).map((p) => ({
       ...p,
       tempId: p.id || Math.random().toString(36).substr(2, 9),
-    })),
+    }))
   );
   const [submitting, setSubmitting] = useState(false);
   const [deletedPhotoIds, setDeletedPhotoIds] = useState([]);
-  const [isDirty, setIsDirty] = useState(false); // Track changes
+  const [isDirty, setIsDirty] = useState(false);
+  const [effectiveCollectionId, setEffectiveCollectionId] = useState(
+    initialCollection.id ?? null
+  );
+  const [effectiveFotografoId, setEffectiveFotografoId] = useState(
+    initialCollection.fotografoId ?? null
+  );
+  const [activeTab, setActiveTab] = useState("detalhes");
+
+  const collectionIdForUpload = effectiveCollectionId || initialCollection.id;
 
   const { uploadState, handleFileSelect } = usePhotoUpload(
-    initialCollection.id,
-    currentFolder,
+    collectionIdForUpload,
+    currentFolder
   );
+
+  /** Cria a coleção com dados atuais ou padrões. Retorna o ID ou null. */
+  const ensureCollectionExists = useCallback(async () => {
+    if (effectiveCollectionId || initialCollection.id) {
+      return effectiveCollectionId || initialCollection.id;
+    }
+    try {
+      const formData = new FormData();
+      const defaults = {
+        nome: collectionData.nome?.trim() || "Nova Coleção",
+        descricao: collectionData.descricao || "",
+        categoria: collectionData.categoria || "",
+        precoFoto: Number(collectionData.precoFoto) || 5,
+        status: collectionData.status || "RASCUNHO",
+        faceRecognitionEnabled: collectionData.faceRecognitionEnabled || false,
+      };
+      Object.entries(defaults).forEach(([key, value]) => {
+        formData.append(key, String(value));
+      });
+      const { createCollection } = await import("@/actions/collections");
+      const result = await createCollection(formData);
+      if (result.error) throw new Error(result.error);
+      const newId = result.data.id;
+      setEffectiveCollectionId(newId);
+      if (result.data.fotografoId) {
+        setEffectiveFotografoId(result.data.fotografoId);
+      }
+      setCollectionData((prev) => ({
+        ...prev,
+        nome: defaults.nome,
+        precoFoto: defaults.precoFoto,
+      }));
+      return newId;
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Erro ao criar coleção.");
+      return null;
+    }
+  }, [
+    effectiveCollectionId,
+    initialCollection.id,
+    collectionData.nome,
+    collectionData.descricao,
+    collectionData.categoria,
+    collectionData.precoFoto,
+    collectionData.status,
+    collectionData.faceRecognitionEnabled,
+  ]);
 
   const currentPhotos = useMemo(() => {
     return allPhotos.filter((p) => {
@@ -95,6 +154,27 @@ export default function CollectionEditor({ collection: initialData }) {
       return p.folderId === currentFolder.id;
     });
   }, [allPhotos, currentFolder]);
+
+  // Cria a coleção ao abrir a aba Fotos (nova coleção) – fotógrafo define a ordem
+  const creatingRef = useRef(false);
+  useEffect(() => {
+    if (
+      activeTab === "fotos" &&
+      !effectiveCollectionId &&
+      !initialCollection.id &&
+      !creatingRef.current
+    ) {
+      creatingRef.current = true;
+      ensureCollectionExists().finally(() => {
+        creatingRef.current = false;
+      });
+    }
+  }, [
+    activeTab,
+    effectiveCollectionId,
+    initialCollection.id,
+    ensureCollectionExists,
+  ]);
 
   // Warning check for unsaved changes
   useEffect(() => {
@@ -142,7 +222,8 @@ export default function CollectionEditor({ collection: initialData }) {
 
       const toastId = toast.loading("Gerando capa original...");
       try {
-        const result = await setCollectionCover(initialCollection.id, photo.id);
+        const cId = effectiveCollectionId || initialCollection.id;
+        const result = await setCollectionCover(cId, photo.id);
         if (result.error) throw new Error(result.error);
 
         setCollectionData((prev) => ({ ...prev, capaUrl: result.coverUrl }));
@@ -155,7 +236,7 @@ export default function CollectionEditor({ collection: initialData }) {
         toast.error(error.message || "Erro ao definir capa");
       }
     },
-    [initialCollection.id],
+    [effectiveCollectionId, initialCollection.id]
   );
 
   const handleNavigate = (folder) => {
@@ -179,7 +260,7 @@ export default function CollectionEditor({ collection: initialData }) {
         setDeletedPhotoIds((prev) => [...prev, photoToRemove.id]);
       }
       setAllPhotos((prev) =>
-        prev.filter((p) => p.tempId !== photoToRemove.tempId),
+        prev.filter((p) => p.tempId !== photoToRemove.tempId)
       );
       if (collectionData.capaUrl === photoToRemove.previewUrl) {
         setCollectionData((prev) => ({ ...prev, capaUrl: "" }));
@@ -187,14 +268,14 @@ export default function CollectionEditor({ collection: initialData }) {
       toast.success("Foto removida.");
       setIsDirty(true);
     },
-    [collectionData.capaUrl],
+    [collectionData.capaUrl]
   );
 
   const updatePhoto = useCallback((photoToUpdate, field, value) => {
     setAllPhotos((prev) =>
       prev.map((p) =>
-        p.tempId === photoToUpdate.tempId ? { ...p, [field]: value } : p,
-      ),
+        p.tempId === photoToUpdate.tempId ? { ...p, [field]: value } : p
+      )
     );
     setIsDirty(true);
   }, []);
@@ -202,6 +283,12 @@ export default function CollectionEditor({ collection: initialData }) {
   const handleBulkUpload = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
+
+    let cId = effectiveCollectionId || initialCollection.id;
+    if (!cId) {
+      cId = await ensureCollectionExists();
+      if (!cId) return;
+    }
 
     toast.info(`Iniciando upload de ${files.length} fotos...`);
 
@@ -223,12 +310,13 @@ export default function CollectionEditor({ collection: initialData }) {
           photoPlaceholder,
           file,
           updatePhoto,
+          cId
         );
         if (updatedPhoto) {
           setAllPhotos((prev) =>
             prev.map((p) =>
-              p.tempId === photoPlaceholder.tempId ? updatedPhoto : p,
-            ),
+              p.tempId === photoPlaceholder.tempId ? updatedPhoto : p
+            )
           );
         }
         completed++;
@@ -240,6 +328,9 @@ export default function CollectionEditor({ collection: initialData }) {
       }
     }
     toast.success("Upload em massa concluído!");
+    if (cId && !initialCollection.id) {
+      router.push(`/dashboard/fotografo/colecoes/${cId}/editar`);
+    }
   };
 
   const handleFolderUpload = async (e) => {
@@ -311,7 +402,7 @@ export default function CollectionEditor({ collection: initialData }) {
               : aiData.tags || p.tags,
             corPredominante: aiData.primaryColor,
           };
-        }),
+        })
       );
       toast.success("Foto preenchida com magia IA! ✨");
     } catch (error) {
@@ -331,13 +422,13 @@ export default function CollectionEditor({ collection: initialData }) {
 
     // Validation: Check status and photos
     const validPhotosCount = allPhotos.filter(
-      (p) => !deletedPhotoIds.includes(p.id) || !p.id,
+      (p) => !deletedPhotoIds.includes(p.id) || !p.id
     ).length; // Check strictly non-deleted photos
 
     // Simplification: Check if we have visible photos remaining
     const remainingPhotos = allPhotos.filter(
       (p) =>
-        !deletedPhotoIds.includes(p.tempId) && !deletedPhotoIds.includes(p.id),
+        !deletedPhotoIds.includes(p.tempId) && !deletedPhotoIds.includes(p.id)
     );
 
     if (collectionData.status === "PUBLICADA" && remainingPhotos.length === 0) {
@@ -349,23 +440,38 @@ export default function CollectionEditor({ collection: initialData }) {
     try {
       let finalCapaUrl = collectionData.capaUrl;
       const validPhotos = allPhotos.filter(
-        (p) => p.previewUrl && !deletedPhotoIds.includes(p.id),
+        (p) => p.previewUrl && !deletedPhotoIds.includes(p.id)
       );
 
-      if (!finalCapaUrl && validPhotos.length > 0) {
+      const collectionIdToSave = effectiveCollectionId || initialCollection.id;
+
+      // Capa SEM marca d'água: usar generateCoverImage (setCollectionCover) em vez de previewUrl
+      if (!finalCapaUrl && validPhotos.length > 0 && collectionIdToSave) {
+        const lastPhoto = validPhotos[validPhotos.length - 1];
+        if (lastPhoto.id) {
+          const coverResult = await setCollectionCover(
+            collectionIdToSave,
+            lastPhoto.id
+          );
+          if (!coverResult.error && coverResult.coverUrl) {
+            finalCapaUrl = coverResult.coverUrl;
+            setCollectionData((prev) => ({ ...prev, capaUrl: finalCapaUrl }));
+          } else {
+            finalCapaUrl = lastPhoto.previewUrl; // fallback (com marca)
+          }
+        } else {
+          finalCapaUrl = lastPhoto.previewUrl;
+        }
+      } else if (!finalCapaUrl && validPhotos.length > 0) {
+        // Nova coleção: usa preview como fallback; capa limpa será gerada após salvar
         finalCapaUrl = validPhotos[validPhotos.length - 1].previewUrl;
         setCollectionData((prev) => ({ ...prev, capaUrl: finalCapaUrl }));
       }
 
-      /* Refactored to use Server Action */
-      // Ideally we should use FormData, but since updateCollection accepts (id, data), we pass object for now
-      // or refactor action to expect FormData. I implemented action to accept 'data' as any (JSON object).
-      // So we can check actions/collections.ts: export async function updateCollection(collectionId: string, data: any)
-
       let result;
-      if (initialCollection.id) {
+      if (collectionIdToSave) {
         // UPDATE EXISTING
-        result = await updateCollection(initialCollection.id, {
+        result = await updateCollection(collectionIdToSave, {
           ...collectionData,
           capaUrl: finalCapaUrl,
         });
@@ -393,17 +499,64 @@ export default function CollectionEditor({ collection: initialData }) {
 
       setIsDirty(false); // Reset dirty status on success
 
-      if (!initialCollection.id && result.data?.id) {
+      if (!collectionIdToSave && result.data?.id) {
         toast.success("Coleção criada com sucesso!");
-        // Redirect to edit page
+        setEffectiveCollectionId(result.data.id);
         router.push(`/dashboard/fotografo/colecoes/${result.data.id}/editar`);
         return;
       }
 
+      let fotografoId = effectiveFotografoId || initialCollection.fotografoId;
+
+      if (
+        !fotografoId &&
+        user?.id &&
+        (allPhotos.length > 0 || deletedPhotoIds.length > 0)
+      ) {
+        try {
+          const res = await fetch(`/api/fotografos/resolve?userId=${user.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            fotografoId = data?.data?.id;
+            if (fotografoId) setEffectiveFotografoId(fotografoId);
+          }
+        } catch (e) {
+          console.warn("Fallback fotografoId fetch failed:", e);
+        }
+      }
+
+      if (
+        !fotografoId &&
+        (allPhotos.length > 0 || deletedPhotoIds.length > 0)
+      ) {
+        toast.error(
+          "Não foi possível identificar o fotógrafo. Faça login novamente."
+        );
+        return;
+      }
+
       const payload = {
-        fotografoId: initialCollection.fotografoId,
-        collectionId: initialCollection.id,
-        fotos: allPhotos,
+        fotografoId,
+        collectionId: collectionIdToSave,
+        fotos: allPhotos.map((p) => ({
+          id: p.id || undefined,
+          titulo: p.titulo,
+          descricao: p.descricao,
+          orientacao: p.orientacao,
+          folderId: p.folderId ?? null,
+          colecaoId: collectionIdToSave || p.colecaoId,
+          s3Key: p.s3Key,
+          width: p.width,
+          height: p.height,
+          numeroSequencial: p.numeroSequencial,
+          dataCaptura: p.dataCaptura
+            ? typeof p.dataCaptura === "string"
+              ? p.dataCaptura
+              : p.dataCaptura instanceof Date
+              ? p.dataCaptura.toISOString()
+              : undefined
+            : undefined,
+        })),
         deletedPhotoIds,
       };
 
@@ -416,7 +569,11 @@ export default function CollectionEditor({ collection: initialData }) {
 
         if (!batchRes.ok) {
           const err = await batchRes.json();
-          throw new Error(err.error || "Erro ao salvar fotos em massa.");
+          const msg =
+            err.error ||
+            (err.details ? JSON.stringify(err.details) : null) ||
+            "Erro ao salvar fotos em massa.";
+          throw new Error(msg);
         }
       }
 
@@ -426,7 +583,7 @@ export default function CollectionEditor({ collection: initialData }) {
       console.error("Save Error Detail:", error);
       if (error.message.includes("Nao foi possivel salvar as fotos")) {
         toast.error(
-          "Erro ao salvar fotos. Verifique os logs do servidor para mais detalhes.",
+          "Erro ao salvar fotos. Verifique os logs do servidor para mais detalhes."
         );
       } else {
         toast.error(error.message);
@@ -460,7 +617,7 @@ export default function CollectionEditor({ collection: initialData }) {
   const handleDeleteAllInFolder = () => {
     if (
       !confirm(
-        "Tem certeza? Isso removerá todas as fotos VISÍVEIS nesta pasta.",
+        "Tem certeza? Isso removerá todas as fotos VISÍVEIS nesta pasta."
       )
     )
       return;
@@ -468,7 +625,7 @@ export default function CollectionEditor({ collection: initialData }) {
     setDeletedPhotoIds((prev) => [...prev, ...idsToRemove]);
     const tempIdsToRemove = currentPhotos.map((p) => p.tempId);
     setAllPhotos((prev) =>
-      prev.filter((p) => !tempIdsToRemove.includes(p.tempId)),
+      prev.filter((p) => !tempIdsToRemove.includes(p.tempId))
     );
     toast.success("Pasta limpa com sucesso.");
   };
@@ -494,14 +651,14 @@ export default function CollectionEditor({ collection: initialData }) {
     setCollectionData((prev) => ({
       ...prev,
       descontos: prev.descontos.map((d, i) =>
-        i === index ? { ...d, [field]: parseFloat(value) } : d,
+        i === index ? { ...d, [field]: parseFloat(value) } : d
       ),
     }));
   };
 
   return (
     <div className="w-full max-w-full overflow-x-hidden">
-      <div className="block space-y-8 pb-32 md:pb-8 w-full px-0 sm:px-0">
+      <div className="block space-y-8 pb-32 md:pb-12 w-full px-0 min-w-0">
         <div className="px-4 md:px-0 w-full min-w-0">
           <EditorHeader
             title={initialCollection.id ? "Editar Coleção" : "Nova Coleção"}
@@ -512,30 +669,32 @@ export default function CollectionEditor({ collection: initialData }) {
         </div>
 
         <Tabs defaultValue="detalhes" className="w-full">
-          <div className="w-full max-w-[100vw] h-14 overflow-x-auto overflow-y-hidden sticky top-16 md:static z-40 bg-black/95 backdrop-blur-md md:bg-transparent border-b border-white/5 md:border-none mb-6 md:mb-8 no-scrollbar">
-            <TabsList className="flex w-max md:w-full md:grid md:grid-cols-4 lg:w-[600px] h-14 p-0 bg-transparent rounded-none gap-0 select-none px-4 md:px-0">
+          <div className="w-full max-w-[100vw] min-h-[56px] overflow-x-auto overflow-y-hidden sticky top-16 md:static z-40 bg-black/95 backdrop-blur-md md:bg-transparent border-b border-white/5 md:border-none mb-6 md:mb-8 no-scrollbar">
+            <TabsList
+              aria-label="Abas do editor: Detalhes, Fotos, Preços, Publicação"
+              className="flex w-max md:w-full md:grid md:grid-cols-4 lg:w-[600px] h-14 p-0 bg-transparent rounded-none gap-0 select-none px-4 md:px-0"
+            >
               <TabsTrigger
                 value="detalhes"
-                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px]"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full min-h-[48px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px] touch-manipulation"
               >
                 Detalhes
               </TabsTrigger>
               <TabsTrigger
                 value="fotos"
-                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px]"
-                disabled={!initialCollection.id}
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full min-h-[48px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px] touch-manipulation"
               >
                 Fotos ({currentPhotos.length})
               </TabsTrigger>
               <TabsTrigger
                 value="precos"
-                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px]"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full min-h-[48px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px] touch-manipulation"
               >
                 Preços
               </TabsTrigger>
               <TabsTrigger
                 value="publicacao"
-                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px]"
+                className="data-[state=active]:text-primary! data-[state=active]:font-black text-xs uppercase tracking-widest relative h-full min-h-[48px] rounded-none border-b-2 border-transparent data-[state=active]:border-primary transition-all flex-1 min-w-[100px] touch-manipulation"
               >
                 Publicação
               </TabsTrigger>
@@ -554,44 +713,27 @@ export default function CollectionEditor({ collection: initialData }) {
             </TabsContent>
           </div>
 
-          <div className="px-0 md:px-0">
-            <TabsContent value="fotos" className="space-y-6">
-              {!initialCollection.id ? (
-                <div className="text-center py-12 border border-dashed rounded-lg bg-surface-subtle">
-                  <p className="text-text-secondary mb-4">
-                    Salvel a coleção para começar a adicionar fotos.
-                  </p>
-                  <Button
-                    onClick={handleSaveChanges}
-                    disabled={!isDirty || submitting}
-                  >
-                    Salvar Rascunho
-                  </Button>
-                </div>
-              ) : (
-                <PhotoManagerTab
-                  collectionId={initialCollection.id}
-                  currentFolder={currentFolder}
-                  folderPath={folderPath}
-                  currentPhotos={currentPhotos}
-                  collectionData={collectionData}
-                  uploadState={uploadState}
-                  // analyzingId={analyzingId}
-                  // analyzingCollection={analyzingCollection}
-                  onNavigate={handleNavigate}
-                  // onAnalyzeCollection={handleAnalyzeCollection}
-                  // onDeleteAllInFolder={handleDeleteAllInFolder}
-                  onBulkUpload={handleBulkUpload}
-                  onSetCover={handleSetCover}
-                  onRemovePhoto={removePhoto}
-                  onUpdatePhoto={updatePhoto}
-                  // onAnalyzePhoto={handleAnalyzePhoto}
-
-                  // Add missing props if they were used in the original PhotoManagerTab
-                  onFolderUpload={handleFolderUpload}
-                  // onFolderCreated -> likely internal or via prop if needed
-                />
-              )}
+          <div className="px-4 md:px-0 w-full min-w-0">
+            <TabsContent
+              value="fotos"
+              className="space-y-6 mt-6 overflow-x-hidden"
+            >
+              <PhotoManagerTab
+                collectionId={effectiveCollectionId || initialCollection.id}
+                currentFolder={currentFolder}
+                folderPath={folderPath}
+                currentPhotos={currentPhotos}
+                collectionData={collectionData}
+                uploadState={uploadState}
+                onNavigate={handleNavigate}
+                onDeleteAllInFolder={handleDeleteAllInFolder}
+                onBulkUpload={handleBulkUpload}
+                onSetCover={handleSetCover}
+                onRemovePhoto={removePhoto}
+                onUpdatePhoto={updatePhoto}
+                onFolderUpload={handleFolderUpload}
+                onEnsureCollection={ensureCollectionExists}
+              />
             </TabsContent>
           </div>
 

@@ -1,132 +1,102 @@
 import Link from "next/link";
 import Image from "next/image";
 import { siteConfig } from "@/config/site";
-import { Instagram, Youtube, Twitter, MessageCircle } from "lucide-react";
+import { Instagram, Youtube, Twitter, Music2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+
+const socialLinks = [
+  { href: "https://instagram.com/gt.clicks", label: "Instagram", icon: Instagram },
+  { href: "https://youtube.com/@gtclicks", label: "YouTube", icon: Youtube },
+  { href: "https://twitter.com/gtclicks", label: "Twitter", icon: Twitter },
+  { href: "https://tiktok.com/@gtclicks", label: "TikTok", icon: Music2 },
+];
+
+function FooterSection({ title, links, id }) {
+  return (
+    <section aria-labelledby={id}>
+      <h3
+        id={id}
+        className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4"
+      >
+        {title}
+      </h3>
+      <ul className="flex flex-col gap-3">
+        {links.map((item) => (
+          <li key={item.href}>
+            <Link
+              href={item.href}
+              className="text-sm text-muted-foreground hover:text-white transition-colors flex items-center py-2 min-h-[44px] md:min-h-0 md:py-1"
+            >
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="w-full border-t border-border-subtle bg-surface-section pt-space-16 pb-space-8">
-      <div className="container-wide">
-        <div className="grid grid-cols-1 gap-space-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-space-20 mb-space-16">
-          <div className="flex flex-col gap-space-6">
-            <Link href="/" className="flex items-center gap-space-2 group">
-              <div className="relative h-10 w-auto aspect-3/1">
+    <footer
+      className="w-full border-t border-white/10 bg-black/40 backdrop-blur-sm"
+      role="contentinfo"
+    >
+      <div className="container-wide px-4 md:px-6 py-12 md:py-16">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-16 lg:gap-y-0 mb-12">
+          {/* Brand */}
+          <div className="flex flex-col gap-6 sm:col-span-2 lg:col-span-1">
+            <Link
+              href="/"
+              className="inline-flex items-center w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-md"
+              aria-label="GTClicks - Página inicial"
+            >
+              <div className="relative h-9 w-28">
                 <Image
                   src="/logo.png"
-                  alt="GTClicks Logo"
+                  alt=""
                   fill
-                  sizes="(max-width: 768px) 120px, 120px"
+                  sizes="(max-width: 768px) 112px, 120px"
                   className="object-contain object-left"
                 />
               </div>
             </Link>
-            <p className="text-text-sm leading-relaxed text-text-secondary max-w-xs">
+            <p className="text-sm leading-relaxed text-muted-foreground max-w-xs">
               {siteConfig.description}
             </p>
 
-            {/* Social Icons */}
-            <div className="flex items-center gap-space-2 mt-space-2">
-              <a
-                href="https://instagram.com/gt.clicks"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center min-h-11 min-w-11 text-text-secondary hover:text-action-primary transition-all rounded-radius-full hover:bg-surface-subtle"
-              >
-                <Instagram className="h-6 w-6" />
-              </a>
-              <a
-                href="https://youtube.com/@gtclicks"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center min-h-11 min-w-11 text-text-secondary hover:text-action-primary transition-all rounded-radius-full hover:bg-surface-subtle"
-              >
-                <Youtube className="h-6 w-6" />
-              </a>
-              <a
-                href="https://twitter.com/gtclicks"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center min-h-11 min-w-11 text-text-secondary hover:text-action-primary transition-all rounded-radius-full hover:bg-surface-subtle"
-              >
-                <Twitter className="h-6 w-6" />
-              </a>
-              <a
-                href="https://tiktok.com/@gtclicks"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center min-h-11 min-w-11 text-text-secondary hover:text-action-primary transition-all rounded-radius-full hover:bg-surface-subtle"
-              >
-                <MessageCircle className="h-6 w-6" />
-              </a>
+            <div className="flex items-center gap-2" role="group" aria-label="Redes sociais">
+              {socialLinks.map(({ href, label, icon: Icon }) => (
+                <a
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-white/10 md:min-h-11 md:min-w-11"
+                  aria-label={label}
+                >
+                  <Icon className="h-5 w-5 md:h-6 md:w-6" />
+                </a>
+              ))}
             </div>
           </div>
 
-          <div className="flex flex-col gap-space-6">
-            <h4 className="text-text-xs font-font-bold uppercase tracking-widest text-text-secondary/80">
-              Plataforma
-            </h4>
-            <ul className="flex flex-col gap-space-3 text-text-sm text-text-secondary">
-              {siteConfig.footerParams.platform.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="transition-all duration-200 hover:text-text-primary hover:translate-x-1 inline-block"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-space-6">
-            <h4 className="text-text-xs font-font-bold uppercase tracking-widest text-text-secondary/80">
-              Fotógrafos
-            </h4>
-            <ul className="flex flex-col gap-space-3 text-text-sm text-text-secondary">
-              {siteConfig.footerParams.photographers.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="transition-all duration-200 hover:text-text-primary hover:translate-x-1 inline-block"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-space-6">
-            <h4 className="text-text-xs font-font-bold uppercase tracking-widest text-text-secondary/80">
-              Suporte
-            </h4>
-            <ul className="flex flex-col gap-space-3 text-text-sm text-text-secondary">
-              {siteConfig.footerParams.support.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="transition-all duration-200 hover:text-text-primary hover:translate-x-1 inline-block"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterSection id="footer-plataforma" title="Plataforma" links={siteConfig.footerParams.platform} />
+          <FooterSection id="footer-fotografos" title="Fotógrafos" links={siteConfig.footerParams.photographers} />
+          <FooterSection id="footer-suporte" title="Suporte" links={siteConfig.footerParams.support} />
         </div>
 
-        <div className="border-t border-border-subtle pt-space-10 flex flex-col md:flex-row items-center justify-between gap-space-4">
-          <p className="text-text-xs text-text-secondary/80">
-            © {new Date().getFullYear()} {siteConfig.name}. Todos os direitos
-            reservados.
+        <Separator className="mb-8 bg-white/10" />
+
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <p className="text-xs text-muted-foreground order-2 md:order-1">
+            © {currentYear} {siteConfig.name}. Todos os direitos reservados.
           </p>
-          <div className="flex items-center gap-space-6">
-            <span className="text-text-xs text-text-secondary/80">
-              Feito com <span className="text-action-primary">❤️</span> para
-              criadores
-            </span>
-          </div>
+          <p className="text-xs text-muted-foreground order-1 md:order-2">
+            Feito com <span className="text-primary">♥</span> para criadores
+          </p>
         </div>
       </div>
     </footer>

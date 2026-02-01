@@ -14,12 +14,11 @@ describe("Financial Logic", () => {
   });
 
   test("handles decimal amounts correctly", () => {
-    // R$ 29.90 -> 85% = 25.415 -> 25.42, 15% = 4.485 -> 4.48
-    // Note: Standard JS toFixed rounding can be tricky, but our utils expects 2 decimals
+    // R$ 29.90 -> 85% = 25.415 (toFixed(2) -> 25.41), 15% = total - 25.41 = 4.49
     const result = calculateCommission(29.9);
-    // 29.90 * 0.85 = 25.415
-    expect(result.photographerAmount).toBe(25.42);
-    expect(result.platformFee).toBe(4.48);
+    expect(result.photographerAmount).toBe(25.41);
+    expect(result.platformFee).toBe(4.49);
+    expect(result.photographerAmount + result.platformFee).toBe(29.9);
   });
 
   test("allows custom fee percentage", () => {

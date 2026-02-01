@@ -2,12 +2,13 @@ import { MercadoPagoConfig, Payment, Customer } from "mercadopago";
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { checkoutProcessBodySchema } from "@/lib/validations";
 
 // Initialize Mercado Pago client
 const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
 if (!accessToken) {
   console.error(
-    "CRITICAL: MERCADOPAGO_ACCESS_TOKEN is missing in environment variables.",
+    "CRITICAL: MERCADOPAGO_ACCESS_TOKEN is missing in environment variables."
   );
 }
 
@@ -72,7 +73,17 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
+    const rawBody = await request.json();
+    const parseResult = checkoutProcessBodySchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      const first = parseResult.error.flatten().fieldErrors;
+      const message =
+        Object.values(first)[0]?.[0] ||
+        parseResult.error.message ||
+        "Dados inválidos";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+    const body = parseResult.data;
     const { formData, orderId } = body;
     // Fetch fresh user data to check for customer ID and photographer profile
     const dbUser = await prisma.user.findUnique({
@@ -98,7 +109,7 @@ export async function POST(request) {
       if (userOrder.status === "PAGO") {
         return NextResponse.json(
           { error: "Order already paid" },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
@@ -154,7 +165,7 @@ export async function POST(request) {
         // 3. Progressive Discount Logic
         // Count items from the SAME collection in the cart
         const collectionItemsCount = allItems.filter(
-          (i) => i.foto.colecaoId === item.foto.colecaoId,
+          (i) => i.foto.colecaoId === item.foto.colecaoId
         ).length;
 
         const discounts = item.foto.colecao.descontos;
@@ -228,7 +239,9 @@ export async function POST(request) {
         order_id: finalOrderId,
       },
       external_reference: finalOrderId, // CRITICAL FOR WEBHOOK
-      notification_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://gtclicks.com.br"}/api/webhooks/mercadopago`,
+      notification_url: `${
+        process.env.NEXT_PUBLIC_APP_URL || "https://gtclicks.com.br"
+      }/api/webhooks/mercadopago`,
     };
 
     console.log("Creating payment:", JSON.stringify(paymentData, null, 2));
@@ -263,7 +276,7 @@ export async function POST(request) {
       {
         error: error.message || "Internal Server Error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
