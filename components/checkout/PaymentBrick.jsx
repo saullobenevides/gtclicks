@@ -33,7 +33,7 @@ export default function PaymentBrick({
       bankTransfer: "all",
       creditCard: "all",
       debitCard: "all",
-      mercadoPago: "all",
+      // mercadoPago: "all" - Removed: requires preferenceId which is not being used
     },
     visual: {
       style: {
