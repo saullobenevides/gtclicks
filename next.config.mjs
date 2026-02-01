@@ -44,6 +44,25 @@ const nextConfig = {
     qualities: [70, 75, 80, 85, 90, 100],
   },
 
+  // PWA: Service worker headers
+  async headers() {
+    return [
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/javascript; charset=utf-8",
+          },
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
+    ];
+  },
+
   // Optimize package imports
   experimental: {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],

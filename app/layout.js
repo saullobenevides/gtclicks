@@ -8,6 +8,8 @@ import Footer from "@/components/layout/Footer";
 import LazyClientComponents from "@/components/providers/LazyClientComponents";
 import BottomNav from "@/components/mobile/BottomNav";
 import NavigationController from "@/components/layout/NavigationController";
+import PWAInstallBanner from "@/components/shared/PWAInstallBanner";
+import ServiceWorkerRegistration from "@/components/shared/ServiceWorkerRegistration";
 
 import "./globals.css";
 
@@ -53,9 +55,17 @@ export const metadata = {
       { url: "/icon-192.svg", sizes: "192x192", type: "image/svg+xml" },
       { url: "/icon-512.svg", sizes: "512x512", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
+    apple: [
+      { url: "/apple-icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.svg", sizes: "192x192", type: "image/svg+xml" },
+    ],
   },
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "GTClicks",
+    statusBarStyle: "black-translucent",
+  },
   alternates: {
     canonical: "https://gtclicks.com.br",
     languages: {
@@ -146,6 +156,8 @@ export default function RootLayout({ children }) {
           <NavigationController>
             <BottomNav />
           </NavigationController>
+          <PWAInstallBanner />
+          <ServiceWorkerRegistration />
           <SpeedInsights />
           <Analytics />
         </AppProviders>

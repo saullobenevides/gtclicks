@@ -1,26 +1,70 @@
 {
-  "name": "GT Clicks",
+  "id": "/",
+  "name": "GTClicks - Marketplace de Fotos",
   "short_name": "GTClicks",
-  "description": "Marketplace de fotos de corrida - Encontre suas fotos",
+  "description": "Compre e venda fotos de esportes, eventos e corridas em alta resolução. Encontre suas fotos e monte seu portfolio.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait-primary",
   "background_color": "#09090b",
   "theme_color": "#ef233c",
-  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "categories": ["photo", "shopping", "lifestyle", "sports"],
+  "lang": "pt-BR",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icon-512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["photo", "shopping", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Explorar Fotos",
+      "short_name": "Explorar",
+      "url": "/busca",
+      "icons": [
+        { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" }
+      ]
+    },
+    {
+      "name": "Carrinho",
+      "short_name": "Carrinho",
+      "url": "/carrinho",
+      "icons": [
+        { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" }
+      ]
+    },
+    {
+      "name": "Meus Downloads",
+      "short_name": "Downloads",
+      "url": "/meus-downloads",
+      "icons": [
+        { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" }
+      ]
+    }
+  ],
   "screenshots": []
 }
