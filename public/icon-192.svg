@@ -1,10 +1,31 @@
 <svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="192" height="192" fill="#0A0A0A"/>
-  <circle cx="96" cy="96" r="60" stroke="#DC2626" stroke-width="8" fill="none"/>
-  <circle cx="96" cy="96" r="40" stroke="#DC2626" stroke-width="6" fill="none"/>
-  <circle cx="96" cy="96" r="20" fill="#DC2626"/>
-  <path d="M96 36 L106 46 L86 46 Z" fill="#DC2626"/>
-  <path d="M96 156 L106 146 L86 146 Z" fill="#DC2626"/>
-  <path d="M36 96 L46 106 L46 86 Z" fill="#DC2626"/>
-  <path d="M156 96 L146 106 L146 86 Z" fill="#DC2626"/>
+  <rect width="192" height="192" rx="32" fill="#0A0A0A"/>
+  
+  <!-- Letter G - outer shape -->
+  <path d="M96 28C59.5 28 30 57.5 30 94C30 130.5 59.5 160 96 160C117 160 135.6 149.8 147 134V96H96V114H129C121.8 129 109.8 139.2 95 139.2C66 139.2 48 118.8 48 93C48 67.2 66 46.8 95 46.8C107 46.8 117.8 51.6 125.6 59.4L137 48C125.6 36.6 111 28 96 28Z" fill="#ef233c"/>
+  
+  <!-- Camera aperture ring outer -->
+  <circle cx="96" cy="96" r="33" stroke="#0A0A0A" stroke-width="4" fill="none"/>
+  
+  <!-- Camera aperture ring inner -->
+  <circle cx="96" cy="96" r="24" stroke="#0A0A0A" stroke-width="3" fill="none"/>
+  
+  <!-- Aperture blades - 6 blade design -->
+  <g fill="#0A0A0A">
+    <!-- Top blade -->
+    <path d="M96 75L104 87L88 87Z"/>
+    <!-- Top-right blade -->
+    <path d="M114.2 85.5L110.4 99.5L98 89.5Z"/>
+    <!-- Bottom-right blade -->
+    <path d="M114.2 106.5L98 106.5L110.4 92.5Z"/>
+    <!-- Bottom blade -->
+    <path d="M96 117L88 105L104 105Z"/>
+    <!-- Bottom-left blade -->
+    <path d="M77.8 106.5L81.6 92.5L94 102.5Z"/>
+    <!-- Top-left blade -->
+    <path d="M77.8 85.5L94 89.5L81.6 99.5Z"/>
+  </g>
+  
+  <!-- Center dot -->
+  <circle cx="96" cy="96" r="8" fill="#0A0A0A"/>
 </svg>

@@ -1,0 +1,25 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="180" height="180" rx="40" fill="#0A0A0A"/>
+  
+  <!-- Letter G - outer shape -->
+  <path d="M90 26C55.5 26 28 53.5 28 88C28 122.5 55.5 150 90 150C109.5 150 126.6 140.5 138 126V90H90V107H121.5C114.8 121 103.7 130.2 89 130.2C62 130.2 46 111.4 46 87C46 62.6 62 43.8 89 43.8C100 43.8 110 48.2 117.2 55.4L127.5 45C116.8 34.4 104 26 90 26Z" fill="#ef233c"/>
+  
+  <!-- Camera aperture ring outer -->
+  <circle cx="90" cy="90" r="31" stroke="#0A0A0A" stroke-width="4" fill="none"/>
+  
+  <!-- Camera aperture ring inner -->
+  <circle cx="90" cy="90" r="22" stroke="#0A0A0A" stroke-width="3" fill="none"/>
+  
+  <!-- Aperture blades - 6 blade design -->
+  <g fill="#0A0A0A">
+    <path d="M90 70L97 81L83 81Z"/>
+    <path d="M107 79.5L103.5 92L92 83Z"/>
+    <path d="M107 100.5L92 100L103.5 88Z"/>
+    <path d="M90 110L83 99L97 99Z"/>
+    <path d="M73 100.5L76.5 88L88 97Z"/>
+    <path d="M73 79.5L88 83L76.5 92Z"/>
+  </g>
+  
+  <!-- Center dot -->
+  <circle cx="90" cy="90" r="7" fill="#0A0A0A"/>
+</svg>

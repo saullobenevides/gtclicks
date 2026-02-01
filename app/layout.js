@@ -47,6 +47,14 @@ export const metadata = {
   creator: "GTClicks",
   publisher: "GTClicks",
   metadataBase: new URL("https://gtclicks.com.br"),
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.svg", sizes: "192x192", type: "image/svg+xml" },
+      { url: "/icon-512.svg", sizes: "512x512", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
+  },
   manifest: "/manifest.json",
   alternates: {
     canonical: "https://gtclicks.com.br",

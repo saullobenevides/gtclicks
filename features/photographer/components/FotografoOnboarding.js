@@ -93,12 +93,17 @@ export default function FotografoOnboarding({ onSuccess }) {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data?.error || "Erro ao criar perfil");
+      if (!response.ok) {
+        const msg = data?.details
+          ? `${data.error}: ${data.details}`
+          : data?.error || "Erro ao criar perfil";
+        throw new Error(msg);
+      }
 
       if (onSuccess) onSuccess(data.data);
       else router.push("/dashboard/fotografo");
     } catch (err) {
-      console.error(err);
+      console.error("FotografoOnboarding error:", err);
       setError(err.message);
     } finally {
       setLoading(false);
