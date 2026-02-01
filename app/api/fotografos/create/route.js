@@ -148,9 +148,24 @@ export async function POST(request) {
       if (attempt >= 10)
         throw new Error("Não foi possível gerar um username único");
     } else {
-      // Remove @ if present
+      // Remove @ if present and normalize
       if (finalUsername.startsWith("@"))
         finalUsername = finalUsername.substring(1);
+      finalUsername = finalUsername.toLowerCase().trim();
+
+      // Check if chosen username is already taken
+      const usernameTaken = await prisma.fotografo.findUnique({
+        where: { username: finalUsername },
+      });
+      if (usernameTaken) {
+        return NextResponse.json(
+          {
+            error: "Este username já está em uso",
+            details: `"${finalUsername}" não está disponível. Escolha outro.`,
+          },
+          { status: 409 }
+        );
+      }
     }
 
     // Step 4: Create photographer profile with full details
