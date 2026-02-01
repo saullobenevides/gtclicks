@@ -107,7 +107,9 @@ O projeto mantém dependências atualizadas e sem vulnerabilidades **críticas**
 - Use `npm audit fix` para aplicar correções seguras (sem breaking changes).
 - Vulnerabilidades que exijam `npm audit fix --force` (ex.: em `@stackframe/stack` ou `@aws-sdk/*`) ficam documentadas aqui; atualize quando houver versões compatíveis.
 
-Opcional em CI: falhar o build em vulnerabilidades high/critical (ex.: `npm audit --audit-level=high`).
+**Vulnerabilidades conhecidas:** O `npm audit` pode reportar vulnerabilidades em dependências transitivas, por exemplo **elliptic** (via `@stackframe/stack`) e **fast-xml-parser** (via AWS SDK). A correção hoje exigiria breaking changes (atualização de Stack ou AWS SDK). A decisão é manter as versões atuais até haver versões compatíveis; esta seção deve ser atualizada quando houver correções disponíveis.
+
+Opcional em CI: falhar o build em vulnerabilidades high/critical (ex.: `npm audit --audit-level=high`). As falhas conhecidas listadas acima podem ser ignoradas no CI até atualização dos pacotes.
 
 ## Pasta `.agent/`
 
@@ -117,6 +119,6 @@ A pasta `.agent/` contem skills, workflows e scripts usados por ferramentas de a
 
 ---
 
-As **diretrizes de contexto e arquitetura** do projeto estão em **[.cursor/rules/gtclicks-context.md](./.cursor/rules/gtclicks-context.md)** (Manual Pro v3.0). A **revisão do app** face ao manual está em **[REVIEW.md](./REVIEW.md)**. O plano de testes está em **[TESTING.md](./TESTING.md)**. Fluxos de **auth, cadastro e onboarding** (cadastro vs registrar, fluxo único do fotógrafo) estão em **[FLUXO_AUTH_CADASTRO.md](./FLUXO_AUTH_CADASTRO.md)**; revisão UI/UX dos fluxos em **[REVISAO_UI_UX_FLUXOS.md](./REVISAO_UI_UX_FLUXOS.md)**. **Análise completa** (multi-perspectiva com base no framework .agent/): **[ANALISE_COMPLETA.md](./ANALISE_COMPLETA.md)**.
+As **diretrizes de contexto e arquitetura** do projeto estão em **[.cursor/rules/gtclicks-context.md](./.cursor/rules/gtclicks-context.md)** (Manual Pro v3.0). A **revisão do app** face ao manual está em **[REVIEW.md](./REVIEW.md)**. O plano de testes está em **[TESTING.md](./TESTING.md)**. Fluxos de **auth, cadastro e onboarding** (cadastro vs registrar, fluxo único do fotógrafo) estão em **[FLUXO_AUTH_CADASTRO.md](./FLUXO_AUTH_CADASTRO.md)**; revisão UI/UX dos fluxos em **[REVISAO_UI_UX_FLUXOS.md](./REVISAO_UI_UX_FLUXOS.md)**. **Análise completa** (multi-perspectiva com base no framework .agent/): **[ANALISE_COMPLETA.md](./ANALISE_COMPLETA.md)**. **Revisão multi-perspectiva com o framework .agent/** (Antigravity Kit): **[REVISAO_AGENT.md](./REVISAO_AGENT.md)**.
 
 Qualquer duvida sobre a camada de dados, confira `lib/data/marketplace.js` e os comentarios do seed. Boas fotos!

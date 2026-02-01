@@ -31,6 +31,8 @@ python .agent/scripts/verify_all.py . --url http://localhost:3000
 
 Inclui: security scan, lint, schema, testes, UX, SEO, Lighthouse, Playwright E2E e análises adicionais quando aplicável.
 
+O **health report** da revisão (framework .agent/, perspectiva Explorer) vem de rodar `python .agent/scripts/checklist.py .`. As checagens P2 (Schema Validation), P3 (Test Runner) e o E2E (Playwright) do `verify_all.py` dependem de Python no PATH e são opcionais; podem ser usadas em desenvolvimento ou em CI quando Python estiver disponível.
+
 ## Testes
 
 - `npm test` — testes unitários (Jest)

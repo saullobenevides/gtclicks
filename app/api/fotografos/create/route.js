@@ -22,11 +22,23 @@ function generateUniqueUsername(baseName) {
 
 export async function POST(request) {
   try {
-    const authUser = await getAuthenticatedUser();
+    // Step 1: Authentication
+    let authUser;
+    try {
+      authUser = await getAuthenticatedUser();
+    } catch (authError) {
+      console.error("[fotografos/create] Auth error:", authError);
+      return NextResponse.json(
+        { error: "Erro de autenticação", details: authError.message },
+        { status: 500 }
+      );
+    }
+
     if (!authUser) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
     const userId = authUser.id;
+    console.log("[fotografos/create] User authenticated:", userId);
 
     const rawBody = await request.json();
     const parseResult = fotografoCreateBodySchema.safeParse(rawBody);
@@ -51,12 +63,26 @@ export async function POST(request) {
       chavePix,
     } = body;
 
-    // Check if photographer already exists
-    const existing = await prisma.fotografo.findUnique({
-      where: { userId },
-    });
+    // Step 2: Check if photographer already exists
+    console.log("[fotografos/create] Checking existing fotografo...");
+    let existing;
+    try {
+      existing = await prisma.fotografo.findUnique({
+        where: { userId },
+      });
+    } catch (dbError) {
+      console.error(
+        "[fotografos/create] DB error checking fotografo:",
+        dbError
+      );
+      return NextResponse.json(
+        { error: "Erro de banco de dados", details: dbError.message },
+        { status: 500 }
+      );
+    }
 
     if (existing) {
+      console.log("[fotografos/create] Fotografo already exists:", existing.id);
       return NextResponse.json({
         data: {
           id: existing.id,
@@ -66,27 +92,42 @@ export async function POST(request) {
       });
     }
 
-    // Verify or create user in Prisma
-    let user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      // Create user in Prisma to sync with Stack Auth
-      user = await prisma.user.create({
-        data: {
-          id: userId,
-          name: name || "Fotógrafo",
-          email: email || `${userId}@gtclicks.temp`,
-          role: "FOTOGRAFO",
-        },
-      });
-    } else {
-      // Upgrade existing user to FOTOGRAFO
-      await prisma.user.update({
+    // Step 3: Verify or create user in Prisma
+    console.log("[fotografos/create] Checking/creating user...");
+    let user;
+    try {
+      user = await prisma.user.findUnique({
         where: { id: userId },
-        data: { role: "FOTOGRAFO" },
       });
+
+      if (!user) {
+        // Create user in Prisma to sync with Stack Auth
+        user = await prisma.user.create({
+          data: {
+            id: userId,
+            name: name || "Fotógrafo",
+            email: email || `${userId}@gtclicks.temp`,
+            role: "FOTOGRAFO",
+          },
+        });
+        console.log("[fotografos/create] User created:", user.id);
+      } else {
+        // Upgrade existing user to FOTOGRAFO
+        await prisma.user.update({
+          where: { id: userId },
+          data: { role: "FOTOGRAFO" },
+        });
+        console.log("[fotografos/create] User upgraded to FOTOGRAFO");
+      }
+    } catch (userError) {
+      console.error("[fotografos/create] DB error with user:", userError);
+      return NextResponse.json(
+        {
+          error: "Erro ao criar/atualizar usuário",
+          details: userError.message,
+        },
+        { status: 500 }
+      );
     }
 
     // Process username (use provided or generate)
@@ -112,25 +153,45 @@ export async function POST(request) {
         finalUsername = finalUsername.substring(1);
     }
 
-    // Create photographer profile with full details
-    const fotografo = await prisma.fotografo.create({
-      data: {
-        userId,
-        username: finalUsername,
-        bio: bio || "Fotógrafo profissional",
-        telefone,
-        cidade,
-        estado,
-        instagram,
-        chavePix,
-      },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true },
+    // Step 4: Create photographer profile with full details
+    console.log(
+      "[fotografos/create] Creating fotografo with username:",
+      finalUsername
+    );
+    let fotografo;
+    try {
+      fotografo = await prisma.fotografo.create({
+        data: {
+          userId,
+          username: finalUsername,
+          bio: bio || "Fotógrafo profissional",
+          telefone,
+          cidade,
+          estado,
+          instagram,
+          chavePix,
         },
-      },
-    });
+        include: {
+          user: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+      });
+    } catch (createError) {
+      console.error(
+        "[fotografos/create] DB error creating fotografo:",
+        createError
+      );
+      return NextResponse.json(
+        { error: "Erro ao criar perfil", details: createError.message },
+        { status: 500 }
+      );
+    }
 
+    console.log(
+      "[fotografos/create] Fotografo created successfully:",
+      fotografo.id
+    );
     return NextResponse.json({
       data: {
         id: fotografo.id,
@@ -144,9 +205,9 @@ export async function POST(request) {
       },
     });
   } catch (error) {
-    console.error("Erro ao criar fotógrafo:", error);
+    console.error("[fotografos/create] Unexpected error:", error);
     return NextResponse.json(
-      { error: "Erro ao criar perfil de fotógrafo", details: error.message },
+      { error: "Erro inesperado", details: error.message },
       { status: 500 }
     );
   }
