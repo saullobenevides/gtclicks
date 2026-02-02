@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Loader2, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
 
@@ -103,7 +105,10 @@ export default function CheckoutPage() {
     } else {
       // Handle explicit errors or unknown states
       const errorMessage =
-        result.error?.message || "Ocorreu um erro ao processar o pagamento.";
+        (typeof result.error === "string"
+          ? result.error
+          : result.error?.message) ||
+        "Ocorreu um erro ao processar o pagamento.";
       console.error("Payment Failed:", result);
       toast.error("Erro no Pagamento", {
         description: errorMessage + " Verifique os dados e tente novamente.",
@@ -136,6 +141,24 @@ export default function CheckoutPage() {
 
   if (!displayItems || displayItems.length === 0) {
     return null;
+  }
+
+  const totalToPay = Number(displayTotal) || 0;
+  if (totalToPay <= 0) {
+    return (
+      <div className="container-wide px-4 py-12 md:py-20 text-center">
+        <h1 className="text-xl font-bold text-white mb-4">
+          Valor do pedido inválido
+        </h1>
+        <p className="text-muted-foreground mb-6">
+          O total do pedido precisa ser maior que zero. Verifique os itens e
+          tente novamente.
+        </p>
+        <Button asChild>
+          <Link href="/carrinho">Voltar ao Carrinho</Link>
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -203,7 +226,7 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between items-center text-lg font-bold text-white">
                 <span>Total a Pagar</span>
-                <span>R$ {displayTotal.toFixed(2)}</span>
+                <span>R$ {totalToPay.toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>
@@ -232,7 +255,7 @@ export default function CheckoutPage() {
             <CardContent>
               <div className="min-h-[400px]">
                 <PaymentBrick
-                  amount={displayTotal}
+                  amount={totalToPay}
                   payer={
                     user
                       ? {

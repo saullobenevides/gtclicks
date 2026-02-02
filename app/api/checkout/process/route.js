@@ -201,9 +201,12 @@ export async function POST(request) {
 
         // 2. If no Collection or Discounts, use Base Price (default 10 if missing)
         // Note: item.foto.colecao.precoFoto is the base price in DB
-        const basePrice = item.foto.colecao?.precoFoto
-          ? Number(item.foto.colecao.precoFoto)
-          : 10;
+        // Mercado Pago exige valor positivo; mínimo 0.01
+        const rawBase =
+          item.foto.colecao?.precoFoto != null
+            ? Number(item.foto.colecao.precoFoto)
+            : 10;
+        const basePrice = rawBase > 0 ? rawBase : 10;
 
         if (
           !item.foto.colecaoId ||
@@ -228,7 +231,8 @@ export async function POST(request) {
           .sort((a, b) => b.min - a.min); // Descending order
 
         if (applicableDiscounts.length > 0) {
-          return Number(applicableDiscounts[0].price);
+          const discountPrice = Number(applicableDiscounts[0].price);
+          return discountPrice > 0 ? discountPrice : basePrice;
         }
 
         return basePrice;
@@ -272,6 +276,18 @@ export async function POST(request) {
       finalOrderId = newOrder.id;
     }
 
+    // Validate amount (Mercado Pago requires positive transaction_amount)
+    const safeTotal = Math.round(Number(total) * 100) / 100;
+    if (!Number.isFinite(safeTotal) || safeTotal <= 0) {
+      return NextResponse.json(
+        {
+          error:
+            "O valor do pedido é inválido. Verifique os itens do carrinho e tente novamente.",
+        },
+        { status: 400 }
+      );
+    }
+
     // 1. Get or Create Customer for Saved Cards
     const customerId = await getOrCreateCustomer(dbUser);
 
@@ -284,9 +300,18 @@ export async function POST(request) {
         ? formData.payer
         : {};
     payerFromForm = normalizePayerAddress(payerFromForm);
+
+    // entityType só aceita "individual" ou "association" (Mercado Pago)
+    if (
+      payerFromForm.entity_type &&
+      !["individual", "association"].includes(payerFromForm.entity_type)
+    ) {
+      delete payerFromForm.entity_type;
+    }
+
     const paymentData = {
       ...formData,
-      transaction_amount: Number(formData.transaction_amount ?? total),
+      transaction_amount: safeTotal,
       payment_method_id: formData.payment_method_id || "pix",
       description: `GTClicks # ${finalOrderId.slice(-8)}`,
       payer: {
@@ -344,6 +369,10 @@ export async function POST(request) {
     ) {
       safeMessage =
         "Para gerar o boleto, preencha todos os campos de endereço no formulário (CEP, rua, número, bairro, cidade e estado).";
+    }
+    if (safeMessage.includes("transaction_amount must be positive")) {
+      safeMessage =
+        "O valor do pedido é inválido. Verifique os itens e tente novamente.";
     }
     return NextResponse.json({ error: safeMessage }, { status: 500 });
   }
