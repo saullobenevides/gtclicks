@@ -84,6 +84,31 @@ export default function CheckoutPage() {
     }
   }, [orderId, user]);
 
+  /** Mapeia status_detail do Mercado Pago para mensagens amigáveis */
+  const getPaymentErrorMessage = (result) => {
+    const fromError =
+      typeof result?.error === "string" ? result.error : result?.error?.message;
+    if (fromError) return fromError;
+
+    const detail = result?.status_detail;
+    const messages = {
+      rejected_by_bank:
+        "O pagamento foi recusado. Verifique os dados preenchidos (nome, CPF, endereço completo para boleto) e tente novamente.",
+      cc_rejected_bad_filled_card_number: "Número do cartão inválido.",
+      cc_rejected_bad_filled_date: "Data de validade inválida.",
+      cc_rejected_bad_filled_security_code:
+        "Código de segurança (CVV) inválido.",
+      cc_rejected_insufficient_amount:
+        "Limite insuficiente no cartão. Tente outro cartão ou método de pagamento.",
+      cc_rejected_max_attempts:
+        "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
+      cc_rejected_blacklist: "Cartão não autorizado para esta operação.",
+      cc_rejected_other_reason:
+        "O banco recusou o pagamento. Entre em contato com seu banco ou tente outro método.",
+    };
+    return messages[detail] || "Ocorreu um erro ao processar o pagamento.";
+  };
+
   const handlePaymentResult = (result) => {
     console.log("Payment Result Full:", result);
 
@@ -103,12 +128,7 @@ export default function CheckoutPage() {
         }&status=${result.status}`
       );
     } else {
-      // Handle explicit errors or unknown states
-      const errorMessage =
-        (typeof result.error === "string"
-          ? result.error
-          : result.error?.message) ||
-        "Ocorreu um erro ao processar o pagamento.";
+      const errorMessage = getPaymentErrorMessage(result);
       console.error("Payment Failed:", result);
       toast.error("Erro no Pagamento", {
         description: errorMessage + " Verifique os dados e tente novamente.",
@@ -249,7 +269,9 @@ export default function CheckoutPage() {
             <CardHeader>
               <CardTitle className="text-xl text-white">Pagamento</CardTitle>
               <CardDescription>
-                Escolha sua forma de pagamento preferida
+                Escolha sua forma de pagamento preferida. Se tiver problemas
+                (ex.: boleto sem preencher endereço), desative temporariamente
+                bloqueadores de anúncios.
               </CardDescription>
             </CardHeader>
             <CardContent>

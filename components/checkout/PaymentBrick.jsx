@@ -77,6 +77,13 @@ export default function PaymentBrick({
   };
 
   const onError = async (error) => {
+    // get_address_data_failed é non_critical - geralmente causado por ad blocker
+    if (error?.cause === "get_address_data_failed") {
+      console.warn(
+        "Brick: endereço não carregado (pode ser bloqueador de anúncios). O usuário pode preencher manualmente."
+      );
+      return;
+    }
     console.error("Brick error:", error);
   };
 
