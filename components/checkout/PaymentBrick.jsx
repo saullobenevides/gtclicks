@@ -100,7 +100,7 @@ export default function PaymentBrick({
   }
 
   return (
-    <div className="payment-brick-container w-full max-w-xl mx-auto relative">
+    <div className="payment-brick-container w-full max-w-xl mx-auto relative overflow-hidden">
       {isLoading && (
         <div className="flex justify-center p-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />

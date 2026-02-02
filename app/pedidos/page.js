@@ -185,7 +185,7 @@ export default async function PedidosPage(props) {
 
                     <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                       {pedido.status === "PENDENTE" && (
-                        <div className="w-full sm:w-48">
+                        <div className="w-full sm:w-48 overflow-hidden rounded-radius-lg">
                           <RetryPaymentButton
                             orderId={pedido.id}
                             paymentId={pedido.paymentId}

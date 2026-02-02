@@ -60,12 +60,14 @@ export default function PendingPaymentDisplay({
   // Sem paymentId: redireciona para checkout
   if (!paymentId) {
     return (
-      <Button asChild className="w-full gap-2 font-bold">
-        <Link href={`/checkout?orderId=${orderId}`}>
-          <CreditCard className="h-4 w-4" />
-          Finalizar Pagamento
-        </Link>
-      </Button>
+      <div className="overflow-hidden rounded-radius-lg">
+        <Button asChild className="w-full gap-2 font-bold">
+          <Link href={`/checkout?orderId=${orderId}`}>
+            <CreditCard className="h-4 w-4" />
+            Finalizar Pagamento
+          </Link>
+        </Button>
+      </div>
     );
   }
 
@@ -80,12 +82,14 @@ export default function PendingPaymentDisplay({
 
   if (error) {
     return (
-      <Button asChild variant="outline" className="w-full gap-2">
-        <Link href={`/checkout?orderId=${orderId}`}>
-          <CreditCard className="h-4 w-4" />
-          Finalizar Pagamento
-        </Link>
-      </Button>
+      <div className="overflow-hidden rounded-radius-lg">
+        <Button asChild variant="outline" className="w-full gap-2">
+          <Link href={`/checkout?orderId=${orderId}`}>
+            <CreditCard className="h-4 w-4" />
+            Finalizar Pagamento
+          </Link>
+        </Button>
+      </div>
     );
   }
 
@@ -192,12 +196,14 @@ export default function PendingPaymentDisplay({
           Pagamento pendente. Complete no checkout para liberar seus downloads.
         </p>
       )}
-      <Button asChild className="w-full gap-2 font-bold">
-        <Link href={`/checkout?orderId=${orderId}`}>
-          <CreditCard className="h-4 w-4" />
-          Finalizar Pagamento
-        </Link>
-      </Button>
+      <div className="overflow-hidden rounded-radius-lg">
+        <Button asChild className="w-full gap-2 font-bold">
+          <Link href={`/checkout?orderId=${orderId}`}>
+            <CreditCard className="h-4 w-4" />
+            Finalizar Pagamento
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }
