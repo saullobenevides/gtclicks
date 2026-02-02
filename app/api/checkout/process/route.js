@@ -15,6 +15,60 @@ const client = new MercadoPagoConfig({
   accessToken: accessToken || "TEST-00000000-0000-0000-0000-000000000000", // Preventing crash, but WILL fail payment
 });
 
+/** Mapeamento nome do estado → sigla UF (Mercado Pago exige federal_unit como sigla) */
+const ESTADOS_UF = {
+  acre: "AC",
+  alagoas: "AL",
+  amapá: "AP",
+  amazonas: "AM",
+  bahia: "BA",
+  ceará: "CE",
+  "distrito federal": "DF",
+  espírito: "ES",
+  "espírito santo": "ES",
+  goiás: "GO",
+  maranhão: "MA",
+  "mato grosso": "MT",
+  "mato grosso do sul": "MS",
+  minas: "MG",
+  "minas gerais": "MG",
+  pará: "PA",
+  paraíba: "PB",
+  paraná: "PR",
+  pernambuco: "PE",
+  piauí: "PI",
+  "rio de janeiro": "RJ",
+  "rio grande do norte": "RN",
+  "rio grande do sul": "RS",
+  rondônia: "RO",
+  roraima: "RR",
+  "santa catarina": "SC",
+  "são paulo": "SP",
+  sergipe: "SE",
+  tocantins: "TO",
+};
+
+function toFederalUnit(val) {
+  if (!val || typeof val !== "string") return val;
+  const trimmed = val.trim();
+  if (trimmed.length === 2) return trimmed.toUpperCase();
+  const key = trimmed.toLowerCase().replace(/\s+/g, " ");
+  return ESTADOS_UF[key] || trimmed;
+}
+
+function normalizePayerAddress(payer) {
+  if (!payer?.address || typeof payer.address !== "object") return payer;
+  const addr = { ...payer.address };
+  const stateVal = addr.federal_unit ?? addr.state_name ?? addr.estado;
+  if (stateVal) {
+    addr.federal_unit = toFederalUnit(stateVal);
+  }
+  if (addr.street_number != null && typeof addr.street_number !== "string") {
+    addr.street_number = String(addr.street_number);
+  }
+  return { ...payer, address: addr };
+}
+
 /**
  * Helper to get or create a Mercado Pago Customer
  */
@@ -225,10 +279,11 @@ export async function POST(request) {
     const payment = new Payment(client);
 
     // Copia campos do Brick (token, installments para cartão; transaction_details para PSE; etc.)
-    const payerFromForm =
+    let payerFromForm =
       formData.payer && typeof formData.payer === "object"
         ? formData.payer
         : {};
+    payerFromForm = normalizePayerAddress(payerFromForm);
     const paymentData = {
       ...formData,
       transaction_amount: Number(formData.transaction_amount ?? total),
@@ -277,10 +332,19 @@ export async function POST(request) {
     }
   } catch (error) {
     console.error("Checkout Error:", error);
-    const safeMessage =
+    let safeMessage =
       error?.message && typeof error.message === "string"
         ? error.message
         : "Erro ao processar pagamento. Tente novamente.";
+    // Mensagem amigável para boleto sem endereço completo
+    if (
+      safeMessage.includes("payer.address") ||
+      safeMessage.includes("federal_unit") ||
+      safeMessage.includes("registered boleto")
+    ) {
+      safeMessage =
+        "Para gerar o boleto, preencha todos os campos de endereço no formulário (CEP, rua, número, bairro, cidade e estado).";
+    }
     return NextResponse.json({ error: safeMessage }, { status: 500 });
   }
 }

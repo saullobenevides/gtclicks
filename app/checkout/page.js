@@ -233,6 +233,20 @@ export default function CheckoutPage() {
               <div className="min-h-[400px]">
                 <PaymentBrick
                   amount={displayTotal}
+                  payer={
+                    user
+                      ? {
+                          email: user.primaryEmail || user.email,
+                          firstName:
+                            user.displayName?.split(" ")[0] ||
+                            user.name?.split(" ")[0],
+                          lastName:
+                            user.displayName?.split(" ").slice(1).join(" ") ||
+                            user.name?.split(" ").slice(1).join(" ") ||
+                            "",
+                        }
+                      : undefined
+                  }
                   onPaymentResult={handlePaymentResult}
                   orderId={orderId}
                 />

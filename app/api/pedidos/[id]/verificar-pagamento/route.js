@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { getAuthenticatedUser } from "@/lib/auth";
 
-export async function POST(request, { params }) {
+export async function POST(request, context) {
   try {
-    const { id: pedidoId } = params;
+    const { id: pedidoId } = await context.params;
     const user = await getAuthenticatedUser();
 
     if (!user) {
@@ -21,7 +21,7 @@ export async function POST(request, { params }) {
     if (!pedido) {
       return NextResponse.json(
         { error: "Pedido não encontrado" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -47,7 +47,7 @@ export async function POST(request, { params }) {
     if (!accessToken) {
       return NextResponse.json(
         { error: "Erro de configuração no servidor" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -66,7 +66,7 @@ export async function POST(request, { params }) {
       console.error("MP Search Error:", await searchRes.text());
       return NextResponse.json(
         { error: "Erro ao consultar Mercado Pago" },
-        { status: 502 },
+        { status: 502 }
       );
     }
 
@@ -86,7 +86,7 @@ export async function POST(request, { params }) {
 
     const paymentId = approvedPayment.id;
     console.log(
-      `✅ [Manual Check] Found approved payment ${paymentId} for order ${pedidoId}`,
+      `✅ [Manual Check] Found approved payment ${paymentId} for order ${pedidoId}`
     );
 
     const result = await prisma.$transaction(async (tx) => {
@@ -122,10 +122,10 @@ export async function POST(request, { params }) {
 
       const { getConfigNumber, CONFIG_KEYS } = await import("@/lib/config");
       const taxaPlataformaPct = await getConfigNumber(
-        CONFIG_KEYS.TAXA_PLATAFORMA,
+        CONFIG_KEYS.TAXA_PLATAFORMA
       );
       const photographerShare = new Prisma.Decimal(1).sub(
-        new Prisma.Decimal(taxaPlataformaPct).div(100),
+        new Prisma.Decimal(taxaPlataformaPct).div(100)
       );
 
       for (const item of items) {
@@ -194,7 +194,7 @@ export async function POST(request, { params }) {
     console.error("Error verifying payment:", error);
     return NextResponse.json(
       { error: "Erro interno ao verificar pagamento" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
