@@ -117,7 +117,7 @@ export default async function PedidosPage(props) {
 
   return (
     <div className="container-wide px-4 py-12 md:py-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+      <div className="mb-8 flex flex-col gap-4 md:mb-10 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2">
             Meus Pedidos
@@ -148,8 +148,8 @@ export default async function PedidosPage(props) {
               className="group overflow-hidden transition-colors hover:border-border-default"
             >
               <CardContent className="p-0">
-                <div className="p-6">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                <div className="p-4 sm:p-6">
+                  <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-3 text-sm text-muted-foreground mb-1">
                         <span className="rounded-radius-sm bg-surface-subtle px-2 py-0.5 font-mono text-xs text-muted-foreground">
@@ -205,7 +205,7 @@ export default async function PedidosPage(props) {
                     </div>
                   </div>
 
-                  <Separator className="mb-6" />
+                  <Separator className="my-6" />
 
                   <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
                     {pedido.itens.slice(0, 4).map((item) => (
@@ -231,12 +231,14 @@ export default async function PedidosPage(props) {
               </CardContent>
             </Card>
           ))}
-          <AppPagination
-            currentPage={page}
-            totalPages={totalPages}
-            baseUrl="/pedidos"
-            searchParams={searchParams}
-          />
+          <div className="mt-8">
+            <AppPagination
+              currentPage={page}
+              totalPages={totalPages}
+              baseUrl="/pedidos"
+              searchParams={searchParams}
+            />
+          </div>
         </div>
       )}
     </div>

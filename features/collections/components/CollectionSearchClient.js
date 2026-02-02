@@ -25,10 +25,12 @@ import { SelectionContext } from "../context/SelectionContext";
 import PhotoCard from "@/components/shared/cards/PhotoCard";
 import AppPagination from "@/components/shared/AppPagination";
 import { LICENSE_MVP_LABEL } from "@/lib/constants";
+import { formatCartItemTitle } from "@/lib/utils";
 
 export default function CollectionSearchClient({
   allPhotos = [],
   collectionId,
+  collectionTitle,
   initialDisplayPhotos = [],
   children,
 }) {
@@ -88,11 +90,11 @@ export default function CollectionSearchClient({
         addToCart({
           fotoId: photo.id,
           colecaoId: collectionId,
-          titulo:
-            photo.titulo ||
-            (photo.numeroSequencial
-              ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
-              : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`),
+          titulo: formatCartItemTitle({
+            collectionName: photo.colecao?.nome || collectionTitle,
+            numeroSequencial: photo.numeroSequencial,
+            photoId: photo.id,
+          }),
           preco: photo.colecao?.precoFoto || photo.preco || 0,
           precoBase: photo.colecao?.precoFoto || photo.preco || 0,
           descontos: photo.colecao?.descontos || [],
@@ -174,12 +176,11 @@ export default function CollectionSearchClient({
     addToCart({
       fotoId: photo.id,
       colecaoId: collectionId,
-      titulo:
-        photo.title ||
-        photo.titulo ||
-        (photo.numeroSequencial
-          ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
-          : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`),
+      titulo: formatCartItemTitle({
+        collectionName: photo.colecao?.nome || collectionTitle,
+        numeroSequencial: photo.numeroSequencial,
+        photoId: photo.id,
+      }),
       preco: photo.colecao?.precoFoto || 0,
       licenca: LICENSE_MVP_LABEL,
       previewUrl: photo.previewUrl,

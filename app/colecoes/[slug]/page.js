@@ -64,11 +64,11 @@ export default async function CollectionDetail({ params, searchParams }) {
 
   // Filter content based on current folder level
   const currentLevelFolders = (collection.folders || []).filter(
-    (f) => f.parentId === (folderId || null),
+    (f) => f.parentId === (folderId || null)
   );
 
   const currentLevelPhotos = (collection.photos || []).filter(
-    (p) => p.folderId === (folderId || null),
+    (p) => p.folderId === (folderId || null)
   );
 
   const currentFolder = folderId
@@ -95,6 +95,7 @@ export default async function CollectionDetail({ params, searchParams }) {
           <CollectionSearchClient
             allPhotos={collection.photos || []}
             collectionId={collection.id}
+            collectionTitle={collection.title}
             initialDisplayPhotos={currentLevelPhotos}
           >
             {/* Folder Navigation Header */}
@@ -175,7 +176,9 @@ export default async function CollectionDetail({ params, searchParams }) {
             name: collection.title,
             description:
               collection.description ||
-              `Coleção de fotos por ${collection.photographer?.name || "GTClicks"}`,
+              `Coleção de fotos por ${
+                collection.photographer?.name || "GTClicks"
+              }`,
             image: collection.photos?.[0]?.previewUrl
               ? [collection.photos[0].previewUrl]
               : [],

@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import ShareButton from "@/components/shared/actions/ShareButton";
 import { LICENSE_MVP_LABEL } from "@/lib/constants";
+import { formatCartItemTitle } from "@/lib/utils";
 
 export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
   const { items, addToCart } = useCart();
@@ -45,9 +46,11 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
     addToCart({
       fotoId: photo.id,
       colecaoId: photo.colecaoId || photo.colecao?.id,
-      titulo: photo.numeroSequencial
-        ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
-        : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`,
+      titulo: formatCartItemTitle({
+        collectionName: photo.colecao?.nome,
+        numeroSequencial: photo.numeroSequencial,
+        photoId: photo.id,
+      }),
       preco: price,
       precoBase: price,
       descontos: photo.colecao?.descontos || [],
@@ -56,9 +59,11 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
     });
   };
 
-  const displayName = photo.numeroSequencial
-    ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
-    : `Foto #${photo.id.replace(/\D/g, "").slice(-3)}`;
+  const displayName = formatCartItemTitle({
+    collectionName: photo.colecao?.nome,
+    numeroSequencial: photo.numeroSequencial,
+    photoId: photo.id,
+  });
 
   return (
     <div className="relative h-full w-full bg-black flex items-center justify-center overflow-hidden animate-fade-in group/modal">

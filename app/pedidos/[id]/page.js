@@ -63,8 +63,8 @@ export default async function PedidoDetalhesPage(props) {
   const isPaid = pedido.status === "PAGO";
 
   return (
-    <div className="container-wide py-12 md:py-20">
-      <div className="max-w-4xl mx-auto">
+    <div className="container-wide px-4 py-12 md:py-20">
+      <div className="mx-auto max-w-4xl">
         <Link
           href="/pedidos"
           className="mb-8 inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
@@ -73,10 +73,10 @@ export default async function PedidoDetalhesPage(props) {
           Voltar para pedidos
         </Link>
 
-        <div className="flex flex-col md:flex-row gap-8 items-start">
-          <div className="flex-1 w-full space-y-6">
+        <div className="flex flex-col gap-8 md:flex-row md:gap-10 md:items-start">
+          <div className="min-w-0 flex-1 space-y-6">
             <Card className="overflow-hidden">
-              <CardHeader className="bg-surface-subtle pb-4">
+              <CardHeader className="bg-surface-subtle px-4 pb-4 pt-6 md:px-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <CardTitle className="text-xl text-white flex items-center gap-3">
@@ -100,9 +100,12 @@ export default async function PedidoDetalhesPage(props) {
                   />
                 </div>
               </CardHeader>
-              <CardContent className="pt-6">
+              <CardContent className="px-4 pb-6 pt-6 md:px-6">
                 {!isPaid && (
-                  <div className="mb-6 space-y-4">
+                  <div
+                    id="pagamento-pendente"
+                    className="mb-6 space-y-4 scroll-mt-24"
+                  >
                     <Alert variant="warning">
                       <AlertCircle className="h-5 w-5" />
                       <div>
@@ -124,7 +127,7 @@ export default async function PedidoDetalhesPage(props) {
 
                 <div className="space-y-6">
                   {pedido.itens.map((item) => (
-                    <div key={item.id} className="flex gap-4 items-start">
+                    <div key={item.id} className="flex items-start gap-4">
                       <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-radius-lg border border-border-subtle bg-surface-subtle md:h-32 md:w-32">
                         <ImageWithFallback
                           src={item.foto.previewUrl}
@@ -183,14 +186,14 @@ export default async function PedidoDetalhesPage(props) {
             </Card>
           </div>
 
-          <div className="w-full md:w-80 space-y-6">
-            <Card>
-              <CardHeader>
+          <aside className="w-full shrink-0 md:w-80">
+            <Card className="sticky top-24">
+              <CardHeader className="px-4 md:px-6">
                 <CardTitle className="text-lg text-white">
                   Resumo do Pedido
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 px-4 md:px-6">
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Subtotal</span>
                   <span>{formatCurrency(Number(pedido.total))}</span>
@@ -205,21 +208,20 @@ export default async function PedidoDetalhesPage(props) {
                   <span>{formatCurrency(Number(pedido.total))}</span>
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col gap-3 bg-surface-subtle pt-6">
+              <CardFooter className="flex flex-col gap-3 border-t border-border-subtle px-4 pb-6 pt-6 md:px-6">
                 {pedido.status === "PENDENTE" && (
-                  <PendingPaymentDisplay
-                    orderId={pedido.id}
-                    paymentId={pedido.paymentId}
-                    user={user}
-                    variant="full"
-                  />
+                  <Button variant="default" className="w-full" asChild>
+                    <Link href="#pagamento-pendente">
+                      Ver detalhes do pagamento
+                    </Link>
+                  </Button>
                 )}
                 <Button variant="outline" className="w-full" asChild>
                   <Link href="/contato">Precisa de ajuda?</Link>
                 </Button>
               </CardFooter>
             </Card>
-          </div>
+          </aside>
         </div>
       </div>
     </div>

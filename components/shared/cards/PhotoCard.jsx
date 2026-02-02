@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { ShoppingCart, Check, Eye } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCartItemTitle } from "@/lib/utils";
 import { usePhotoModal } from "@/components/providers/PhotoModalProvider";
 
 /**
@@ -72,13 +72,19 @@ export default function PhotoCard({
     openPhoto(photo, contextList);
   };
 
+  const displayTitle = formatCartItemTitle({
+    collectionName: photo.colecao?.nome,
+    numeroSequencial: photo.numeroSequencial,
+    photoId: photo.id || "",
+  });
+
   const aspectClass = "aspect-square md:aspect-[2/3]";
   const textSize =
     variant === "compact"
       ? "text-xs"
       : variant === "large"
-        ? "text-base"
-        : "text-sm";
+      ? "text-base"
+      : "text-sm";
 
   return (
     <div
@@ -93,17 +99,13 @@ export default function PhotoCard({
           aspectClass,
           isSelected
             ? "border-action-primary border-4 translate-y-[-4px] shadow-shadow-lg"
-            : "",
+            : ""
         )}
-        aria-label={`Ver detalhes de ${photo.titulo || "foto"}`}
+        aria-label={`Ver detalhes de ${displayTitle}`}
       >
         <ImageWithFallback
           src={photo.previewUrl}
-          alt={
-            photo.titulo && photo.titulo !== "Foto"
-              ? `${photo.titulo} - GTClicks`
-              : `Foto Esportiva #${photo.numeroSequencial || photo.id.slice(-4)} - GTClicks Marketplace`
-          }
+          alt={`${displayTitle} - GTClicks`}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           priority={priority}
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -116,7 +118,7 @@ export default function PhotoCard({
             isSelected ? "opacity-60 bg-action-primary/20" : "opacity-80",
             variant === "centered-hover"
               ? "opacity-0 group-hover:opacity-40 transition-opacity duration-300 bg-surface-page"
-              : "",
+              : ""
           )}
         />
 
@@ -142,7 +144,7 @@ export default function PhotoCard({
                     "h-12 w-12 rounded-radius-lg backdrop-blur-md border transition-all duration-200 shadow-shadow-md",
                     isSelected
                       ? "bg-action-primary border-action-primary text-text-on-brand shadow-action-primary/30 scale-105"
-                      : "bg-surface-subtle/50 border-action-primary/20 text-text-primary hover:bg-surface-page hover:text-text-primary",
+                      : "bg-surface-subtle/50 border-action-primary/20 text-text-primary hover:bg-surface-page hover:text-text-primary"
                   )}
                   onClick={handleSelection}
                   title={
@@ -169,7 +171,7 @@ export default function PhotoCard({
                     "h-11 w-11 rounded-radius-full backdrop-blur-md border transition-all duration-200 shadow-shadow-sm",
                     isSelected
                       ? "bg-action-primary border-action-primary text-text-on-brand shadow-action-primary/30"
-                      : "bg-surface-subtle/20 border-action-primary/20 text-text-primary",
+                      : "bg-surface-subtle/20 border-action-primary/20 text-text-primary"
                   )}
                   onClick={handleSelection}
                   title={
@@ -194,7 +196,7 @@ export default function PhotoCard({
           <div
             className={cn(
               "absolute top-4 left-4 z-30 transition-all duration-200",
-              !isSelected ? "opacity-100" : "opacity-100",
+              !isSelected ? "opacity-100" : "opacity-100"
             )}
           >
             <button
@@ -203,7 +205,7 @@ export default function PhotoCard({
                 "h-8 w-8 rounded-radius-full border-2 flex items-center justify-center transition-all duration-200 shadow-shadow-md backdrop-blur-sm z-50",
                 isSelected
                   ? "bg-surface-elevated border-surface-elevated text-text-primary scale-110 shadow-shadow-sm"
-                  : "bg-surface-page/50 border-border-default text-text-secondary hover:bg-surface-page/80 hover:border-text-primary hover:text-text-primary hover:scale-105",
+                  : "bg-surface-page/50 border-border-default text-text-secondary hover:bg-surface-page/80 hover:border-text-primary hover:text-text-primary hover:scale-105"
               )}
               aria-label={isSelected ? "Desselecionar foto" : "Selecionar foto"}
               aria-pressed={isSelected}
@@ -240,14 +242,10 @@ export default function PhotoCard({
               textSize,
               variant === "centered-hover"
                 ? "opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
-                : "",
+                : ""
             )}
           >
-            {photo.numeroSequencial
-              ? `Foto #${photo.numeroSequencial.toString().padStart(3, "0")}`
-              : `Foto #${
-                  photo.id ? photo.id.replace(/\D/g, "").slice(-3) : "..."
-                }`}
+            {displayTitle}
           </h3>
         </div>
       </Card>

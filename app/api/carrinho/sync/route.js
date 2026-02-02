@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { cartSyncSchema } from "@/lib/validations";
+import { formatCartItemTitle } from "@/lib/utils";
 
 export async function POST(request) {
   const user = await getAuthenticatedUser();
@@ -17,7 +18,7 @@ export async function POST(request) {
     if (!validation.success) {
       return NextResponse.json(
         { error: "Invalid data", details: validation.error.format() },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -42,7 +43,7 @@ export async function POST(request) {
       for (const item of items) {
         // Check if item already exists in DB cart
         const exists = cart.itens.some(
-          (dbItem) => dbItem.fotoId === item.fotoId,
+          (dbItem) => dbItem.fotoId === item.fotoId
         );
 
         if (!exists) {
@@ -99,11 +100,21 @@ export async function POST(request) {
         ? Number(item.foto.colecao.precoFoto)
         : 0;
 
+      const colecao = item.foto.colecao;
       return {
         fotoId: item.fotoId,
-        licencaId: null, // No longer used
-        titulo: item.foto.titulo,
+        colecaoId: item.foto.colecaoId,
+        licencaId: null,
+        titulo: formatCartItemTitle({
+          collectionName: colecao?.nome,
+          numeroSequencial: item.foto.numeroSequencial,
+          photoId: item.foto.id,
+        }),
         preco: preco,
+        precoBase: preco,
+        descontos: Array.isArray(colecao?.descontos)
+          ? [...colecao.descontos]
+          : [],
         licenca: "Uso Padrão",
         previewUrl: item.foto.previewUrl,
       };
@@ -114,7 +125,7 @@ export async function POST(request) {
     console.error("Error syncing cart:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
