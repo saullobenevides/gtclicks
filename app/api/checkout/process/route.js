@@ -2,7 +2,6 @@ import { MercadoPagoConfig, Payment, Customer } from "mercadopago";
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
-import { checkoutProcessBodySchema } from "@/lib/validations";
 
 // Initialize Mercado Pago client
 const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
@@ -74,17 +73,16 @@ export async function POST(request) {
     }
 
     const rawBody = await request.json();
-    const parseResult = checkoutProcessBodySchema.safeParse(rawBody);
-    if (!parseResult.success) {
-      const first = parseResult.error.flatten().fieldErrors;
-      const message =
-        Object.values(first)[0]?.[0] ||
-        parseResult.error.message ||
-        "Dados inválidos";
-      return NextResponse.json({ error: message }, { status: 400 });
+    // Validação manual para evitar conflito Zod 4 vs Next.js bundled Zod
+    const formData = rawBody?.formData;
+    const orderId =
+      typeof rawBody?.orderId === "string" ? rawBody.orderId : undefined;
+    if (!formData || typeof formData !== "object") {
+      return NextResponse.json(
+        { error: "Dados de pagamento inválidos" },
+        { status: 400 }
+      );
     }
-    const body = parseResult.data;
-    const { formData, orderId } = body;
     // Fetch fresh user data to check for customer ID and photographer profile
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
@@ -226,11 +224,18 @@ export async function POST(request) {
     // 2. Create Payment in Mercado Pago
     const payment = new Payment(client);
 
+    // Copia campos do Brick (token, installments para cartão; transaction_details para PSE; etc.)
+    const payerFromForm =
+      formData.payer && typeof formData.payer === "object"
+        ? formData.payer
+        : {};
     const paymentData = {
       ...formData,
+      transaction_amount: Number(formData.transaction_amount ?? total),
+      payment_method_id: formData.payment_method_id || "pix",
       description: `GTClicks # ${finalOrderId.slice(-8)}`,
       payer: {
-        ...formData.payer,
+        ...payerFromForm,
         email: user.email,
         ...(customerId && { id: customerId }),
       },
@@ -272,11 +277,10 @@ export async function POST(request) {
     }
   } catch (error) {
     console.error("Checkout Error:", error);
-    return NextResponse.json(
-      {
-        error: error.message || "Internal Server Error",
-      },
-      { status: 500 }
-    );
+    const safeMessage =
+      error?.message && typeof error.message === "string"
+        ? error.message
+        : "Erro ao processar pagamento. Tente novamente.";
+    return NextResponse.json({ error: safeMessage }, { status: 500 });
   }
 }

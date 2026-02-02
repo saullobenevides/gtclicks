@@ -45,6 +45,20 @@ describe("POST /api/checkout/process", () => {
     expect(prisma.user.findUnique).not.toHaveBeenCalled();
   });
 
+  it("retorna 400 quando formData inválido", async () => {
+    getAuthenticatedUser.mockResolvedValue({ id: "user-1", email: "u@u.com" });
+
+    const request = new Request("http://localhost/api/checkout/process", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toBe("Dados de pagamento inválidos");
+  });
+
   it("retorna 400 quando carrinho está vazio (novo checkout)", async () => {
     getAuthenticatedUser.mockResolvedValue({ id: "user-1", email: "u@u.com" });
     prisma.user.findUnique.mockResolvedValue({
@@ -56,7 +70,13 @@ describe("POST /api/checkout/process", () => {
 
     const request = new Request("http://localhost/api/checkout/process", {
       method: "POST",
-      body: JSON.stringify({}),
+      body: JSON.stringify({
+        formData: {
+          transaction_amount: 10,
+          payment_method_id: "pix",
+          payer: {},
+        },
+      }),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -80,7 +100,13 @@ describe("POST /api/checkout/process", () => {
 
     const request = new Request("http://localhost/api/checkout/process", {
       method: "POST",
-      body: JSON.stringify({}),
+      body: JSON.stringify({
+        formData: {
+          transaction_amount: 10,
+          payment_method_id: "pix",
+          payer: {},
+        },
+      }),
     });
     const response = await POST(request);
     const data = await response.json();

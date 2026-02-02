@@ -22,7 +22,12 @@ export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
 
-  const { items: cartItems, getTotalPrice, clearCart } = useCart();
+  const {
+    items: cartItems,
+    getTotalPrice,
+    getItemPrice,
+    clearCart,
+  } = useCart();
   const app = useStackApp();
   const [user, setUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
@@ -155,39 +160,44 @@ export default function CheckoutPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {displayItems.map((item) => (
-                <div
-                  key={`${item.fotoId}-${item.licencaId}`}
-                  className="flex gap-4 items-start"
-                >
-                  <div className="relative w-24 aspect-video rounded-md overflow-hidden bg-white/5 shrink-0">
-                    <ImageWithFallback
-                      src={item.previewUrl}
-                      alt={item.titulo}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <h4 className="font-bold text-white text-sm sm:text-base">
-                      {item.titulo}
-                    </h4>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <ShieldCheck className="h-3 w-3 text-primary" />
-                      <span>
-                        {typeof item.licenca === "object"
-                          ? item.licenca.nome
-                          : item.licenca}
+              {displayItems.map((item) => {
+                const itemPrice = orderId
+                  ? Number(item.preco)
+                  : getItemPrice(item);
+                return (
+                  <div
+                    key={`${item.fotoId}-${item.licencaId}`}
+                    className="flex gap-4 items-start"
+                  >
+                    <div className="relative w-24 aspect-video rounded-md overflow-hidden bg-white/5 shrink-0">
+                      <ImageWithFallback
+                        src={item.previewUrl}
+                        alt={item.titulo}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <h4 className="font-bold text-white text-sm sm:text-base">
+                        {item.titulo}
+                      </h4>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <ShieldCheck className="h-3 w-3 text-primary" />
+                        <span>
+                          {typeof item.licenca === "object"
+                            ? item.licenca.nome
+                            : item.licenca}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-bold text-white text-sm sm:text-base">
+                        R$ {(itemPrice || 0).toFixed(2)}
                       </span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span className="font-bold text-white text-sm sm:text-base">
-                      R$ {(item.preco || 0).toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
 
               <Separator className="bg-white/10 my-4" />
 
