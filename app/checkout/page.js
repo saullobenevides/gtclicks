@@ -133,6 +133,10 @@ export default function CheckoutPage() {
       toast.error("Erro no Pagamento", {
         description: errorMessage + " Verifique os dados e tente novamente.",
       });
+      // Mantém o mesmo pedido para retentativa: atualiza URL com orderId
+      if (result.orderId && !orderId) {
+        router.replace(`/checkout?orderId=${result.orderId}`);
+      }
     }
   };
 
