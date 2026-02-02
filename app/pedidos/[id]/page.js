@@ -11,6 +11,7 @@ import {
   Clock,
   CheckCircle,
 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import RetryPaymentButton from "@/components/pedidos/RetryPaymentButton";
+import PendingPaymentDisplay from "@/components/pedidos/PendingPaymentDisplay";
 import PaymentStatusChecker from "@/components/pedidos/PaymentStatusChecker";
 
 export async function generateMetadata(props) {
@@ -66,7 +67,7 @@ export default async function PedidoDetalhesPage(props) {
       <div className="max-w-4xl mx-auto">
         <Link
           href="/pedidos"
-          className="inline-flex items-center text-muted-foreground hover:text-white mb-8 transition-colors"
+          className="mb-8 inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar para pedidos
@@ -74,8 +75,8 @@ export default async function PedidoDetalhesPage(props) {
 
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <div className="flex-1 w-full space-y-6">
-            <Card className="bg-card border-white/5 overflow-hidden">
-              <CardHeader className="bg-white/5 pb-4">
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-surface-subtle pb-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <CardTitle className="text-xl text-white flex items-center gap-3">
@@ -101,30 +102,37 @@ export default async function PedidoDetalhesPage(props) {
               </CardHeader>
               <CardContent className="pt-6">
                 {!isPaid && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-6 flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-yellow-500 text-sm">
-                        Pagamento Pendente
-                      </h4>
-                      <p className="text-yellow-500/80 text-sm mt-1">
-                        Seu pagamento ainda está sendo processado. Assim que
-                        confirmado, suas fotos estarão disponíveis para
-                        download.
-                      </p>
-                    </div>
+                  <div className="mb-6 space-y-4">
+                    <Alert variant="warning">
+                      <AlertCircle className="h-5 w-5" />
+                      <div>
+                        <AlertTitle>Pagamento Pendente</AlertTitle>
+                        <AlertDescription>
+                          Finalize o pagamento abaixo para liberar o download
+                          das suas fotos.
+                        </AlertDescription>
+                      </div>
+                    </Alert>
+                    <PendingPaymentDisplay
+                      orderId={pedido.id}
+                      paymentId={pedido.paymentId}
+                      user={user}
+                      variant="full"
+                    />
                   </div>
                 )}
 
                 <div className="space-y-6">
                   {pedido.itens.map((item) => (
                     <div key={item.id} className="flex gap-4 items-start">
-                      <div className="relative h-24 w-24 md:h-32 md:w-32 bg-muted rounded-lg overflow-hidden shrink-0 border border-white/10">
+                      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-radius-lg border border-border-subtle bg-surface-subtle md:h-32 md:w-32">
                         <ImageWithFallback
                           src={item.foto.previewUrl}
                           alt={item.foto.titulo}
                           fill
-                          className={`object-cover ${!isPaid ? "opacity-60 blur-[1px]" : ""}`}
+                          className={`object-cover ${
+                            !isPaid ? "opacity-60 blur-[1px]" : ""
+                          }`}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -154,7 +162,7 @@ export default async function PedidoDetalhesPage(props) {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-8 gap-2 bg-white/5 hover:bg-white/10 border-white/10 text-white"
+                              className="h-8 gap-2 border-border-subtle bg-surface-subtle text-foreground hover:bg-surface-elevated"
                               asChild
                             >
                               <Link
@@ -176,7 +184,7 @@ export default async function PedidoDetalhesPage(props) {
           </div>
 
           <div className="w-full md:w-80 space-y-6">
-            <Card className="bg-card border-white/5">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-lg text-white">
                   Resumo do Pedido
@@ -191,23 +199,19 @@ export default async function PedidoDetalhesPage(props) {
                   <span>Taxas</span>
                   <span>R$ 0,00</span>
                 </div>
-                <Separator className="bg-white/10 my-2" />
+                <Separator className="my-2" />
                 <div className="flex justify-between font-bold text-white text-lg">
                   <span>Total</span>
                   <span>{formatCurrency(Number(pedido.total))}</span>
                 </div>
               </CardContent>
-              <CardFooter className="bg-white/5 pt-6 flex flex-col gap-3">
+              <CardFooter className="flex flex-col gap-3 bg-surface-subtle pt-6">
                 {pedido.status === "PENDENTE" && (
-                  <RetryPaymentButton
+                  <PendingPaymentDisplay
                     orderId={pedido.id}
-                    items={pedido.itens.map((item) => ({
-                      fotoId: item.fotoId,
-                      licencaId: item.licencaId,
-                      titulo: item.foto.titulo,
-                      precoPaid: Number(item.precoPago),
-                    }))}
+                    paymentId={pedido.paymentId}
                     user={user}
+                    variant="full"
                   />
                 )}
                 <Button variant="outline" className="w-full" asChild>

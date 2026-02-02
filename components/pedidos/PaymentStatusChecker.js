@@ -19,7 +19,7 @@ export default function PaymentStatusChecker({ orderId, initialStatus }) {
             `/api/pedidos/${orderId}/verificar-pagamento`,
             {
               method: "POST",
-            },
+            }
           );
 
           if (response.ok) {
@@ -47,18 +47,15 @@ export default function PaymentStatusChecker({ orderId, initialStatus }) {
 
   if (status === "PAGO") {
     return (
-      <Badge className="bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/50 px-4 py-1.5 text-sm">
-        <CheckCircle className="h-4 w-4 mr-2" />
+      <Badge variant="success" className="px-4 py-1.5 text-sm">
+        <CheckCircle className="mr-2 h-4 w-4" />
         Pedido Pago
       </Badge>
     );
   }
 
   return (
-    <Badge
-      variant="outline"
-      className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 px-4 py-1.5 text-sm"
-    >
+    <Badge variant="warning" className="px-4 py-1.5 text-sm">
       <Clock className={`h-4 w-4 mr-2 ${checking ? "animate-pulse" : ""}`} />
       {checking ? "Verificando..." : "Aguardando Pagamento"}
     </Badge>
