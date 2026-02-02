@@ -3,31 +3,7 @@
 import { useEffect, useState } from "react";
 import { Payment } from "@mercadopago/sdk-react";
 import { initMercadoPago } from "@mercadopago/sdk-react";
-import { Loader2, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-
-/**
- * Busca endereço por CEP via ViaCEP (gratuito, sem auth).
- * O Brick do MP usa api.mercadolibre.com que retorna 401 com nossa chave.
- */
-async function fetchAddressByCep(cep) {
-  const digits = cep.replace(/\D/g, "");
-  if (digits.length !== 8) return null;
-  const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
-  const data = await res.json();
-  if (data.erro) return null;
-  return {
-    zipCode: data.cep,
-    federalUnit: data.uf,
-    city: data.localidade,
-    neighborhood: data.bairro,
-    streetName: data.logradouro || "",
-    streetNumber: "",
-    complement: "",
-  };
-}
+import { Loader2 } from "lucide-react";
 
 /**
  * PaymentBrick Component
@@ -41,9 +17,6 @@ export default function PaymentBrick({
   orderId,
 }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [cep, setCep] = useState("");
-  const [addressFromCep, setAddressFromCep] = useState(null);
-  const [cepLoading, setCepLoading] = useState(false);
 
   useEffect(() => {
     // Initialize Mercado Pago with Public Key
@@ -111,25 +84,6 @@ export default function PaymentBrick({
     setIsLoading(false);
   };
 
-  const handleBuscarCep = async () => {
-    const digits = cep.replace(/\D/g, "");
-    if (digits.length !== 8) return;
-    setCepLoading(true);
-    try {
-      const addr = await fetchAddressByCep(cep);
-      if (addr) {
-        setAddressFromCep(addr);
-      }
-    } catch (e) {
-      console.error("CEP lookup failed:", e);
-    } finally {
-      setCepLoading(false);
-    }
-  };
-
-  const mergedPayer =
-    payer && addressFromCep ? { ...payer, address: addressFromCep } : payer;
-
   if (!process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
     return (
       <div className="text-red-500 text-center p-4">
@@ -139,47 +93,7 @@ export default function PaymentBrick({
   }
 
   return (
-    <div className="payment-brick-container w-full max-w-xl mx-auto relative space-y-4">
-      <div className="space-y-2">
-        <Label className="text-muted-foreground text-sm">
-          Buscar endereço por CEP (preenche automaticamente para Boleto)
-        </Label>
-        <div className="flex gap-2">
-          <Input
-            placeholder="00000-000"
-            value={cep}
-            onChange={(e) => {
-              const v = e.target.value.replace(/\D/g, "").slice(0, 8);
-              setCep(v.length > 5 ? `${v.slice(0, 5)}-${v.slice(5)}` : v);
-            }}
-            onBlur={() =>
-              cep.replace(/\D/g, "").length === 8 && handleBuscarCep()
-            }
-            maxLength={9}
-            className="flex-1"
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            size="icon"
-            onClick={handleBuscarCep}
-            disabled={cepLoading || cep.replace(/\D/g, "").length !== 8}
-          >
-            {cepLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Search className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-        {addressFromCep && (
-          <p className="text-xs text-green-500/80">
-            ✓ {addressFromCep.streetName}, {addressFromCep.neighborhood} -{" "}
-            {addressFromCep.city}/{addressFromCep.federalUnit}
-          </p>
-        )}
-      </div>
-
+    <div className="payment-brick-container w-full max-w-xl mx-auto relative">
       {isLoading && (
         <div className="flex justify-center p-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -188,7 +102,7 @@ export default function PaymentBrick({
       <Payment
         initialization={{
           amount: amount,
-          ...(mergedPayer && { payer: mergedPayer }),
+          ...(payer && { payer }),
         }}
         customization={customization}
         onSubmit={onSubmit}
