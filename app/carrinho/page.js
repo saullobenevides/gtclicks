@@ -63,13 +63,12 @@ export default function CartPage() {
               key={`${item.fotoId}-${item.licencaId}`}
               className="glass-panel group relative flex flex-col gap-6 rounded-xl border border-white/10 bg-black/40 p-6 transition-all hover:border-white/20 sm:flex-row sm:items-center"
             >
-              <div className="relative aspect-video w-full overflow-hidden rounded-lg sm:w-48">
+              <div className="relative h-28 w-full shrink-0 overflow-hidden rounded-lg sm:h-32 sm:w-48">
                 <ImageWithFallback
                   src={item.previewUrl}
                   alt={item.titulo}
-                  width={300}
-                  height={200}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  fill
+                  className="transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 

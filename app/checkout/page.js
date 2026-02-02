@@ -192,7 +192,7 @@ export default function CheckoutPage() {
                     key={`${item.fotoId}-${item.licencaId}`}
                     className="flex gap-4 items-start"
                   >
-                    <div className="relative w-24 aspect-video rounded-md overflow-hidden bg-white/5 shrink-0">
+                    <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md bg-muted">
                       <ImageWithFallback
                         src={item.previewUrl}
                         alt={item.titulo}
