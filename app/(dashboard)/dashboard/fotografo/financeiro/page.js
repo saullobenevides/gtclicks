@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useUser } from "@stackframe/stack";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -18,10 +18,10 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SortableTableHead } from "@/components/shared/SortableTableHead";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, CheckCircle2, Loader2, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -100,6 +100,38 @@ export default function FinanceiroPage() {
   const [solicitandoSaque, setSolicitandoSaque] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [minSaque, setMinSaque] = useState(50);
+  const [sort, setSort] = useState("createdAt");
+  const [order, setOrder] = useState("desc");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
+
+  const handleSort = (field) => {
+    setSort(field);
+    setOrder((o) => (sort === field ? (o === "asc" ? "desc" : "asc") : "desc"));
+  };
+  const sortedTransacoes = useMemo(() => {
+    if (!transacoes?.length) return [];
+    return [...transacoes].sort((a, b) => {
+      let va, vb;
+      if (sort === "descricao") {
+        va = (a.descricao ?? "").toLowerCase();
+        vb = (b.descricao ?? "").toLowerCase();
+      } else if (sort === "createdAt") {
+        va = new Date(a.createdAt ?? 0).getTime();
+        vb = new Date(b.createdAt ?? 0).getTime();
+      } else if (sort === "valor") {
+        va = Number(a.valor ?? 0);
+        vb = Number(b.valor ?? 0);
+      } else {
+        va = a[sort];
+        vb = b[sort];
+      }
+      if (va < vb) return order === "asc" ? -1 : 1;
+      if (va > vb) return order === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [transacoes, sort, order]);
 
   const fetchData = async () => {
     try {
@@ -134,10 +166,6 @@ export default function FinanceiroPage() {
     }
     fetchData();
   }, [user, isUserLoading, router, page]);
-
-  const [verificationCode, setVerificationCode] = useState("");
-  const [showCodeInput, setShowCodeInput] = useState(false);
-  const [sendingCode, setSendingCode] = useState(false);
 
   const handleSendCode = async () => {
     setSendingCode(true);
@@ -404,7 +432,7 @@ export default function FinanceiroPage() {
                 </div>
               </div>
             ) : (
-              transacoes.map((t) => (
+              sortedTransacoes.map((t) => (
                 <div
                   key={t.id}
                   className="flex justify-between items-center py-4 px-3 rounded-lg border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors"
@@ -436,17 +464,37 @@ export default function FinanceiroPage() {
           <Table className="hidden md:table">
             <TableHeader>
               <TableRow className="border-white/10 hover:bg-transparent">
-                <TableHead className="text-muted-foreground">
+                <SortableTableHead
+                  field="descricao"
+                  sort={sort}
+                  order={order}
+                  onSort={handleSort}
+                  className="text-muted-foreground"
+                >
                   Descrição
-                </TableHead>
-                <TableHead className="text-muted-foreground">Data</TableHead>
-                <TableHead className="text-right text-muted-foreground">
+                </SortableTableHead>
+                <SortableTableHead
+                  field="createdAt"
+                  sort={sort}
+                  order={order}
+                  onSort={handleSort}
+                  className="text-muted-foreground"
+                >
+                  Data
+                </SortableTableHead>
+                <SortableTableHead
+                  field="valor"
+                  sort={sort}
+                  order={order}
+                  onSort={handleSort}
+                  className="text-right text-muted-foreground"
+                >
                   Valor
-                </TableHead>
+                </SortableTableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transacoes.length === 0 ? (
+              {sortedTransacoes.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={3}
@@ -462,7 +510,7 @@ export default function FinanceiroPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                transacoes.map((t) => (
+                sortedTransacoes.map((t) => (
                   <TableRow
                     key={t.id}
                     className="border-white/10 hover:bg-white/5"

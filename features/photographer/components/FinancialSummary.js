@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import {
@@ -16,10 +16,10 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SortableTableHead } from "@/components/shared/SortableTableHead";
 import { toast } from "sonner";
 
 import { getFinancialData } from "@/actions/photographers";
@@ -27,6 +27,36 @@ import { getFinancialData } from "@/actions/photographers";
 export default function FinancialSummary() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sort, setSort] = useState("createdAt");
+  const [order, setOrder] = useState("desc");
+
+  const handleSort = (field) => {
+    setSort(field);
+    setOrder((o) => (sort === field ? (o === "asc" ? "desc" : "asc") : "desc"));
+  };
+  const transacoes = data?.transacoes ?? [];
+  const sortedTransacoes = useMemo(() => {
+    if (!transacoes?.length) return [];
+    return [...transacoes].sort((a, b) => {
+      let va, vb;
+      if (sort === "descricao") {
+        va = (a.descricao ?? "").toLowerCase();
+        vb = (b.descricao ?? "").toLowerCase();
+      } else if (sort === "createdAt") {
+        va = new Date(a.createdAt ?? 0).getTime();
+        vb = new Date(b.createdAt ?? 0).getTime();
+      } else if (sort === "valor") {
+        va = Number(a.valor ?? 0);
+        vb = Number(b.valor ?? 0);
+      } else {
+        va = a[sort];
+        vb = b[sort];
+      }
+      if (va < vb) return order === "asc" ? -1 : 1;
+      if (va > vb) return order === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [transacoes, sort, order]);
 
   useEffect(() => {
     async function fetchData() {
@@ -52,7 +82,7 @@ export default function FinancialSummary() {
 
   if (!data) return null;
 
-  const { saldo, transacoes } = data;
+  const { saldo } = data;
 
   return (
     <div className="space-y-6">
@@ -125,13 +155,33 @@ export default function FinancialSummary() {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-white/10">
-                  <TableHead className="text-muted-foreground">Data</TableHead>
-                  <TableHead className="text-muted-foreground">
+                  <SortableTableHead
+                    field="createdAt"
+                    sort={sort}
+                    order={order}
+                    onSort={handleSort}
+                    className="text-muted-foreground"
+                  >
+                    Data
+                  </SortableTableHead>
+                  <SortableTableHead
+                    field="descricao"
+                    sort={sort}
+                    order={order}
+                    onSort={handleSort}
+                    className="text-muted-foreground"
+                  >
                     Descrição
-                  </TableHead>
-                  <TableHead className="text-right text-muted-foreground">
+                  </SortableTableHead>
+                  <SortableTableHead
+                    field="valor"
+                    sort={sort}
+                    order={order}
+                    onSort={handleSort}
+                    className="text-right text-muted-foreground"
+                  >
                     Valor
-                  </TableHead>
+                  </SortableTableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -148,7 +198,7 @@ export default function FinancialSummary() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  transacoes.map((t) => (
+                  sortedTransacoes.map((t) => (
                     <TableRow
                       key={t.id}
                       className="border-white/10 hover:bg-white/5"
@@ -159,7 +209,7 @@ export default function FinancialSummary() {
                       <TableCell className="max-w-[200px] truncate">
                         {t.descricao}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell>
                         <span
                           className={cn(
                             "font-bold inline-flex items-center gap-1",

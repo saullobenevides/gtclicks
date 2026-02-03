@@ -14,7 +14,7 @@ export function DashboardLayout({ children, navItems }) {
     <div className="flex min-h-screen w-full bg-background">
       {/* Desktop Sidebar */}
       <aside className="hidden w-[260px] shrink-0 border-r border-white/10 bg-black/40 backdrop-blur-sm lg:block">
-        <div className="sticky top-20 h-[calc(100vh-5rem)] overflow-auto py-6">
+        <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-auto py-6">
           <nav
             className="grid items-start gap-1 px-3 text-sm font-medium"
             aria-label="Menu do dashboard"

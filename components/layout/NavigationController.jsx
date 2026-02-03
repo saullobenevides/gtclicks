@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const HIDDEN_ROUTES_PATTERNS = [
   /\/editar/, // Collection Editor
   /\/admin/, // Admin Panel
+  /\/dashboard/, // Fotógrafo Dashboard
   /\/checkout/, // Checkout Flow
 ];
 
@@ -15,7 +16,7 @@ export default function NavigationController({ children }) {
   if (!pathname) return null;
 
   const shouldHide = HIDDEN_ROUTES_PATTERNS.some((pattern) =>
-    pattern.test(pathname),
+    pattern.test(pathname)
   );
 
   if (shouldHide) return null;

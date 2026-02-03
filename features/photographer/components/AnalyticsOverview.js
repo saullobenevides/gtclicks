@@ -130,9 +130,14 @@ export default function AnalyticsOverview({ stats }) {
             </p>
           </CardHeader>
           <CardContent className="pl-2 pr-2">
-            <div className="h-[220px] md:h-[250px] w-full">
+            <div className="h-[220px] md:h-[250px] min-h-[180px] w-full min-w-[200px]">
               {/* Placeholder Chart */}
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                minWidth={200}
+                minHeight={180}
+              >
                 <BarChart data={chartData}>
                   <XAxis
                     dataKey="name"

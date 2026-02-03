@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Images, DollarSign, Upload, ArrowRight, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import FotografoOnboarding from "@/features/photographer/components/FotografoOnboarding";
 import FinancialSummary from "./FinancialSummary";
 import {
@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SortableTableHead } from "@/components/shared/SortableTableHead";
 import { Badge } from "@/components/ui/badge";
 import {
   PlusCircle,
@@ -47,6 +48,8 @@ export default function DashboardContent() {
   const router = useRouter();
   const [fotografo, setFotografo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sort, setSort] = useState("nome");
+  const [order, setOrder] = useState("asc");
 
   useEffect(() => {
     if (user) {
@@ -64,6 +67,42 @@ export default function DashboardContent() {
         .finally(() => setLoading(false));
     }
   }, [user, router]); // Adicionado router como dependência
+
+  const handleSort = (field) => {
+    setSort(field);
+    setOrder((o) => (sort === field ? (o === "asc" ? "desc" : "asc") : "asc"));
+  };
+  const sortedColecoes = useMemo(() => {
+    const cols = fotografo?.colecoes ?? [];
+    return [...cols].sort((a, b) => {
+      let va, vb;
+      if (sort === "nome") {
+        va = (a.nome ?? "").toLowerCase();
+        vb = (b.nome ?? "").toLowerCase();
+      } else if (sort === "status") {
+        va = (a.status ?? "").toLowerCase();
+        vb = (b.status ?? "").toLowerCase();
+      } else if (sort === "views") {
+        va = a.views ?? 0;
+        vb = b.views ?? 0;
+      } else if (sort === "carrinhoCount") {
+        va = a.carrinhoCount ?? 0;
+        vb = b.carrinhoCount ?? 0;
+      } else if (sort === "vendas") {
+        va = a.vendas ?? 0;
+        vb = b.vendas ?? 0;
+      } else if (sort === "createdAt") {
+        va = new Date(a.createdAt ?? 0).getTime();
+        vb = new Date(b.createdAt ?? 0).getTime();
+      } else {
+        va = a[sort];
+        vb = b[sort];
+      }
+      if (va < vb) return order === "asc" ? -1 : 1;
+      if (va > vb) return order === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [fotografo?.colecoes, sort, order]);
 
   if (loading || !fotografo) {
     return (
@@ -272,16 +311,52 @@ export default function DashboardContent() {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-white/10">
-                  <TableHead className="w-[300px]">Coleção</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Visualizações</TableHead>
-                  <TableHead className="text-right">No Carrinho</TableHead>
-                  <TableHead className="text-right">Vendas</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <SortableTableHead
+                    field="nome"
+                    sort={sort}
+                    order={order}
+                    onSort={handleSort}
+                    className="w-[300px]"
+                  >
+                    Coleção
+                  </SortableTableHead>
+                  <SortableTableHead
+                    field="status"
+                    sort={sort}
+                    order={order}
+                    onSort={handleSort}
+                  >
+                    Status
+                  </SortableTableHead>
+                  <SortableTableHead
+                    field="views"
+                    sort={sort}
+                    order={order}
+                    onSort={handleSort}
+                  >
+                    Visualizações
+                  </SortableTableHead>
+                  <SortableTableHead
+                    field="carrinhoCount"
+                    sort={sort}
+                    order={order}
+                    onSort={handleSort}
+                  >
+                    No Carrinho
+                  </SortableTableHead>
+                  <SortableTableHead
+                    field="vendas"
+                    sort={sort}
+                    order={order}
+                    onSort={handleSort}
+                  >
+                    Vendas
+                  </SortableTableHead>
+                  <TableHead className="text-right w-24">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(fotografo.colecoes || []).length === 0 ? (
+                {sortedColecoes.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={6}
@@ -291,7 +366,7 @@ export default function DashboardContent() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  fotografo.colecoes.map((col) => (
+                  sortedColecoes.map((col) => (
                     <TableRow
                       key={col.id}
                       className="border-white/10 hover:bg-white/5"
@@ -320,11 +395,9 @@ export default function DashboardContent() {
                           {col.status === "PUBLICADA" ? "Ativo" : "Rascunho"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">{col.views}</TableCell>
-                      <TableCell className="text-right">
-                        {col.carrinhoCount}
-                      </TableCell>
-                      <TableCell className="text-right font-bold text-green-400">
+                      <TableCell>{col.views}</TableCell>
+                      <TableCell>{col.carrinhoCount}</TableCell>
+                      <TableCell className="font-bold text-green-400">
                         {col.vendas}
                       </TableCell>
                       <TableCell className="text-right">

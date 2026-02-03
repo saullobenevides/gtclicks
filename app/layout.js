@@ -3,8 +3,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { Inter, Syne } from "next/font/google"; // [NEW] Added Syne
 import AppProviders from "@/components/providers/AppProviders";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import LazyClientComponents from "@/components/providers/LazyClientComponents";
 import BottomNav from "@/components/mobile/BottomNav";
 import NavigationController from "@/components/layout/NavigationController";
@@ -153,15 +151,7 @@ export default function RootLayout({ children }) {
           >
             Pular para o conteúdo
           </a>
-          <Header />
-          <main
-            id="main-content"
-            className="flex-1 w-full pt-16 pb-24 md:pt-[76px] md:pb-0"
-            tabIndex={-1}
-          >
-            {children}
-          </main>
-          <Footer />
+          {children}
           <LazyClientComponents />
           <NavigationController>
             <BottomNav />

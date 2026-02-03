@@ -213,7 +213,7 @@ export default function Header() {
               className="h-6 hidden md:block mx-1 bg-white/10"
             />
 
-            <div className="hidden md:block shrink-0">
+            <div className="hidden md:block shrink-0 rounded-full">
               <Suspense
                 fallback={
                   <div className="h-10 w-10 rounded-full bg-white/10 animate-pulse" />

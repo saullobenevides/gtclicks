@@ -34,9 +34,18 @@ export default async function MinhasColecoesPage(props) {
     redirect("/dashboard/fotografo");
   }
 
+  const status = searchParams?.status ?? "";
+  const q = searchParams?.q ?? "";
+  const sort = searchParams?.sort ?? "createdAt";
+  const order = searchParams?.order ?? "desc";
+
   const { colecoes, totalPages } = await getColecoesPaginated(fotografo.id, {
     page,
     limit,
+    status: status || undefined,
+    q: q || undefined,
+    sort,
+    order,
   });
 
   return (

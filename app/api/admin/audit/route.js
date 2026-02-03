@@ -34,6 +34,16 @@ export async function POST(request) {
     for (const order of recentOrders) {
       if (!order.paymentId) continue;
 
+      // Skip non-Mercado Pago IDs (Stripe pi_*, mock_feb_*, etc.)
+      const paymentId = String(order.paymentId);
+      if (
+        paymentId.startsWith("pi_") ||
+        paymentId.startsWith("mock_") ||
+        !/^\d+$/.test(paymentId)
+      ) {
+        continue;
+      }
+
       try {
         const mpPayment = await paymentClient.get({ id: order.paymentId });
 
@@ -77,7 +87,7 @@ export async function POST(request) {
       const dbTotal = Number(order.total);
       const itemsTotal = order.itens.reduce(
         (sum, item) => sum + Number(item.precoPago),
-        0,
+        0
       );
 
       // Allow small float margin error (0.01)

@@ -246,17 +246,28 @@ export async function POST(request) {
           continue;
         }
 
-        // Use a permanent proxy URL instead of a signed URL that expires
-        const previewUrl = `/api/images/${foto.s3Key}`;
-
-        // Verify existence logic (HeadObject) remains to ensure file exists before saving record
-        // ... (The HEAD check is good, keep it if not removed by this block replacement)
+        // Processar com marca d'água - NUNCA usar original no preview (photo cards)
+        const { processUploadedImage } = await import("@/lib/processing");
+        let previewUrl;
+        try {
+          const processResult = await processUploadedImage(
+            foto.s3Key,
+            `batch-${Date.now()}-${nextNumber}`
+          );
+          previewUrl = processResult.previewUrl;
+        } catch (procErr) {
+          console.error(
+            `[Batch] Watermark processing failed for ${foto.s3Key}:`,
+            procErr.message
+          );
+          continue; // Não criar foto sem marca d'água
+        }
 
         processedFoto = await prisma.foto.create({
           data: {
             ...commonData,
             s3Key: foto.s3Key,
-            previewUrl: previewUrl,
+            previewUrl,
             width: typeof foto.width === "number" ? foto.width : 0, // Ensure strictly number
             height: typeof foto.height === "number" ? foto.height : 0,
             formato: "jpg", // Default/Mock

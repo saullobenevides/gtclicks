@@ -99,23 +99,36 @@ export default function CollectionEditor({ collection: initialData }) {
     currentFolder
   );
 
-  /** Cria a coleção com dados atuais ou padrões. Retorna o ID ou null. */
+  /** Cria a coleção com TODOS os dados preenchidos pelo usuário. Retorna o ID ou null. */
   const ensureCollectionExists = useCallback(async () => {
     if (effectiveCollectionId || initialCollection.id) {
       return effectiveCollectionId || initialCollection.id;
     }
     try {
       const formData = new FormData();
-      const defaults = {
+      const fieldsToSave = {
         nome: collectionData.nome?.trim() || "Nova Coleção",
         descricao: collectionData.descricao || "",
         categoria: collectionData.categoria || "",
         precoFoto: Number(collectionData.precoFoto) || 5,
         status: collectionData.status || "RASCUNHO",
         faceRecognitionEnabled: collectionData.faceRecognitionEnabled || false,
+        cidade: collectionData.cidade || "",
+        estado: collectionData.estado || "",
+        local: collectionData.local || "",
+        dataInicio: collectionData.dataInicio || "",
+        dataFim: collectionData.dataFim || "",
+        descontos:
+          Array.isArray(collectionData.descontos) &&
+          collectionData.descontos.length > 0
+            ? JSON.stringify(collectionData.descontos)
+            : "",
       };
-      Object.entries(defaults).forEach(([key, value]) => {
-        formData.append(key, String(value));
+      Object.entries(fieldsToSave).forEach(([key, value]) => {
+        const str = typeof value === "string" ? value : String(value ?? "");
+        if (key === "nome" || str !== "") {
+          formData.append(key, str);
+        }
       });
       const { createCollection } = await import("@/actions/collections");
       const result = await createCollection(formData);
@@ -125,11 +138,6 @@ export default function CollectionEditor({ collection: initialData }) {
       if (result.data.fotografoId) {
         setEffectiveFotografoId(result.data.fotografoId);
       }
-      setCollectionData((prev) => ({
-        ...prev,
-        nome: defaults.nome,
-        precoFoto: defaults.precoFoto,
-      }));
       return newId;
     } catch (err) {
       console.error(err);
@@ -145,6 +153,12 @@ export default function CollectionEditor({ collection: initialData }) {
     collectionData.precoFoto,
     collectionData.status,
     collectionData.faceRecognitionEnabled,
+    collectionData.cidade,
+    collectionData.estado,
+    collectionData.local,
+    collectionData.dataInicio,
+    collectionData.dataFim,
+    collectionData.descontos,
   ]);
 
   const currentPhotos = useMemo(() => {
@@ -302,6 +316,7 @@ export default function CollectionEditor({ collection: initialData }) {
     setAllPhotos((prev) => [...prev, ...newPhotos]);
 
     let completed = 0;
+    let firstUploadedPhoto = null;
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const photoPlaceholder = newPhotos[i];
@@ -319,6 +334,7 @@ export default function CollectionEditor({ collection: initialData }) {
               p.tempId === photoPlaceholder.tempId ? updatedPhoto : p
             )
           );
+          if (!firstUploadedPhoto) firstUploadedPhoto = updatedPhoto;
         }
         completed++;
         if (completed % 5 === 0)
@@ -328,6 +344,39 @@ export default function CollectionEditor({ collection: initialData }) {
         toast.error(`Falha no envio de ${file.name}`);
       }
     }
+
+    // Auto-definir capa quando a primeira foto é enviada e ainda não há capa
+    if (
+      firstUploadedPhoto?.id &&
+      firstUploadedPhoto?.previewUrl &&
+      !collectionData.capaUrl &&
+      cId
+    ) {
+      try {
+        const coverResult = await setCollectionCover(
+          cId,
+          firstUploadedPhoto.id
+        );
+        if (!coverResult.error && coverResult.coverUrl) {
+          setCollectionData((prev) => ({
+            ...prev,
+            capaUrl: coverResult.coverUrl,
+          }));
+          toast.success("Capa definida automaticamente!");
+        } else {
+          setCollectionData((prev) => ({
+            ...prev,
+            capaUrl: firstUploadedPhoto.previewUrl,
+          }));
+        }
+      } catch (e) {
+        setCollectionData((prev) => ({
+          ...prev,
+          capaUrl: firstUploadedPhoto.previewUrl,
+        }));
+      }
+    }
+
     toast.success("Upload em massa concluído!");
     if (cId && !initialCollection.id) {
       router.push(`/dashboard/fotografo/colecoes/${cId}/editar`);

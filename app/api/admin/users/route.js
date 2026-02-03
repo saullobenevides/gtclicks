@@ -3,11 +3,14 @@ import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { z } from "zod";
 
+const SORT_FIELDS = ["name", "email", "role", "createdAt", "pedidos"];
 const querySchema = z.object({
   role: z.enum(["CLIENTE", "FOTOGRAFO", "ADMIN"]).optional(),
   search: z.string().optional(),
   page: z.string().optional(),
   limit: z.string().optional(),
+  sort: z.string().optional(),
+  order: z.enum(["asc", "desc"]).optional(),
 });
 
 export async function GET(request) {
@@ -18,7 +21,7 @@ export async function GET(request) {
     if (!user || user.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Unauthorized: Admin access required" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -28,18 +31,22 @@ export async function GET(request) {
     const rawSearch = searchParams.get("search");
     const rawPage = searchParams.get("page");
     const rawLimit = searchParams.get("limit");
+    const rawSort = searchParams.get("sort");
+    const rawOrder = searchParams.get("order");
 
     const validationResult = querySchema.safeParse({
       role: rawRole || undefined,
       search: rawSearch || undefined,
       page: rawPage || undefined,
       limit: rawLimit || undefined,
+      sort: rawSort || undefined,
+      order: rawOrder || undefined,
     });
 
     if (!validationResult.success) {
       return NextResponse.json(
         { error: "Invalid query parameters" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -48,6 +55,8 @@ export async function GET(request) {
       search,
       page: pageStr,
       limit: limitStr,
+      sort: sortField = "createdAt",
+      order: orderDir = "desc",
     } = validationResult.data;
     const page = parseInt(pageStr || "1");
     const limit = parseInt(limitStr || "20");
@@ -65,6 +74,16 @@ export async function GET(request) {
         { name: { contains: search, mode: "insensitive" } },
         { email: { contains: search, mode: "insensitive" } },
       ];
+    }
+
+    const validSort = SORT_FIELDS.includes(sortField) ? sortField : "createdAt";
+    const dir = orderDir === "asc" ? "asc" : "desc";
+
+    let orderBy;
+    if (validSort === "pedidos") {
+      orderBy = { pedidos: { _count: dir } };
+    } else {
+      orderBy = { [validSort]: dir };
     }
 
     const [total, users] = await Promise.all([
@@ -89,7 +108,7 @@ export async function GET(request) {
             },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy,
         take: limit,
         skip: skip,
       }),
@@ -107,7 +126,7 @@ export async function GET(request) {
     console.error("[API /admin/users] Error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

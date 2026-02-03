@@ -4,19 +4,37 @@ import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { SortableTableHead } from "@/components/shared/SortableTableHead";
 import AppPagination from "@/components/shared/AppPagination";
-import Link from "next/link";
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
 
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page")) || 1;
+  const roleFilter = searchParams.get("role") ?? "";
+  const sort = searchParams.get("sort") ?? "createdAt";
+  const order = searchParams.get("order") ?? "desc";
   const router = useRouter();
+
+  const handleSort = (field) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("sort", field);
+    params.set("order", sort === field && order === "desc" ? "asc" : "desc");
+    params.set("page", "1");
+    router.push(`/admin/usuarios?${params.toString()}`);
+  };
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -25,6 +43,8 @@ export default function UsersPage() {
       if (roleFilter) params.append("role", roleFilter);
       if (search) params.append("search", search);
       params.append("page", page.toString());
+      params.append("sort", sort);
+      params.append("order", order);
 
       const response = await fetch(`/api/admin/users?${params}`);
       const data = await response.json();
@@ -44,7 +64,7 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [roleFilter, page, search]);
+  }, [roleFilter, page, search, sort, order]);
 
   useEffect(() => {
     fetchUsers();
@@ -66,8 +86,11 @@ export default function UsersPage() {
 
   const handleRoleChange = (e) => {
     const newRole = e.target.value;
-    setRoleFilter(newRole);
-    // Let useEffect trigger refetch
+    const params = new URLSearchParams(searchParams);
+    if (newRole) params.set("role", newRole);
+    else params.delete("role");
+    params.set("page", "1");
+    router.push(`/admin/usuarios?${params.toString()}`);
   };
 
   if (loading) {
@@ -103,7 +126,14 @@ export default function UsersPage() {
 
           <select
             value={roleFilter}
-            onChange={handleRoleChange}
+            onChange={(e) => {
+              const v = e.target.value;
+              const params = new URLSearchParams(searchParams);
+              if (v) params.set("role", v);
+              else params.delete("role");
+              params.set("page", "1");
+              router.push(`/admin/usuarios?${params.toString()}`);
+            }}
             className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">Todos os roles</option>
@@ -119,30 +149,50 @@ export default function UsersPage() {
       {/* Users Table */}
       <div className="glass-panel overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b border-white/10">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                  Usuário
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                  Pedidos
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                  Cadastro
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {users.map((user) => (
-                <tr
-                  key={user.id}
-                  className="hover:bg-white/5 transition-colors"
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent border-white/10">
+                <SortableTableHead
+                  field="name"
+                  sort={sort}
+                  order={order}
+                  onSort={handleSort}
                 >
-                  <td className="px-6 py-4">
+                  Usuário
+                </SortableTableHead>
+                <SortableTableHead
+                  field="role"
+                  sort={sort}
+                  order={order}
+                  onSort={handleSort}
+                >
+                  Role
+                </SortableTableHead>
+                <SortableTableHead
+                  field="pedidos"
+                  sort={sort}
+                  order={order}
+                  onSort={handleSort}
+                >
+                  Pedidos
+                </SortableTableHead>
+                <SortableTableHead
+                  field="createdAt"
+                  sort={sort}
+                  order={order}
+                  onSort={handleSort}
+                >
+                  Cadastro
+                </SortableTableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow
+                  key={user.id}
+                  className="hover:bg-white/5 transition-colors border-white/5"
+                >
+                  <TableCell>
                     <div>
                       <p className="font-medium text-white">
                         {user.name || "Sem nome"}
@@ -154,30 +204,30 @@ export default function UsersPage() {
                         </p>
                       )}
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell>
                     <Badge
                       variant={
                         user.role === "ADMIN"
                           ? "destructive"
                           : user.role === "FOTOGRAFO"
-                            ? "default"
-                            : "secondary"
+                          ? "default"
+                          : "secondary"
                       }
                     >
                       {user.role}
                     </Badge>
-                  </td>
-                  <td className="px-6 py-4 text-zinc-400">
-                    {user._count.pedidos}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-zinc-400">
+                  </TableCell>
+                  <TableCell className="text-zinc-400">
+                    {user._count?.pedidos ?? 0}
+                  </TableCell>
+                  <TableCell className="text-sm text-zinc-400">
                     {new Date(user.createdAt).toLocaleDateString("pt-BR")}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 
@@ -186,6 +236,7 @@ export default function UsersPage() {
           currentPage={page}
           totalPages={totalPages}
           baseUrl="/admin/usuarios"
+          searchParams={Object.fromEntries(searchParams.entries())}
         />
       </div>
     </div>

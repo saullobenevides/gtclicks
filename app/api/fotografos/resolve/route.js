@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { serializePrismaData } from "@/lib/utils/serialization";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -129,19 +130,25 @@ export async function GET(request) {
       cart: cartData, // Valor real da contagem de itens nos carrinhos
     };
 
-    return NextResponse.json({
-      data: {
-        id: fotografo.id,
-        userId: fotografo.userId,
-        username: fotografo.username,
-        nome: fotografo.user?.name ?? null,
-        email: fotografo.user?.email ?? null,
-        saldo: fotografo.saldo,
-        colecoes: fotografo.colecoes,
-        _count: fotografo._count,
-        stats, // Estatísticas agregadas
-      },
-    });
+    const saldoSerialized = fotografo.saldo
+      ? {
+          disponivel: Number(fotografo.saldo.disponivel || 0),
+          bloqueado: Number(fotografo.saldo.bloqueado || 0),
+        }
+      : null;
+
+    const data = {
+      id: fotografo.id,
+      userId: fotografo.userId,
+      username: fotografo.username,
+      nome: fotografo.user?.name ?? null,
+      email: fotografo.user?.email ?? null,
+      saldo: saldoSerialized,
+      colecoes: serializePrismaData(fotografo.colecoes || []),
+      _count: fotografo._count,
+      stats,
+    };
+    return NextResponse.json({ data });
   } catch (error) {
     return NextResponse.json(
       {

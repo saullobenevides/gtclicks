@@ -17,6 +17,18 @@ const collectionSchema = z.object({
   status: z.enum(["RASCUNHO", "PUBLICADA"]).default("RASCUNHO"),
   faceRecognitionEnabled: z.boolean().optional().default(false),
   filtroFotografoId: z.string().optional(),
+  cidade: z.string().optional(),
+  estado: z.string().optional(),
+  local: z.string().optional(),
+  dataInicio: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.coerce.date().optional()
+  ),
+  dataFim: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.coerce.date().optional()
+  ),
+  descontos: z.any().optional(),
 });
 
 const updateCollectionSchema = z.object({
@@ -65,6 +77,20 @@ export async function createCollection(formData: FormData) {
     precoFoto: parseFloat(formData.get("precoFoto")?.toString() || "0"),
     status: formData.get("status")?.toString(),
     faceRecognitionEnabled: formData.get("faceRecognitionEnabled") === "true",
+    cidade: formData.get("cidade")?.toString() || undefined,
+    estado: formData.get("estado")?.toString() || undefined,
+    local: formData.get("local")?.toString() || undefined,
+    dataInicio: formData.get("dataInicio")?.toString() || undefined,
+    dataFim: formData.get("dataFim")?.toString() || undefined,
+    descontos: (() => {
+      const raw = formData.get("descontos")?.toString();
+      if (!raw) return undefined;
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return undefined;
+      }
+    })(),
   };
 
   const validatedFields = collectionSchema.safeParse({ ...rawData });
@@ -84,6 +110,12 @@ export async function createCollection(formData: FormData) {
       precoFoto,
       status,
       faceRecognitionEnabled,
+      cidade,
+      estado,
+      local,
+      dataInicio,
+      dataFim,
+      descontos,
     } = validatedFields.data;
 
     // Slug generation
@@ -105,6 +137,12 @@ export async function createCollection(formData: FormData) {
         precoFoto,
         status,
         faceRecognitionEnabled,
+        cidade: cidade || null,
+        estado: estado || null,
+        local: local || null,
+        dataInicio: dataInicio ? new Date(dataInicio) : null,
+        dataFim: dataFim ? new Date(dataFim) : null,
+        descontos: descontos && Array.isArray(descontos) ? descontos : null,
         fotografoId: fotografo.id,
       },
     });
@@ -192,6 +230,45 @@ export async function updateCollection(collectionId: string, data: any) {
   } catch (error: any) {
     console.error("[updateCollection] Error:", error.message);
     return { error: "Falha ao atualizar coleção" };
+  }
+}
+
+/**
+ * Atualiza o status de várias coleções em lote.
+ * @param {string[]} collectionIds - IDs das coleções
+ * @param {"RASCUNHO" | "PUBLICADA"} status - Novo status
+ */
+export async function bulkUpdateCollectionsStatus(
+  collectionIds: string[],
+  status: "RASCUNHO" | "PUBLICADA"
+) {
+  const user = await getAuthenticatedUser();
+  if (!user) return { error: "Não autorizado" };
+
+  if (!collectionIds?.length) {
+    return { error: "Nenhuma coleção selecionada" };
+  }
+
+  try {
+    const fotografo = await prisma.fotografo.findUnique({
+      where: { userId: user.id },
+      select: { id: true },
+    });
+    if (!fotografo) return { error: "Perfil de fotógrafo não encontrado" };
+
+    const { count } = await prisma.colecao.updateMany({
+      where: {
+        id: { in: collectionIds },
+        fotografoId: fotografo.id,
+      },
+      data: { status },
+    });
+
+    revalidatePath("/dashboard/fotografo/colecoes");
+    return { success: true, updated: count };
+  } catch (error: any) {
+    console.error("[bulkUpdateCollectionsStatus] Error:", error.message);
+    return { error: "Falha ao atualizar coleções" };
   }
 }
 

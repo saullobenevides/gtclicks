@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
+import { serializePrismaData } from "@/lib/utils/serialization";
 
 export async function GET(request, { params }) {
   const user = await getAuthenticatedUser();
@@ -35,7 +36,15 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
 
-    return NextResponse.json({ data: pedido });
+    const serialized = serializePrismaData({
+      ...pedido,
+      total: pedido.total ? Number(pedido.total) : 0,
+      itens: (pedido.itens || []).map((item) => ({
+        ...item,
+        precoPago: item.precoPago ? Number(item.precoPago) : 0,
+      })),
+    });
+    return NextResponse.json({ data: serialized });
   } catch (error) {
     console.error("Error fetching order:", error);
     return NextResponse.json(

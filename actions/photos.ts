@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { serializePrismaData } from "@/lib/utils/serialization";
 
 /**
  * Alterna o estado de "like" de uma foto para o usuário atual
@@ -114,7 +115,8 @@ export async function getLikedPhotos() {
       orderBy: { createdAt: "desc" },
     });
 
-    return { success: true, data: likes.map((l) => l.foto) };
+    const fotos = likes.map((l) => l.foto);
+    return { success: true, data: serializePrismaData(fotos) };
   } catch (error) {
     console.error("[Action] getLikedPhotos error:", error);
     return { error: "Erro ao buscar fotos curtidas", data: [] };

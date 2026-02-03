@@ -74,8 +74,13 @@ export function usePhotoUpload(collectionId, currentFolder) {
       });
 
       const processData = await processRes.json();
-      if (!processRes.ok)
-        throw new Error(processData?.error || "Erro ao processar foto");
+      if (!processRes.ok) {
+        const msg =
+          processData?.details ??
+          processData?.error ??
+          "Erro ao processar foto";
+        throw new Error(String(msg));
+      }
 
       setUploadState({ photoTempId: null, label: "" });
       return {
