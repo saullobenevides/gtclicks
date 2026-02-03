@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { processUploadedImage } from "@/lib/processing";
-import { indexPhotoFaces } from "@/lib/rekognition";
+// import { indexPhotoFaces } from "@/lib/rekognition"; // TODO: Rekognition desabilitado
 import { z } from "zod";
 
 // --- Validation Schema ---
@@ -38,7 +38,7 @@ export async function POST(request) {
           error: "Dados inválidos",
           details: validation.error.flatten().fieldErrors,
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -64,7 +64,7 @@ export async function POST(request) {
     if (!fotografo) {
       return NextResponse.json(
         { error: "Fotógrafo não encontrado" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -76,7 +76,7 @@ export async function POST(request) {
     if (!colecao) {
       return NextResponse.json(
         { error: "Coleção não encontrada" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -115,7 +115,7 @@ export async function POST(request) {
     });
 
     console.log(
-      `[Process API] Created photo ${foto.id}, starting processing...`,
+      `[Process API] Created photo ${foto.id}, starting processing...`
     );
 
     // 2. Trigger async processing
@@ -125,7 +125,7 @@ export async function POST(request) {
     } catch (procError) {
       console.error(
         "Processing failed, rolling back photo creation",
-        procError.message,
+        procError.message
       );
 
       // Rollback
@@ -135,7 +135,7 @@ export async function POST(request) {
       } catch (rollbackError) {
         console.error(
           `[Process API] CRITICAL: Rollback failed for photo ${foto.id}`,
-          rollbackError,
+          rollbackError
         );
       }
 
@@ -144,7 +144,7 @@ export async function POST(request) {
           error: "Erro no processamento da imagem",
           details: procError.message,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -152,7 +152,9 @@ export async function POST(request) {
     const finalTitle =
       titulo && titulo.trim() !== "Sem título"
         ? titulo
-        : `${colecao.nome || "Coleção"} IMG_${String(nextSequentialNumber).padStart(4, "0")}`;
+        : `${colecao.nome || "Coleção"} IMG_${String(
+            nextSequentialNumber
+          ).padStart(4, "0")}`;
 
     const updatedFoto = await prisma.foto.update({
       where: { id: foto.id },
@@ -170,38 +172,14 @@ export async function POST(request) {
     });
 
     // 4. Async Facial Recognition Indexing (Optional/Background)
-    if (updatedFoto.colecao?.faceRecognitionEnabled) {
-      console.log(`[Process API] Indexing faces for photo ${foto.id}...`);
-      const bucket = process.env.S3_UPLOAD_BUCKET;
-
-      // Ensure non-blocking execution properly if environment supports it,
-      // otherwise await to guarantee execution in serverless.
-      try {
-        const indexResult = await indexPhotoFaces(bucket, s3Key, foto.id);
-        if (indexResult.success) {
-          await prisma.foto.update({
-            where: { id: foto.id },
-            data: {
-              indexingStatus: "INDEXED",
-              indexedFaceIds: indexResult.indexedFaces,
-            },
-          });
-          console.log(
-            `[Process API] Indexed ${indexResult.faceCount} faces for photo ${foto.id}`,
-          );
-        } else {
-          await prisma.foto.update({
-            where: { id: foto.id },
-            data: { indexingStatus: "FAILED" },
-          });
-        }
-      } catch (indexError) {
-        console.error(
-          `[Process API] Face indexing background error for ${foto.id}:`,
-          indexError,
-        );
-      }
-    }
+    // TODO: Rekognition desabilitado até estar configurado
+    // if (updatedFoto.colecao?.faceRecognitionEnabled) {
+    //   const bucket = process.env.S3_UPLOAD_BUCKET;
+    //   try {
+    //     const indexResult = await indexPhotoFaces(bucket, s3Key, foto.id);
+    //     ...
+    //   } catch (indexError) { ... }
+    // }
 
     return NextResponse.json({
       message: "Processamento concluído",
@@ -211,7 +189,7 @@ export async function POST(request) {
     console.error("Critical error in process route:", error);
     return NextResponse.json(
       { error: "Erro interno no servidor", details: error.message },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

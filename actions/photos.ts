@@ -42,6 +42,7 @@ export async function togglePhotoLike(fotoId: string) {
       ]);
 
       revalidatePath(`/fotos/${fotoId}`);
+      revalidatePath("/meus-favoritos");
       return { success: true, liked: false };
     } else {
       // Like
@@ -59,6 +60,7 @@ export async function togglePhotoLike(fotoId: string) {
       ]);
 
       revalidatePath(`/fotos/${fotoId}`);
+      revalidatePath("/meus-favoritos");
       return { success: true, liked: true };
     }
   } catch (error) {
@@ -105,6 +107,7 @@ export async function getLikedPhotos() {
         foto: {
           include: {
             fotografo: true,
+            colecao: true,
           },
         },
       },

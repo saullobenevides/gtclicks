@@ -40,9 +40,14 @@ export default function PaymentBrick({
       style: {
         theme: "dark",
         customVariables: {
-          // DESIGN_SYSTEM: surface-card–like (#0a0a0a) / text-on-dark (#ffffff); SDK exige hex
-          formBackgroundColor: "#0a0a0a",
-          baseColor: "#ffffff",
+          // Alinhado ao checkout (#3a3a3a)
+          formBackgroundColor: "#3a3a3a",
+          // Botão no estilo primary: vermelho + texto branco
+          baseColor: "#ff0000",
+          baseColorFirstVariant: "#cc0000",
+          baseColorSecondVariant: "#990000",
+          buttonTextColor: "#ffffff",
+          outlinePrimaryColor: "#ff0000",
         },
       },
     },

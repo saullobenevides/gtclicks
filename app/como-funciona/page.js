@@ -7,14 +7,10 @@ import {
   DollarSign,
   ChevronRight,
   Search,
-  Zap,
-  Lock,
   Image as ImageIcon,
   CreditCard,
   Shield,
   UploadCloud,
-  Check,
-  Sparkles,
 } from "lucide-react";
 import { stackServerApp } from "@/stack/server";
 import prisma from "@/lib/prisma";
@@ -38,27 +34,6 @@ export default async function ComoFuncionaPage() {
     hasProfile = !!fotografo;
   }
 
-  const athleteSteps = [
-    {
-      title: "Busca Inteligente",
-      description:
-        "Utilize nossa busca por IA para encontrar suas fotos de forma rápida e precisa através de uma única selfie.",
-      icon: Search,
-    },
-    {
-      title: "Escolha e Compre",
-      description:
-        "Navegue pelas suas fotos, selecione as melhores e finalize a compra com segurança.",
-      icon: Camera,
-    },
-    {
-      title: "Receba na Hora",
-      description:
-        "Após o pagamento, o link para download das fotos em alta qualidade é liberado instantaneamente.",
-      icon: Sparkles,
-    },
-  ];
-
   return (
     <PageSection variant="default" containerWide className="min-h-screen">
       <SectionHeader
@@ -73,8 +48,11 @@ export default async function ComoFuncionaPage() {
         description="Selecione seu perfil abaixo para ver como a plataforma funciona para você."
       />
 
-      <Tabs defaultValue="fotografo" className="w-full max-w-5xl mx-auto">
-        <div className="flex justify-center px-4">
+      <Tabs
+        defaultValue="fotografo"
+        className="w-full max-w-5xl mx-auto space-y-16 md:space-y-20"
+      >
+        <div className="flex justify-center">
           <TabsList
             role="tablist"
             aria-label="Selecione seu perfil: Fotógrafo ou Atleta"
@@ -104,7 +82,7 @@ export default async function ComoFuncionaPage() {
         >
           {/* Feature Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass-card p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
+            <div className="glass-card p-6 md:p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
               <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
                 <DollarSign className="h-6 w-6 text-primary" />
               </div>
@@ -117,7 +95,7 @@ export default async function ComoFuncionaPage() {
               </p>
             </div>
 
-            <div className="glass-card p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
+            <div className="glass-card p-6 md:p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
               <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
                 <Shield className="h-6 w-6 text-primary" />
               </div>
@@ -130,7 +108,7 @@ export default async function ComoFuncionaPage() {
               </p>
             </div>
 
-            <div className="glass-card p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
+            <div className="glass-card p-6 md:p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
               <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
                 <UploadCloud className="h-6 w-6 text-primary" />
               </div>
@@ -252,7 +230,7 @@ export default async function ComoFuncionaPage() {
         >
           {/* Feature Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass-card p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
+            <div className="glass-card p-6 md:p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
               <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
                 <Search className="h-6 w-6 text-primary" />
               </div>
@@ -265,7 +243,7 @@ export default async function ComoFuncionaPage() {
               </p>
             </div>
 
-            <div className="glass-card p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
+            <div className="glass-card p-6 md:p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
               <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
                 <ImageIcon className="h-6 w-6 text-primary" />
               </div>
@@ -278,7 +256,7 @@ export default async function ComoFuncionaPage() {
               </p>
             </div>
 
-            <div className="glass-card p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
+            <div className="glass-card p-6 md:p-8 rounded-2xl border-primary/20 hover:border-primary/50 transition-colors">
               <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
                 <CreditCard className="h-6 w-6 text-primary" />
               </div>
@@ -333,6 +311,37 @@ export default async function ComoFuncionaPage() {
             </div>
           </div>
 
+          {/* FAQ Atletas */}
+          <div className="max-w-4xl mx-auto">
+            <h2 className="heading-display text-2xl font-black text-white text-center mb-12">
+              Dúvidas Frequentes dos Atletas
+            </h2>
+            <StandardFaq
+              items={[
+                {
+                  question: "Como encontro minhas fotos?",
+                  answer:
+                    "Use a busca por evento (local, data) ou a busca por selfie com IA para encontrar suas fotos em segundos.",
+                },
+                {
+                  question: "Qual a qualidade das fotos?",
+                  answer:
+                    "Todas as fotos são entregues em alta resolução, prontas para impressão ou uso em redes sociais.",
+                },
+                {
+                  question: "Como funciona o pagamento?",
+                  answer:
+                    "Aceitamos Pix, cartão de crédito e débito via Mercado Pago. Após a confirmação, o link de download é liberado na hora.",
+                },
+                {
+                  question: "Posso comprar várias fotos de uma vez?",
+                  answer:
+                    "Sim! Adicione ao carrinho e aproveite descontos progressivos quanto mais fotos você comprar.",
+                },
+              ]}
+            />
+          </div>
+
           {/* CTA */}
           <div className="text-center py-8">
             <Button
@@ -348,8 +357,8 @@ export default async function ComoFuncionaPage() {
           </div>
         </TabsContent>
       </Tabs>
-      <section className="py-24 border-t border-white/5 bg-zinc-950">
-        <div className="container px-4 text-center">
+      <section className="py-20 md:py-24 mt-20 md:mt-24 border-t border-white/5 bg-zinc-950/80">
+        <div className="max-w-2xl mx-auto text-center px-4">
           <h2 className="heading-display text-2xl md:text-3xl font-black text-white mb-6">
             Ainda com dúvidas?
           </h2>
@@ -357,7 +366,7 @@ export default async function ComoFuncionaPage() {
             Nossa equipe de suporte está pronta para ajudar você a tirar o
             máximo proveito da plataforma.
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <Button
               asChild
               variant="outline"

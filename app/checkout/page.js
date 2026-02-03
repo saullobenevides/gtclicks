@@ -16,7 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Loader2, ShieldCheck, Lock } from "lucide-react";
+import { Loader2, ShieldCheck, Lock, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CheckoutPage() {
@@ -175,7 +175,7 @@ export default function CheckoutPage() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-12">
         {/* Left Column: Review Order */}
         <div className="space-y-6">
-          <Card className="glass-panel border-white/10 bg-black/40">
+          <Card className="border-white/10 bg-[#3a3a3a] rounded-xl">
             <CardHeader>
               <CardTitle className="text-xl text-white">
                 Itens do Pedido{" "}
@@ -245,14 +245,23 @@ export default function CheckoutPage() {
 
         {/* Right Column: Payment Brick */}
         <div className="relative">
-          <Card className="glass-panel border-white/10 bg-black/40 lg:sticky lg:top-24">
-            <CardHeader>
-              <CardTitle className="text-xl text-white">Pagamento</CardTitle>
-              <CardDescription>
-                Escolha sua forma de pagamento preferida
+          <Card className="border-white/10 bg-[#3a3a3a] rounded-xl lg:sticky lg:top-24 overflow-hidden">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 border border-white/10">
+                  <CreditCard className="h-5 w-5 text-action-primary" />
+                </div>
+                <CardTitle className="text-xl text-white font-bold">
+                  Pagamento
+                </CardTitle>
+              </div>
+              <CardDescription className="text-sm text-white/70 leading-relaxed mt-1">
+                Pagamento seguro via Mercado Pago. Aceitamos cartão de crédito,
+                débito e PIX.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <Separator className="bg-white/10 mx-4 md:mx-6" />
+            <CardContent className="pt-5">
               <div className="min-h-[400px]">
                 <PaymentBrick
                   amount={totalToPay}

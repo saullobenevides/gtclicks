@@ -3,133 +3,184 @@ import Image from "next/image";
 import { CATEGORIES } from "@/lib/constants";
 import { PageSection, SectionHeader } from "@/components/shared/layout";
 
-// Real, verified Unsplash images to avoid 404s
+// Imagens Unsplash verificadas - uma para cada categoria
 const REAL_IMAGES = {
   // Nature / Outdoor / Adventure
   nature: "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
   beach: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
   mountain: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
-  water: "https://images.unsplash.com/photo-1534234828563-025816b30368", // Iatismo/Sailing
+  water: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", // praia/mar
+  forest: "https://images.unsplash.com/photo-1501785888041-af3ef285b470", // natureza
 
   // Urban / City / Lifestyle
   urban: "https://images.unsplash.com/photo-1514565131-fce0801e5785",
   architecture: "https://images.unsplash.com/photo-1486325212027-8081e485255e",
-  abstract: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853", // Using neon as abstract fallback or similar
+  abstract: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853",
   neon: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853",
+  motorcycle: "https://images.unsplash.com/photo-1558981806-ec527fa84c39",
+  car: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8",
+  drone: "https://images.unsplash.com/photo-1473968512647-3e447244af8f",
+  skate: "https://images.unsplash.com/photo-1561214115-f2f134cc4912",
+  food: "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
 
-  // Sports Specific (Verified from Showcase/Seed or known Staples)
-  soccer:
-    "https://images.unsplash.com/photo-1579952363873-27f3bde9beaa?w=800&q=80", // Field
+  // Sports Specific
+  soccer: "https://images.unsplash.com/photo-1574629810360-7efbbe195018", // campo futebol
   basketball:
-    "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=800&q=80", // Court
+    "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=800&q=80",
   fitness:
-    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80", // Gym
-  cycling:
-    "https://images.unsplash.com/photo-1534787037060-18a507787f77?w=800&q=80", // Bike
-  running:
-    "https://images.unsplash.com/photo-1552674605-46d5c496db56?w=800&q=80", // Track
+    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
+  cycling: "https://images.unsplash.com/photo-1571333250630-f0230c320b6d", // mountain bike
+  running: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438", // fitness/corrida
+  volleyball:
+    "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80",
+  tennis:
+    "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&q=80",
+  swimming:
+    "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&q=80",
+  surf: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800&q=80",
+  martial:
+    "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+  golf: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&q=80",
+  horse: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=800&q=80",
+  paintball:
+    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+  pet: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80",
 
   // Events / People
-  event: "https://images.unsplash.com/photo-1540575467063-178a50c2df87", // Corporate/Tech
+  event: "https://images.unsplash.com/photo-1540575467063-178a50c2df87",
   crowd:
-    "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80", // Party/Concert
-  portrait: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e", // Portrait/Fashion
+    "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80",
+  portrait: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e",
+  wedding:
+    "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80",
+  fashion:
+    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80",
+  family:
+    "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&q=80",
+  dance:
+    "https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80",
 };
 
 const CATEGORY_IMAGES = {
   // --- Esportes com Bola/Campo ---
   Futebol: REAL_IMAGES.soccer,
-  Futsal: REAL_IMAGES.soccer, // Field generic
-  Futevôlei: REAL_IMAGES.beach, // Beach context
-  "Futebol de Areia": REAL_IMAGES.beach,
+  Futsal:
+    "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80",
+  Futevôlei: REAL_IMAGES.beach,
+  "Futebol de Areia":
+    "https://images.unsplash.com/photo-1592659762303-90081d34b277?w=800&q=80",
   Altinha: REAL_IMAGES.beach,
-  "Flag Football": REAL_IMAGES.soccer, // Field generic
-  "Futebol Americano": REAL_IMAGES.soccer, // Field generic
-  Rugby: REAL_IMAGES.soccer, // Field generic
-  Baseball: REAL_IMAGES.soccer, // Field generic
-  Vôlei: REAL_IMAGES.beach, // Court/Beach
+  "Flag Football":
+    "https://images.unsplash.com/photo-1574629810360-7efbbe195018", // campo
+  "Futebol Americano":
+    "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=800&q=80",
+  Rugby:
+    "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80",
+  Baseball:
+    "https://images.unsplash.com/photo-1529963183134-61a90db47eaf?w=800&q=80",
+  Vôlei: REAL_IMAGES.volleyball,
   Basquete: REAL_IMAGES.basketball,
-  Handebol: REAL_IMAGES.basketball, // Indoor court
+  Handebol: REAL_IMAGES.basketball, // quadra coberta
 
   // --- Raquetes ---
-  Tênis: REAL_IMAGES.basketball, // Court surface
+  Tênis: REAL_IMAGES.tennis,
   "Beach Tennis": REAL_IMAGES.beach,
-  Padel: REAL_IMAGES.basketball, // Court
-  Pickeball: REAL_IMAGES.basketball,
-  Pickleball: REAL_IMAGES.basketball,
-  Badminton: REAL_IMAGES.basketball,
-  "Tênis de Mesa": REAL_IMAGES.fitness, // Indoor
+  Padel: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8", // tênis/quadra
+  Pickeball:
+    "https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=800&q=80",
+  Pickleball:
+    "https://images.unsplash.com/photo-1624526267942-ab0ff8a3e972?w=800&q=80",
+  Badminton:
+    "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&q=80",
+  "Tênis de Mesa":
+    "https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=800&q=80",
 
   // --- Fitness / Ginástica ---
   Crossfit: REAL_IMAGES.fitness,
-  Treinos: REAL_IMAGES.fitness,
-  Ginástica: REAL_IMAGES.fitness,
+  Treinos:
+    "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80",
+  Ginástica:
+    "https://images.unsplash.com/photo-1588286840104-8957b019727f?w=800&q=80",
   "Treinamento Funcional": REAL_IMAGES.fitness,
-  Hyrox: REAL_IMAGES.fitness,
+  Hyrox:
+    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
 
   // --- Outdoor / Aventura / Água ---
   Corrida: REAL_IMAGES.running,
   Ciclismo: REAL_IMAGES.cycling,
-  "Mountain Bike": REAL_IMAGES.cycling,
-  Triathlon: REAL_IMAGES.running,
-  Natação: REAL_IMAGES.water,
-  Surf: REAL_IMAGES.water,
-  "Kite Surf": REAL_IMAGES.water,
+  "Mountain Bike":
+    "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800&q=80",
+  Triathlon:
+    "https://images.unsplash.com/photo-1541625602330-2277a4c46182?w=800&q=80",
+  Natação: REAL_IMAGES.swimming,
+  Surf: REAL_IMAGES.surf,
+  "Kite Surf":
+    "https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800&q=80",
   Skimboard: REAL_IMAGES.water,
-  Mergulho: REAL_IMAGES.water,
-  Subaquática: REAL_IMAGES.water,
-  "Canoa Havaiana": REAL_IMAGES.water,
+  Mergulho:
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+  Subaquática:
+    "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+  "Canoa Havaiana":
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", // praia/remo
   Iatismo: REAL_IMAGES.water,
-  Pescaria: REAL_IMAGES.water,
+  Pescaria: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e", // praia/água
   Trilhas: REAL_IMAGES.mountain,
-  "Escalada Trilhas": REAL_IMAGES.mountain,
-  "Voo Livre": REAL_IMAGES.mountain,
-  Natureza: REAL_IMAGES.nature,
-  Paraquedismo: REAL_IMAGES.mountain,
+  "Escalada Trilhas":
+    "https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&q=80",
+  "Voo Livre":
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
+  Natureza: REAL_IMAGES.forest,
+  Paraquedismo:
+    "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&q=80",
 
   // --- Lutas ---
-  "Artes Marciais": REAL_IMAGES.fitness, // Gym context
-  "Jiu-jítsu": REAL_IMAGES.fitness,
-  Judô: REAL_IMAGES.fitness,
-  "Muay Thai": REAL_IMAGES.fitness,
+  "Artes Marciais": REAL_IMAGES.martial,
+  "Jiu-jítsu": REAL_IMAGES.martial,
+  Judô: REAL_IMAGES.martial,
+  "Muay Thai": REAL_IMAGES.martial,
 
   // --- Motor / Velocidade ---
-  Motociclismo: REAL_IMAGES.urban,
-  Motocross: REAL_IMAGES.mountain,
-  Automotiva: REAL_IMAGES.urban,
-  Kart: REAL_IMAGES.urban,
-  Arrancada: REAL_IMAGES.urban,
+  Motociclismo: REAL_IMAGES.motorcycle,
+  Motocross:
+    "https://images.unsplash.com/photo-1558981359-219d6364c9c8?w=800&q=80",
+  Automotiva: REAL_IMAGES.car,
+  Kart: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80",
+  Arrancada: REAL_IMAGES.car,
   Offroad: REAL_IMAGES.mountain,
+  Grau: REAL_IMAGES.motorcycle,
 
   // --- Eventos / Social ---
   Eventos: REAL_IMAGES.event,
   Corporativo: REAL_IMAGES.event,
   Formaturas: REAL_IMAGES.crowd,
   Festas: REAL_IMAGES.crowd,
-  Casamento: REAL_IMAGES.event,
-  Batizado: REAL_IMAGES.event,
+  Casamento: REAL_IMAGES.wedding,
+  Batizado: REAL_IMAGES.family,
   "Teatro e Musicais": REAL_IMAGES.crowd,
   "Evento Religioso": REAL_IMAGES.event,
-  Dança: REAL_IMAGES.crowd,
+  Dança: REAL_IMAGES.dance,
   Ensaios: REAL_IMAGES.portrait,
-  Família: REAL_IMAGES.portrait,
-  Moda: REAL_IMAGES.portrait,
-  Pets: REAL_IMAGES.nature,
+  Família: REAL_IMAGES.family,
+  Moda: REAL_IMAGES.fashion,
+  Pets: REAL_IMAGES.pet,
 
   // --- Outros ---
-  Hipismo: REAL_IMAGES.nature,
-  Equestre: REAL_IMAGES.nature,
-  Rodeio: REAL_IMAGES.nature,
-  Skate: REAL_IMAGES.urban,
-  Patinação: REAL_IMAGES.urban,
-  Paintball: REAL_IMAGES.mountain,
-  Airsoft: REAL_IMAGES.mountain,
-  Drones: REAL_IMAGES.urban,
+  Hipismo: REAL_IMAGES.horse,
+  Equestre: REAL_IMAGES.horse,
+  Rodeio: REAL_IMAGES.horse,
+  Skate: REAL_IMAGES.skate,
+  Patinação:
+    "https://images.unsplash.com/photo-1545128485-c400e7702796?w=800&q=80",
+  Paintball: REAL_IMAGES.paintball,
+  Airsoft:
+    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+  Drones: REAL_IMAGES.drone,
   Imóveis: REAL_IMAGES.architecture,
   Jornalística: REAL_IMAGES.urban,
   Ecommerce: REAL_IMAGES.urban,
-  Alimentos: REAL_IMAGES.event, // Social
-  Golfe: REAL_IMAGES.nature,
+  Alimentos: REAL_IMAGES.food,
+  Golfe: REAL_IMAGES.golf,
   Esportes: REAL_IMAGES.fitness,
   Turismo: REAL_IMAGES.beach,
   Passeio: REAL_IMAGES.nature,

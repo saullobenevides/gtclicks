@@ -67,6 +67,7 @@ export default function CollectionEditor({ collection: initialData }) {
     dataFim: initialCollection.dataFim
       ? new Date(initialCollection.dataFim).toISOString().split("T")[0]
       : "",
+    eventoDuracao: initialCollection.dataFim ? "multi" : "single",
     descontos: initialCollection.descontos || [],
     faceRecognitionEnabled: initialCollection.faceRecognitionEnabled || false,
   });
@@ -205,7 +206,7 @@ export default function CollectionEditor({ collection: initialData }) {
   const handleCollectionDataChange = (field, value) => {
     setCollectionData((prev) => {
       const updates = { [field]: value };
-      if (field === "nome" && !initialCollection.id) {
+      if (field === "nome") {
         updates.slug = slugify(value);
       }
       return { ...prev, ...updates };

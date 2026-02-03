@@ -12,12 +12,10 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Camera,
-  Aperture,
-  Maximize2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ShareButton from "@/components/shared/actions/ShareButton";
+import LikeButton from "@/components/shared/actions/LikeButton";
 import { LICENSE_MVP_LABEL } from "@/lib/constants";
 import { formatCartItemTitle } from "@/lib/utils";
 
@@ -25,7 +23,7 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
   const { items, addToCart } = useCart();
   const isAdded = items.some((i) => i.fotoId === photo.id);
 
-  const price = photo.colecao?.precoFoto || 0;
+  const price = photo.colecao?.precoFoto ?? photo.preco ?? 0;
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -77,11 +75,16 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
         }}
       />
 
-      {/* Close Button - Always visible top right (min 44px touch target) */}
+      {/* Top Right Actions - Share, Like, Close (min 44px touch target) */}
       <div
         className="absolute top-4 right-4 z-50 flex items-center gap-2"
         style={{ top: "max(1rem, env(safe-area-inset-top))" }}
       >
+        <LikeButton
+          photoId={photo.id}
+          likesCount={photo.likes ?? 0}
+          className="bg-black/40 text-white hover:bg-black/60 hover:text-white backdrop-blur-md rounded-full border border-white/10 min-h-11 min-w-11 h-11 w-11 md:h-12 md:w-12 shrink-0 p-0"
+        />
         <ShareButton
           title="Foto GTClicks"
           text="Olha essa foto incrível!"

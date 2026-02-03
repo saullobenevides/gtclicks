@@ -12,7 +12,7 @@ import { serializeModel, serializeDecimal } from "@/lib/serialization";
 const collectionSchema = z.object({
   nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   descricao: z.string().optional(),
-  categoria: z.string().optional(),
+  categoria: z.string().min(1, "Categoria é obrigatória"),
   precoFoto: z.number().min(0, "Preço não pode ser negativo").default(0),
   status: z.enum(["RASCUNHO", "PUBLICADA"]).default("RASCUNHO"),
   faceRecognitionEnabled: z.boolean().optional().default(false),
@@ -21,6 +21,7 @@ const collectionSchema = z.object({
 
 const updateCollectionSchema = z.object({
   nome: z.string().min(3).optional(),
+  slug: z.string().min(1).optional(),
   descricao: z.string().optional(),
   categoria: z.string().optional(),
   precoFoto: z.number().min(0).optional(),
@@ -28,11 +29,11 @@ const updateCollectionSchema = z.object({
   capaUrl: z.string().optional(),
   dataInicio: z.preprocess(
     (val) => (val === "" || val === null ? undefined : val),
-    z.coerce.date().optional(),
+    z.coerce.date().optional()
   ),
   dataFim: z.preprocess(
     (val) => (val === "" || val === null ? undefined : val),
-    z.coerce.date().optional(),
+    z.coerce.date().optional()
   ),
   cidade: z.string().optional(),
   estado: z.string().optional(),
@@ -162,7 +163,23 @@ export async function updateCollection(collectionId: string, data: any) {
       };
     }
 
-    const cleanData = validation.data;
+    let cleanData = validation.data;
+
+    if (cleanData.slug) {
+      let slug = cleanData.slug;
+      let suffix = 1;
+      let exists = await prisma.colecao.findFirst({
+        where: { slug, id: { not: collectionId } },
+      });
+      while (exists) {
+        const baseSlug = slug.replace(/-\d+$/, "");
+        slug = `${baseSlug}-${suffix++}`;
+        exists = await prisma.colecao.findFirst({
+          where: { slug, id: { not: collectionId } },
+        });
+      }
+      cleanData = { ...cleanData, slug };
+    }
 
     const updated = await prisma.colecao.update({
       where: { id: collectionId },
@@ -180,7 +197,7 @@ export async function updateCollection(collectionId: string, data: any) {
 
 export async function setCollectionCover(
   collectionId: string,
-  photoId: string,
+  photoId: string
 ) {
   const user = await getAuthenticatedUser();
   if (!user) return { error: "Não autorizado" };

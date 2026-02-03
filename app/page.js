@@ -7,8 +7,8 @@ import dynamic from "next/dynamic";
 
 const FAQSection = dynamic(() => import("@/components/home/FAQSection"));
 
-// Revalidate this page every hour
-export const revalidate = 3600;
+// Revalidate a cada minuto para o ranking atualizar
+export const revalidate = 60;
 
 export default async function Home() {
   const {
@@ -16,6 +16,9 @@ export default async function Home() {
     recentCollections = [],
     photographers = [],
     topBuyers = [],
+    lastMonthWinner = null,
+    rankingMonth = "",
+    lastMonthName = "",
   } = await getHomepageData();
 
   return (
@@ -30,7 +33,12 @@ export default async function Home() {
 
       <PhotographerSpotlight photographers={photographers} />
 
-      <BuyerRanking buyers={topBuyers} />
+      <BuyerRanking
+        buyers={topBuyers}
+        month={rankingMonth}
+        lastMonthWinner={lastMonthWinner}
+        lastMonthName={lastMonthName}
+      />
 
       <FeaturedCollections
         collections={recentCollections}

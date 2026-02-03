@@ -20,8 +20,10 @@ export default function PWAInstallBanner() {
     const ios =
       /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-    setIsStandalone(standalone);
-    setIsIOS(ios);
+    queueMicrotask(() => {
+      setIsStandalone(standalone);
+      setIsIOS(ios);
+    });
 
     if (standalone) return;
 
@@ -36,7 +38,7 @@ export default function PWAInstallBanner() {
 
     window.addEventListener("beforeinstallprompt", handler);
 
-    if (ios) setShowBanner(true);
+    if (ios) queueMicrotask(() => setShowBanner(true));
 
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
@@ -61,23 +63,23 @@ export default function PWAInstallBanner() {
 
   return (
     <div className="fixed bottom-20 md:bottom-6 left-4 right-4 z-50 max-w-md mx-auto">
-      <div className="glass-panel border border-white/10 rounded-xl p-4 shadow-xl flex items-start gap-3">
+      <div className="bg-surface-card border border-border-default rounded-xl p-4 shadow-xl flex items-start gap-3">
         <div className="p-2 rounded-lg bg-primary/20 shrink-0">
           <Smartphone className="w-5 h-5 text-primary" />
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-white text-sm">
+          <h3 className="font-semibold text-text-primary text-sm">
             Instalar o GTClicks
           </h3>
           {isIOS ? (
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-text-secondary mt-1">
               Toque em <Share className="w-3 h-3 inline align-middle mx-0.5" />{" "}
               e depois <Plus className="w-3 h-3 inline align-middle mx-0.5" />{" "}
               &quot;Adicionar à Tela de Início&quot; para acesso rápido.
             </p>
           ) : (
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-text-secondary mt-1">
               Use como app: acesso rápido, notificações e experiência fluida.
             </p>
           )}
@@ -91,7 +93,7 @@ export default function PWAInstallBanner() {
                 size="sm"
                 variant="ghost"
                 onClick={handleDismiss}
-                className="h-8 text-xs text-muted-foreground"
+                className="h-8 text-xs text-text-secondary"
               >
                 Agora não
               </Button>
@@ -101,7 +103,7 @@ export default function PWAInstallBanner() {
 
         <button
           onClick={handleDismiss}
-          className="p-1 rounded-md hover:bg-white/10 text-muted-foreground shrink-0"
+          className="p-1 rounded-md hover:bg-surface-subtle text-text-secondary shrink-0"
           aria-label="Fechar"
         >
           <X className="w-4 h-4" />

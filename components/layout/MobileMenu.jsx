@@ -20,7 +20,7 @@ export default function MobileMenu({ id = "mobile-menu", isOpen, onClose }) {
   const pathname = usePathname();
 
   const mainNavItems = siteConfig.navItems.filter(
-    (item) => !["/meus-favoritos", "/carrinho"].includes(item.href),
+    (item) => !["/meus-favoritos", "/carrinho"].includes(item.href)
   );
 
   return (
@@ -69,7 +69,7 @@ export default function MobileMenu({ id = "mobile-menu", isOpen, onClose }) {
               <Input
                 name="search"
                 type="search"
-                placeholder="Buscar fotos..."
+                placeholder="Buscar coleções, eventos ou fotógrafos..."
                 className="w-full h-11 pl-10 rounded-lg bg-black/40 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-primary"
                 autoComplete="off"
               />
@@ -86,7 +86,7 @@ export default function MobileMenu({ id = "mobile-menu", isOpen, onClose }) {
                   "flex items-center min-h-[48px] px-4 py-3 rounded-xl text-base font-medium transition-colors",
                   pathname === item.href
                     ? "bg-white/10 text-white"
-                    : "text-muted-foreground hover:text-white hover:bg-white/5",
+                    : "text-muted-foreground hover:text-white hover:bg-white/5"
                 )}
                 aria-current={pathname === item.href ? "page" : undefined}
               >
@@ -104,11 +104,9 @@ export default function MobileMenu({ id = "mobile-menu", isOpen, onClose }) {
               "flex items-center gap-3 min-h-[48px] px-4 py-3 rounded-xl text-base font-medium transition-colors",
               pathname === "/meus-favoritos"
                 ? "bg-white/10 text-white"
-                : "text-muted-foreground hover:text-white hover:bg-white/5",
+                : "text-muted-foreground hover:text-white hover:bg-white/5"
             )}
-            aria-current={
-              pathname === "/meus-favoritos" ? "page" : undefined
-            }
+            aria-current={pathname === "/meus-favoritos" ? "page" : undefined}
           >
             <Heart className="h-5 w-5 shrink-0" />
             Meus Favoritos

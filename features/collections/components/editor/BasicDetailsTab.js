@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import LocationSelector from "../LocationSelector";
 import PlaceSelector from "../PlaceSelector";
 import { CATEGORIES } from "@/lib/constants";
@@ -35,7 +36,9 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
       <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6 w-full max-w-full min-w-0 overflow-hidden">
         <div className="grid md:grid-cols-2 gap-4 w-full min-w-0">
           <div className="space-y-1.5 w-full min-w-0">
-            <Label htmlFor="collection-name">Título da Coleção</Label>
+            <Label htmlFor="collection-name">
+              Título da Coleção <span className="text-primary">*</span>
+            </Label>
             <Input
               id="collection-name"
               className="w-full min-w-0 h-11 bg-transparent border-2 border-border-default rounded-radius-lg"
@@ -45,7 +48,9 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
             />
           </div>
           <div className="space-y-1.5 w-full min-w-0">
-            <Label htmlFor="collection-category">Categoria</Label>
+            <Label htmlFor="collection-category">
+              Categoria <span className="text-primary">*</span>
+            </Label>
             <Select
               value={collectionData.categoria}
               onValueChange={(value) => onDataChange("categoria", value)}
@@ -78,26 +83,60 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
           />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4 w-full min-w-0">
-          <div className="space-y-1.5 w-full min-w-0">
-            <Label htmlFor="collection-date-start">Início do Evento</Label>
-            <Input
-              id="collection-date-start"
-              className="w-full min-w-0 h-11 bg-transparent border-2 border-border-default rounded-radius-lg date-icon-right"
-              type="date"
-              value={collectionData.dataInicio}
-              onChange={(e) => onDataChange("dataInicio", e.target.value)}
-            />
+        <div className="space-y-4 w-full min-w-0">
+          <div className="space-y-2">
+            <Label>Duração do evento</Label>
+            <RadioGroup
+              value={
+                collectionData.eventoDuracao ||
+                (collectionData.dataFim ? "multi" : "single")
+              }
+              onValueChange={(v) => {
+                onDataChange("eventoDuracao", v);
+                onDataChange("dataFim", "");
+              }}
+              className="flex gap-4"
+            >
+              <label className="flex items-center gap-2 cursor-pointer">
+                <RadioGroupItem value="single" id="evento-single" />
+                <span className="text-sm font-medium">Dia único</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <RadioGroupItem value="multi" id="evento-multi" />
+                <span className="text-sm font-medium">
+                  Duração de vários dias
+                </span>
+              </label>
+            </RadioGroup>
           </div>
-          <div className="space-y-1.5 w-full min-w-0">
-            <Label htmlFor="collection-date-end">Fim do Evento</Label>
-            <Input
-              id="collection-date-end"
-              className="w-full min-w-0 h-11 bg-transparent border-2 border-border-default rounded-radius-lg date-icon-right"
-              type="date"
-              value={collectionData.dataFim}
-              onChange={(e) => onDataChange("dataFim", e.target.value)}
-            />
+
+          <div className="grid md:grid-cols-2 gap-4 w-full min-w-0">
+            <div className="space-y-1.5 w-full min-w-0">
+              <Label htmlFor="collection-date-start">
+                {collectionData.eventoDuracao === "multi"
+                  ? "Início do Evento"
+                  : "Data do Evento"}
+              </Label>
+              <Input
+                id="collection-date-start"
+                className="w-full min-w-0 h-11 bg-transparent border-2 border-border-default rounded-radius-lg date-icon-right"
+                type="date"
+                value={collectionData.dataInicio}
+                onChange={(e) => onDataChange("dataInicio", e.target.value)}
+              />
+            </div>
+            {collectionData.eventoDuracao === "multi" ? (
+              <div className="space-y-1.5 w-full min-w-0">
+                <Label htmlFor="collection-date-end">Fim do Evento</Label>
+                <Input
+                  id="collection-date-end"
+                  className="w-full min-w-0 h-11 bg-transparent border-2 border-border-default rounded-radius-lg date-icon-right"
+                  type="date"
+                  value={collectionData.dataFim}
+                  onChange={(e) => onDataChange("dataFim", e.target.value)}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -110,41 +149,11 @@ export default function BasicDetailsTab({ collectionData, onDataChange }) {
           />
         </div>
 
-        <div
-          role="group"
-          aria-labelledby="face-recognition-label"
-          aria-describedby="face-recognition-desc"
-          className="flex items-start gap-3 rounded-md border p-4 md:p-5 bg-primary/5 border-primary/20 min-h-[44px] touch-manipulation"
-        >
-          <Checkbox
-            id="face-recognition"
-            checked={collectionData.faceRecognitionEnabled}
-            onCheckedChange={(checked) =>
-              onDataChange("faceRecognitionEnabled", !!checked)
-            }
-            className="mt-0.5 h-5 w-5 shrink-0 rounded border-white/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-            aria-describedby="face-recognition-desc"
-          />
-          <div className="space-y-1 leading-none min-w-0 flex-1">
-            <Label
-              id="face-recognition-label"
-              htmlFor="face-recognition"
-              className="text-sm font-bold leading-none cursor-pointer text-white flex items-center gap-2 flex-wrap"
-            >
-              Ativar Reconhecimento Facial (IA)
-              <span className="text-[10px] bg-primary text-black px-1.5 py-0.5 rounded-full font-black uppercase shrink-0">
-                Premium
-              </span>
-            </Label>
-            <p
-              id="face-recognition-desc"
-              className="text-xs text-muted-foreground"
-            >
-              Permite que os clientes encontrem suas fotos através de uma selfie
-              utilizando IA da AWS.
-            </p>
-          </div>
+        {/* TODO: Reconhecimento facial desabilitado até Rekognition estar configurado
+        <div role="group" ...>
+          <Checkbox ... Ativar Reconhecimento Facial (IA) ... />
         </div>
+        */}
 
         {/* 
         <div className="space-y-1.5 w-full max-w-full min-w-0">

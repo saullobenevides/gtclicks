@@ -56,7 +56,13 @@ export default function MyFavoritesPage() {
           }
         >
           {likedPhotos.map((photo) => (
-            <PhotoCard key={photo.id} photo={photo} contextList={likedPhotos} />
+            <PhotoCard
+              key={photo.id}
+              photo={photo}
+              contextList={likedPhotos}
+              variant="centered-hover"
+              showSelection={false}
+            />
           ))}
         </ResponsiveGrid>
       )}

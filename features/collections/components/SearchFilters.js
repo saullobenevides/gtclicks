@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -10,149 +8,91 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useState } from "react";
-import { Filter, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Search } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function SearchFilters({ filters }) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function SearchFilters({ filters, cities = [] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Local state to manage inputs before applying
-  const [query, setQuery] = useState(filters.q || "");
-  const [category, setCategory] = useState(filters.categoria || "all");
-  const [date, setDate] = useState(filters.date || "");
+  const query = filters.q || "";
+  const category = filters.categoria || "all";
+  const city = filters.cidade || "all";
+  const date = filters.date || "";
 
-  const handleApplyFilters = (e) => {
-    e.preventDefault();
-
-    // Construct URL params
+  const handleChange = (key, value) => {
     const params = new URLSearchParams(searchParams);
-
-    if (query) params.set("q", query);
-    else params.delete("q");
-
-    if (category && category !== "all") params.set("categoria", category);
-    else params.delete("categoria");
-
-    if (date) params.set("date", date);
-    else params.delete("date");
-
-    // Reset page to 1 on new filter
+    if (value && value !== "all") params.set(key, value);
+    else params.delete(key);
     params.delete("page");
+    router.push(`/busca?${params.toString()}`);
+  };
 
-    router.push(`?${params.toString()}`);
-    setIsOpen(false); // Close mobile drawer if open
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const q = form.q?.value?.trim() || "";
+    handleChange("q", q);
   };
 
   return (
-    <aside className="w-full max-w-3xl mx-auto h-fit z-30 lg:sticky lg:top-24">
-      {/* Toggle Button (Mobile Only) */}
-      <div className="mb-4 lg:hidden">
-        <Button
-          onClick={() => setIsOpen(!isOpen)}
-          variant="outline"
-          className="w-full justify-between bg-black/40 border-white/10 text-white backdrop-blur-md h-12"
-        >
-          <span className="flex items-center gap-2 font-semibold">
-            <Filter className="h-4 w-4" /> Filtros
-          </span>
-          {isOpen ? (
-            <X className="h-4 w-4" />
-          ) : (
-            <span className="text-xs text-muted-foreground">Mostrar</span>
-          )}
-        </Button>
+    <form
+      key={`${query}-${category}-${city}-${date}`}
+      onSubmit={handleSubmit}
+      className="w-full flex flex-col sm:flex-row gap-3 sm:gap-4"
+    >
+      <div className="relative flex-1 min-w-0">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Input
+          name="q"
+          defaultValue={query}
+          placeholder="Buscar coleções, eventos ou fotógrafos..."
+          className="pl-9 h-11 bg-white dark:bg-zinc-900/50 border-border rounded-lg"
+        />
       </div>
 
-      <form
-        onSubmit={handleApplyFilters}
-        className={cn(
-          "transition-all duration-300 lg:block",
-          isOpen ? "block animate-in fade-in zoom-in-95" : "hidden",
-        )}
+      <Select
+        value={category}
+        onValueChange={(v) => handleChange("categoria", v)}
       >
-        <Card className="bg-black border-white/10 rounded-xl shadow-2xl p-4">
-          <CardHeader className="p-0 mb-3">
-            <CardTitle className="text-lg font-bold text-white">
-              Filtros
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 flex flex-col gap-3">
-            <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="q" className="text-xs font-medium text-gray-300">
-                Palavra-chave
-              </Label>
-              <Input
-                id="q"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Ex: natureza, retrato..."
-                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 rounded-lg focus:border-primary/50 focus:ring-primary/20 h-9 text-sm"
-              />
-            </div>
+        <SelectTrigger className="w-full sm:w-[180px] h-11 bg-white dark:bg-zinc-900/50 border-border rounded-lg">
+          <SelectValue placeholder="Categoria" />
+        </SelectTrigger>
+        <SelectContent className="max-h-[300px] overflow-y-auto">
+          <SelectItem value="all">Todas as categorias</SelectItem>
+          {CATEGORIES.map((cat) => (
+            <SelectItem key={cat} value={cat}>
+              {cat}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-            <div className="grid w-full items-center gap-1.5">
-              <Label
-                htmlFor="categoria"
-                className="text-xs font-medium text-gray-300"
-              >
-                Categoria
-              </Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white rounded-lg focus:ring-primary/20 h-9 text-sm">
-                  <SelectValue placeholder="Todas as categorias" />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-900 border-zinc-800 text-white max-h-[300px] overflow-y-auto">
-                  <SelectItem value="all">Todas as categorias</SelectItem>
-                  {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      <Select value={city} onValueChange={(v) => handleChange("cidade", v)}>
+        <SelectTrigger className="w-full sm:w-[180px] h-11 bg-white dark:bg-zinc-900/50 border-border rounded-lg">
+          <SelectValue placeholder="Cidade" />
+        </SelectTrigger>
+        <SelectContent className="max-h-[300px] overflow-y-auto">
+          <SelectItem value="all">Todas as cidades</SelectItem>
+          {cities.map((c) => (
+            <SelectItem key={c} value={c}>
+              {c}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-            <div className="grid w-full items-center gap-1.5">
-              <Label
-                htmlFor="date"
-                className="text-xs font-medium text-gray-300"
-              >
-                Data do Evento
-              </Label>
-              <div className="relative">
-                <Input
-                  id="date"
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  placeholder="dd/mm/aaaa"
-                  className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 rounded-lg focus:border-primary/50 focus:ring-primary/20 h-9 w-full text-sm scheme-dark date-icon-right"
-                />
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="p-0 mt-4">
-            <Button
-              type="submit"
-              className="w-full h-12 font-black uppercase tracking-widest text-xs scale-100 hover:scale-[1.02] transition-all"
-            >
-              Aplicar Filtros
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
-    </aside>
+      <div className="flex-1 sm:flex-initial sm:w-[180px] min-w-0">
+        <Input
+          id="search-date"
+          type="date"
+          aria-label="Data"
+          value={date}
+          onChange={(e) => handleChange("date", e.target.value)}
+          className="w-full h-11 bg-transparent dark:bg-zinc-900/50 border-2 border-border-default rounded-radius-lg date-icon-right"
+        />
+      </div>
+    </form>
   );
 }

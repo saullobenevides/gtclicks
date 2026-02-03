@@ -36,7 +36,9 @@ export default function PricingTab({
             Preço Unitário da Foto
           </Label>
           <div className="space-y-1.5 max-w-xs">
-            <Label htmlFor="price">Preço por Foto (R$)</Label>
+            <Label htmlFor="price">
+              Preço por Foto (R$) <span className="text-primary">*</span>
+            </Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold z-10">
                 R$

@@ -1,47 +1,17 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Trophy, Medal, Crown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { PageSection, SectionHeader } from "@/components/shared/layout";
+import { Crown, ChevronDown } from "lucide-react";
+import { cn, formatCurrency } from "@/lib/utils";
+import { PageSection } from "@/components/shared/layout";
 
-export default function BuyerRanking({ buyers = [] }) {
-  if (!buyers || buyers.length === 0) return null;
-
-  // Reorder for Podium: 2nd, 1st, 3rd (if we have at least 3)
-  const podiumOrder = [];
-  if (buyers.length >= 2) podiumOrder.push(buyers[1]);
-  if (buyers.length >= 1) podiumOrder.push(buyers[0]);
-  if (buyers.length >= 3) podiumOrder.push(buyers[2]);
-
-  // If less than 3, just show them in order
-  const displayBuyers = buyers.length < 3 ? buyers : podiumOrder;
-
-  const getRankIcon = (rank) => {
-    switch (rank) {
-      case 1:
-        return <Crown className="h-6 w-6 text-yellow-500 fill-yellow-500" />;
-      case 2:
-        return <Medal className="h-6 w-6 text-slate-400 fill-slate-400" />;
-      case 3:
-        return <Medal className="h-6 w-6 text-amber-700 fill-amber-700" />;
-      default:
-        return <Trophy className="h-5 w-5 text-text-muted" />;
-    }
-  };
-
-  const getPodiumHeight = (rank) => {
-    if (buyers.length < 3) return "h-auto";
-    switch (rank) {
-      case 1:
-        return "md:h-64 h-auto scale-105 z-10";
-      case 2:
-        return "md:h-52 h-auto";
-      case 3:
-        return "md:h-48 h-auto";
-      default:
-        return "h-auto";
-    }
-  };
+export default function BuyerRanking({
+  buyers = [],
+  month = "",
+  lastMonthWinner = null,
+  lastMonthName = "",
+}) {
+  const hasContent =
+    (lastMonthWinner && lastMonthWinner.name) || (buyers && buyers.length > 0);
+  if (!hasContent) return null;
 
   return (
     <PageSection
@@ -49,62 +19,120 @@ export default function BuyerRanking({ buyers = [] }) {
       containerWide
       className="bg-surface-section border-y border-border-subtle"
     >
-      <SectionHeader
-        title={
-          <span className="flex items-center gap-3">
-            <Trophy className="h-8 w-8 text-action-primary" /> TOP COMPRADORES
-          </span>
-        }
-        description="Os maiores apoiadores da comunidade"
-      />
+      <div className="max-w-2xl mx-auto">
+        {/* Banner RANKING */}
+        <div className="rounded-2xl bg-action-primary shadow-lg px-6 py-4 mb-6">
+          <h2 className="text-text-on-brand font-black text-xl uppercase tracking-tight text-center">
+            Ranking
+          </h2>
+        </div>
 
-      <div className="flex flex-col md:flex-row gap-6 justify-center items-center md:items-end max-w-4xl mx-auto">
-        {displayBuyers.map((buyer) => (
-          <Card
-            key={buyer.id}
-            className={cn(
-              "w-full max-w-sm md:w-1/3 relative border-border-default overflow-visible transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
-              getPodiumHeight(buyer.rank),
-              buyer.rank === 1
-                ? "border-action-primary/50 bg-surface-elevated shadow-md"
-                : "bg-surface-card",
-            )}
-          >
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-surface-page p-2 rounded-full border border-border-subtle shadow-sm z-20">
-              {getRankIcon(buyer.rank)}
-            </div>
-
-            <CardContent className="flex flex-col items-center justify-center p-6 h-full text-center pt-8">
-              <Avatar
-                className={cn(
-                  "border-2 mb-4",
-                  buyer.rank === 1
-                    ? "h-24 w-24 border-yellow-500 ring-4 ring-yellow-500/20"
-                    : "h-16 w-16 border-surface-subtle",
-                )}
-              >
-                <AvatarImage
-                  src={buyer.avatar}
-                  alt={buyer.name}
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-surface-subtle font-bold text-text-primary">
-                  {buyer.name?.substring(0, 2).toUpperCase() || "US"}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="space-y-1">
-                <h3 className="font-bold text-lg leading-tight line-clamp-1">
-                  {buyer.name || "Usuário Anônimo"}
+        {/* Card branco com as seções */}
+        <div className="rounded-2xl bg-surface-card border border-border-default shadow-md overflow-hidden">
+          {/* ÚLTIMO VENCEDOR */}
+          {lastMonthWinner && lastMonthWinner.name && (
+            <>
+              <div className="px-6 py-5">
+                <h3 className="font-bold text-text-primary text-sm uppercase tracking-wider mb-4">
+                  Último vencedor
+                  {lastMonthName && (
+                    <span className="font-normal text-text-secondary normal-case ml-1">
+                      ({lastMonthName})
+                    </span>
+                  )}
                 </h3>
-                <div className="text-sm text-text-secondary font-medium">
-                  {buyer.ordersCount}{" "}
-                  {buyer.ordersCount === 1 ? "compra" : "compras"}
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <Avatar className="h-14 w-14 border-2 border-surface-subtle">
+                      <AvatarImage
+                        src={lastMonthWinner.avatar}
+                        alt={lastMonthWinner.name}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="bg-surface-subtle font-bold text-text-primary">
+                        {lastMonthWinner.name?.substring(0, 2).toUpperCase() ||
+                          "US"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -top-1 -left-1 bg-yellow-500 rounded-full p-1">
+                      <Crown className="h-4 w-4 text-white fill-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg text-text-primary">
+                      {lastMonthWinner.name || "Usuário"}
+                    </p>
+                    <p className="text-sm text-text-secondary">
+                      {formatCurrency(lastMonthWinner.totalSpent || 0)} em{" "}
+                      {lastMonthWinner.ordersCount}{" "}
+                      {lastMonthWinner.ordersCount === 1 ? "compra" : "compras"}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+              {buyers.length > 0 && (
+                <div className="border-t border-border-subtle" />
+              )}
+            </>
+          )}
+
+          {/* RANKING DO MÊS */}
+          {buyers.length > 0 && (
+            <div className="px-6 py-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-text-primary text-sm uppercase tracking-wider">
+                  Ranking do mês
+                  {month && (
+                    <span className="font-normal text-text-secondary normal-case ml-1">
+                      ({month})
+                    </span>
+                  )}
+                </h3>
+                <span className="text-text-muted">
+                  <ChevronDown className="h-4 w-4" />
+                </span>
+              </div>
+              <p className="text-sm text-text-secondary mb-4">
+                O 1º lugar ganha <strong>1 foto grátis</strong> e{" "}
+                <strong>desconto nas próximas compras</strong>!
+              </p>
+              <ul className="space-y-4">
+                {buyers.map((buyer) => (
+                  <li
+                    key={buyer.id}
+                    className={cn(
+                      "flex items-center gap-4",
+                      buyer.rank === 1 &&
+                        "bg-action-primary/5 -mx-2 px-4 py-2 rounded-xl"
+                    )}
+                  >
+                    <span className="text-lg font-bold text-text-secondary w-6">
+                      {buyer.rank}.
+                    </span>
+                    <Avatar className="h-10 w-10 border border-border-subtle">
+                      <AvatarImage
+                        src={buyer.avatar}
+                        alt={buyer.name}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="bg-surface-subtle text-sm font-bold text-text-primary">
+                        {buyer.name?.substring(0, 2).toUpperCase() || "US"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-text-primary truncate">
+                        {buyer.name || "Usuário Anônimo"}
+                      </p>
+                      <p className="text-sm text-text-secondary">
+                        {formatCurrency(buyer.totalSpent || 0)}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </PageSection>
   );
