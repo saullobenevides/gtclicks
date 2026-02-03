@@ -19,16 +19,25 @@ import { useWindowSize } from "react-use";
 import { getPaymentDetails } from "@/actions/checkout";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCart } from "@/features/cart/context/CartContext";
 
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
-  const status = searchParams.get("status"); // 'approved', 'in_process', 'pending', 'rejected'
+  const status = searchParams.get("status"); // MP: 'approved', 'in_process', 'pending'
+  const redirectStatus = searchParams.get("redirect_status"); // Stripe: 'succeeded', 'processing', 'failed'
+  const { clearCart } = useCart();
 
-  // Determine if successful based on Mercado Pago status
-  const isApproved = status === "approved" || status === "PAGO";
+  // Determine if successful (MP ou Stripe)
+  const isApproved =
+    status === "approved" ||
+    status === "PAGO" ||
+    redirectStatus === "succeeded";
   const isPending =
-    status === "in_process" || status === "pending" || status === "PENDENTE";
+    status === "in_process" ||
+    status === "pending" ||
+    status === "PENDENTE" ||
+    redirectStatus === "processing";
 
   const [showConfetti, setShowConfetti] = useState(isApproved);
   const { width, height } = useWindowSize(); // Hooks should be at top level
@@ -42,6 +51,13 @@ export default function CheckoutSuccessPage() {
       return () => clearTimeout(timer);
     }
   }, [isApproved]);
+
+  // Limpa carrinho quando pagamento confirmado (Stripe redireciona sem passar pelo checkout)
+  useEffect(() => {
+    if (isApproved && orderId && clearCart) {
+      clearCart();
+    }
+  }, [isApproved, orderId, clearCart]);
 
   // Fetch Pix/Boleto Data if pending
   useEffect(() => {

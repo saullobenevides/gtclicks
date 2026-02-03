@@ -227,7 +227,7 @@ export default function CartPage() {
                   ⚡ Entrega automática e download imediato
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Pagamento 100% seguro via Mercado Pago
+                  Pagamento 100% seguro via Stripe
                 </p>
               </div>
             </CardFooter>

@@ -56,12 +56,17 @@ model Fotografo {
   cpf            String?   @unique
   especialidades String[]
   equipamentos   String?
+
+  // Stripe Connect (migração de MP)
+  stripeAccountId  String?   @unique
+  stripeOnboarded  Boolean   @default(false)
   
   fotos          Foto[]
   colecoes       Colecao[]
   saldo          Saldo?
   transacoes     Transacao[]
   saques         SolicitacaoSaque[]
+  pendingTransfers PendingTransfer[]
 }
 
 // --- PRODUTOS (FOTOS) ---
@@ -345,6 +350,27 @@ model SolicitacaoSaque {
   transacoes     Transacao[]
   
   createdAt      DateTime  @default(now())
+}
+
+/// Repasses pendentes: quando fotógrafo não tinha Stripe na venda.
+/// Processado automaticamente quando configurar conta.
+model PendingTransfer {
+  id             String    @id @default(cuid())
+  fotografoId    String
+  fotografo      Fotografo @relation(fields: [fotografoId], references: [id])
+  
+  amountCents    Int       // Valor em centavos para Stripe
+  chargeId       String    // ch_xxx - necessário para criar Transfer
+  orderId        String
+  itemPedidoId   String?   // Referência ao item
+  descricao      String?
+  
+  processedAt    DateTime? // null = pendente
+  stripeTransferId String? // id do Transfer criado
+  
+  createdAt      DateTime  @default(now())
+  
+  @@index([fotografoId, processedAt])
 }
 
 model Notification {

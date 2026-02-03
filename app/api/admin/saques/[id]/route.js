@@ -10,7 +10,7 @@ export async function PATCH(request, { params }) {
   if (!user || user.role !== "ADMIN") {
     return NextResponse.json(
       { error: "Acesso não autorizado" },
-      { status: 403 },
+      { status: 403 }
     );
   }
 
@@ -32,108 +32,31 @@ export async function PATCH(request, { params }) {
     if (!saque) {
       return NextResponse.json(
         { error: "Saque não encontrado" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
     if (saque.status !== "PENDENTE") {
       return NextResponse.json(
         { error: "Saque já foi processado" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (action === "aprovar") {
-      // --- NEW: Automated Payout with Mercado Pago ---
-      try {
-        const { sendPixPayout } = await import("@/lib/mercadopago");
-        const payoutResult = await sendPixPayout({
-          amount: Number(saque.valor),
-          pixKey: saque.chavePix,
-          description: `Pagamento GT Clicks - Saque ${saque.id}`,
-          externalReference: saque.id,
-        });
+      // Sistema migrado para Stripe: saques são automáticos via Stripe Connect.
+      // Saques antigos (SolicitacaoSaque) não podem mais ser processados via PIX manual.
+      return NextResponse.json(
+        {
+          error:
+            "Sistema migrado para Stripe. Os repasses aos fotógrafos são feitos automaticamente. Para saques antigos pendentes, cancele e oriente o fotógrafo a usar o painel Stripe.",
+        },
+        { status: 400 }
+      );
+    }
 
-        if (!payoutResult.success) {
-          console.error(
-            `❌ Automatic payout failed for ${saque.id}:`,
-            payoutResult.error,
-          );
-          return NextResponse.json(
-            {
-              error: `Falha no Pix Automático: ${payoutResult.error}. O saque não foi processado no banco.`,
-            },
-            { status: 400 },
-          );
-        }
-
-        console.log(
-          `✅ Pix Automático enviado com sucesso para saque ${saque.id}. ID MP: ${payoutResult.id}`,
-        );
-      } catch (payoutErr) {
-        console.error(`❌ Payout integration error:`, payoutErr);
-        return NextResponse.json(
-          {
-            error:
-              "Erro crítico ao tentar processar o Pix. Entre em contato com o suporte.",
-          },
-          { status: 500 },
-        );
-      }
-
-      // Mark as processed logic wrapped in transaction
-      await prisma.$transaction(async (tx) => {
-        // 1. Mark withdrawal as processed
-        await tx.solicitacaoSaque.update({
-          where: { id },
-          data: {
-            status: "PROCESSADO",
-            processadoEm: new Date(),
-            observacao: "Saque processado via PIX Automático",
-          },
-        });
-
-        // 2. Update transaction status
-        await tx.transacao.updateMany({
-          where: {
-            saqueId: id,
-            tipo: "SAQUE",
-          },
-          data: {
-            status: "PROCESSADO",
-          },
-        });
-
-        // 3. Move from blocked to paid (remove from balance)
-        // Use Decimal for precision
-        const valorSaque = new Prisma.Decimal(saque.valor);
-
-        await tx.saldo.update({
-          where: { fotografoId: saque.fotografoId },
-          data: {
-            bloqueado: {
-              decrement: valorSaque,
-            },
-          },
-        });
-      });
-
-      // --- NOTIFICATION: Withdrawal Approved ---
-      try {
-        const { notifyWithdrawalProcessed } =
-          await import("@/actions/notifications");
-        await notifyWithdrawalProcessed({
-          userId: saque.fotografo.userId,
-          value: Number(saque.valor),
-          status: "APROVADO",
-        });
-      } catch (nErr) {
-        console.error("Failed to send withdrawal approval notification:", nErr);
-      }
-
-      console.log(`✅ Saque ${id} aprovado: R$ ${saque.valor} processado`);
-    } else {
-      // Cancel withdrawal logic wrapped in transaction
+    if (action === "cancelar") {
+      // Mark as cancelled logic wrapped in transaction
       await prisma.$transaction(async (tx) => {
         // 1. Cancel request
         await tx.solicitacaoSaque.update({
@@ -174,8 +97,9 @@ export async function PATCH(request, { params }) {
 
       // --- NOTIFICATION: Withdrawal Rejected ---
       try {
-        const { notifyWithdrawalProcessed } =
-          await import("@/actions/notifications");
+        const { notifyWithdrawalProcessed } = await import(
+          "@/actions/notifications"
+        );
         await notifyWithdrawalProcessed({
           userId: saque.fotografo.userId,
           value: Number(saque.valor),
@@ -184,12 +108,12 @@ export async function PATCH(request, { params }) {
       } catch (nErr) {
         console.error(
           "Failed to send withdrawal rejection notification:",
-          nErr,
+          nErr
         );
       }
 
       console.log(
-        `❌ Saque ${id} cancelado: R$ ${saque.valor} devolvido ao saldo`,
+        `❌ Saque ${id} cancelado: R$ ${saque.valor} devolvido ao saldo`
       );
     }
 
@@ -198,7 +122,7 @@ export async function PATCH(request, { params }) {
     console.error("Error processing withdrawal:", error);
     return NextResponse.json(
       { error: "Erro ao processar saque" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

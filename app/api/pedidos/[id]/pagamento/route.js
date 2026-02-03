@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { MercadoPagoConfig, Payment } from "mercadopago";
 import { getAuthenticatedUser } from "@/lib/auth";
 
 /**
  * GET /api/pedidos/[id]/pagamento
- * Retorna detalhes do pagamento (Pix, boleto, status) para pedidos pendentes.
+ * Retorna detalhes do pagamento. Para Stripe (paymentId pi_*), indica redirecionar ao checkout.
  */
 export async function GET(request, context) {
   try {
@@ -40,48 +39,21 @@ export async function GET(request, context) {
       });
     }
 
-    const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: "Configuração de pagamento indisponível" },
-        { status: 500 }
-      );
-    }
-
-    const client = new MercadoPagoConfig({ accessToken });
-    const payment = new Payment(client);
-    const paymentData = await payment.get({ id: pedido.paymentId });
-
-    let pixData = null;
-    let boletoData = null;
-
-    if (paymentData.payment_method_id === "pix") {
-      const poi = paymentData.point_of_interaction;
-      if (poi?.transaction_data) {
-        pixData = {
-          qrCode: poi.transaction_data.qr_code,
-          qrCodeBase64: poi.transaction_data.qr_code_base64,
-          ticketUrl: poi.transaction_data.ticket_url,
-          expiration: paymentData.date_of_expiration,
-        };
-      }
-    } else if (paymentData.payment_type_id === "ticket") {
-      boletoData = {
-        ticketUrl:
-          paymentData.transaction_details?.external_resource_url ||
-          paymentData.point_of_interaction?.transaction_data?.ticket_url,
-        barcode: paymentData.barcode?.content,
-        expiration: paymentData.date_of_expiration,
-      };
+    // Stripe: paymentId começa com "pi_"
+    if (pedido.paymentId.startsWith("pi_")) {
+      return NextResponse.json({
+        hasPayment: true,
+        paymentMethod: "stripe",
+        status: pedido.status,
+        redirectToCheckout: true,
+        message: "Complete o pagamento na página de checkout",
+      });
     }
 
     return NextResponse.json({
-      hasPayment: true,
-      status: paymentData.status,
-      paymentMethodId: paymentData.payment_method_id,
-      paymentTypeId: paymentData.payment_type_id,
-      pix: pixData,
-      boleto: boletoData,
+      hasPayment: false,
+      status: pedido.status,
+      message: "Sistema de pagamento migrado. Acesse o checkout para pagar.",
     });
   } catch (error) {
     console.error("[pagamento] Error:", error);

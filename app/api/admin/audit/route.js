@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
-import { MercadoPagoConfig, Payment } from "mercadopago";
+import { stripe } from "@/lib/stripe";
 
 export async function POST(request) {
   try {
@@ -13,48 +13,31 @@ export async function POST(request) {
 
     const { action, orderId } = await request.json().catch(() => ({}));
 
-    // Config MP
-    const client = new MercadoPagoConfig({
-      accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
-    });
-    const paymentClient = new Payment(client);
-
     const discrepancies = [];
 
-    // --- CHECK 1: ORDER STATUS vs MERCADO PAGO ---
-    // Fetch last 50 orders to check consistency
+    // --- CHECK 1: ORDER STATUS vs STRIPE ---
     const recentOrders = await prisma.pedido.findMany({
       take: 50,
       orderBy: { createdAt: "desc" },
       where: {
-        paymentId: { not: null }, // Only orders that initiated payment
+        paymentId: { not: null },
       },
     });
 
     for (const order of recentOrders) {
-      if (!order.paymentId) continue;
+      if (!order.paymentId || !order.paymentId.startsWith("pi_")) continue;
 
       try {
-        const mpPayment = await paymentClient.get({ id: order.paymentId });
+        const pi = await stripe.paymentIntents.retrieve(order.paymentId);
+        const stripeStatus = pi.status === "succeeded" ? "PAGO" : "PENDENTE";
 
-        let mpStatus = "PENDENTE";
-        if (mpPayment.status === "approved") mpStatus = "PAGO";
-        else if (
-          mpPayment.status === "rejected" ||
-          mpPayment.status === "cancelled"
-        )
-          mpStatus = "CANCELADO";
-
-        // Mismatch detection
-        if (order.status !== mpStatus && order.status !== "CANCELADO") {
-          // Note: We ignore if DB is CANCELADO but MP is pending/rejected, usually fine.
-          // Critical is: DB says PENDING, MP says APPROVED.
-          if (mpStatus === "PAGO" && order.status !== "PAGO") {
+        if (order.status !== stripeStatus && order.status !== "CANCELADO") {
+          if (stripeStatus === "PAGO" && order.status !== "PAGO") {
             discrepancies.push({
               type: "STATUS_MISMATCH",
               severity: "CRITICAL",
               orderId: order.id,
-              message: `Pedido ${order.id} está ${order.status} no banco, mas PAGO no Mercado Pago (${order.paymentId}).`,
+              message: `Pedido ${order.id} está ${order.status} no banco, mas PAGO no Stripe (${order.paymentId}).`,
               action: "SYNC_STATUS",
             });
           }
@@ -77,7 +60,7 @@ export async function POST(request) {
       const dbTotal = Number(order.total);
       const itemsTotal = order.itens.reduce(
         (sum, item) => sum + Number(item.precoPago),
-        0,
+        0
       );
 
       // Allow small float margin error (0.01)

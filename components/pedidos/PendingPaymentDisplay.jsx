@@ -93,7 +93,28 @@ export default function PendingPaymentDisplay({
     );
   }
 
-  // Pix
+  // Stripe: redirecionar ao checkout
+  if (data?.paymentMethod === "stripe" || data?.redirectToCheckout) {
+    return (
+      <div className="space-y-3">
+        {variant === "full" && (
+          <p className="text-sm text-muted-foreground">
+            Complete o pagamento no checkout para liberar seus downloads.
+          </p>
+        )}
+        <div className="overflow-hidden rounded-radius-lg">
+          <Button asChild className="w-full gap-2 font-bold">
+            <Link href={`/checkout?orderId=${orderId}`}>
+              <CreditCard className="h-4 w-4" />
+              Finalizar Pagamento
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Pix (legado - não usado com Stripe)
   if (data?.pix && variant === "full") {
     return (
       <Card className="overflow-hidden border-status-warning/30 bg-status-warning/5">

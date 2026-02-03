@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/features/cart/context/CartContext";
 import { useStackApp } from "@stackframe/stack";
-import PaymentBrick from "@/components/checkout/PaymentBrick";
+import StripePaymentElement from "@/components/checkout/StripePaymentElement";
 import {
   Card,
   CardContent,
@@ -83,62 +83,6 @@ export default function CheckoutPage() {
         .finally(() => setLoadingOrder(false));
     }
   }, [orderId, user]);
-
-  /** Mapeia status_detail do Mercado Pago para mensagens amigáveis */
-  const getPaymentErrorMessage = (result) => {
-    const fromError =
-      typeof result?.error === "string" ? result.error : result?.error?.message;
-    if (fromError) return fromError;
-
-    const detail = result?.status_detail;
-    const messages = {
-      rejected_by_bank:
-        "O pagamento foi recusado. Verifique os dados preenchidos (nome, CPF, endereço completo para boleto) e tente novamente.",
-      cc_rejected_bad_filled_card_number: "Número do cartão inválido.",
-      cc_rejected_bad_filled_date: "Data de validade inválida.",
-      cc_rejected_bad_filled_security_code:
-        "Código de segurança (CVV) inválido.",
-      cc_rejected_insufficient_amount:
-        "Limite insuficiente no cartão. Tente outro cartão ou método de pagamento.",
-      cc_rejected_max_attempts:
-        "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
-      cc_rejected_blacklist: "Cartão não autorizado para esta operação.",
-      cc_rejected_other_reason:
-        "O banco recusou o pagamento. Entre em contato com seu banco ou tente outro método.",
-    };
-    return messages[detail] || "Ocorreu um erro ao processar o pagamento.";
-  };
-
-  const handlePaymentResult = (result) => {
-    console.log("Payment Result Full:", result);
-
-    if (
-      result.status === "approved" ||
-      result.status === "PAGO" ||
-      result.status === "in_process" ||
-      result.status === "pending"
-    ) {
-      setIsRedirecting(true); // Prevent redirect to empty cart
-      if (!orderId) {
-        clearCart();
-      }
-      router.push(
-        `/checkout/sucesso?orderId=${
-          result.orderId || orderId || "pending"
-        }&status=${result.status}`
-      );
-    } else {
-      const errorMessage = getPaymentErrorMessage(result);
-      console.error("Payment Failed:", result);
-      toast.error("Erro no Pagamento", {
-        description: errorMessage + " Verifique os dados e tente novamente.",
-      });
-      // Mantém o mesmo pedido para retentativa: atualiza URL com orderId
-      if (result.orderId && !orderId) {
-        router.replace(`/checkout?orderId=${result.orderId}`);
-      }
-    }
-  };
 
   // Determine items and total based on mode (Cart or Order Retry)
   const displayItems = orderId ? orderItems : cartItems;
@@ -267,38 +211,41 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Right Column: Payment Brick */}
+        {/* Right Column: Payment (Stripe ou Mercado Pago) */}
         <div className="relative">
           <Card className="glass-panel border-white/10 bg-black/40 lg:sticky lg:top-24">
             <CardHeader>
               <CardTitle className="text-xl text-white">Pagamento</CardTitle>
               <CardDescription>
-                Escolha sua forma de pagamento preferida. Se tiver problemas
-                (ex.: boleto sem preencher endereço), desative temporariamente
-                bloqueadores de anúncios.
+                {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+                  ? "Escolha sua forma de pagamento: cartão, Pix ou boleto."
+                  : "O sistema de pagamento está em configuração."}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="min-h-[400px]">
-                <PaymentBrick
-                  amount={totalToPay}
-                  payer={
-                    user
-                      ? {
-                          email: user.primaryEmail || user.email,
-                          firstName:
-                            user.displayName?.split(" ")[0] ||
-                            user.name?.split(" ")[0],
-                          lastName:
-                            user.displayName?.split(" ").slice(1).join(" ") ||
-                            user.name?.split(" ").slice(1).join(" ") ||
-                            "",
-                        }
-                      : undefined
-                  }
-                  onPaymentResult={handlePaymentResult}
-                  orderId={orderId}
-                />
+                {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
+                  <StripePaymentElement
+                    amount={totalToPay}
+                    orderId={orderId}
+                    onError={(msg) =>
+                      toast.error("Erro no Pagamento", {
+                        description: msg,
+                      })
+                    }
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-16 px-4 text-center rounded-lg border border-amber-500/30 bg-amber-500/5">
+                    <p className="text-amber-200 font-medium mb-2">
+                      Pagamento temporariamente indisponível
+                    </p>
+                    <p className="text-sm text-muted-foreground max-w-md">
+                      O sistema de pagamento está em configuração. Assim que
+                      estiver disponível, você poderá finalizar sua compra aqui.
+                      Entre em contato conosco se precisar de ajuda.
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

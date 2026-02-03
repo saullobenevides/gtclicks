@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getConfigNumber, CONFIG_KEYS } from "@/lib/config";
 import { serializeDecimal, serializeModel } from "@/lib/serialization";
 
 // --- Schemas ---
@@ -15,7 +14,7 @@ const createPhotographerSchema = z.object({
     .min(3, "Username muito curto")
     .regex(
       /^[a-zA-Z0-9_]+$/,
-      "Username deve conter apenas letras, números e underline",
+      "Username deve conter apenas letras, números e underline"
     )
     .optional(),
   bio: z.string().max(500, "Bio muito longa").optional(),
@@ -209,140 +208,5 @@ export async function updatePhotographer(formData: FormData) {
   } catch (error: any) {
     console.error("[updatePhotographer] Error:", error.message);
     return { error: "Falha ao atualizar perfil" };
-  }
-}
-
-/**
- * Busca dados financeiros do fotógrafo autenticado
- */
-export async function getFinancialData() {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    return { error: "Não autorizado" };
-  }
-
-  try {
-    const fotografo = await prisma.fotografo.findUnique({
-      where: { userId: user.id },
-    });
-
-    if (!fotografo) {
-      return { error: "Perfil de fotógrafo não encontrado" };
-    }
-
-    // Using findUnique first to avoid unnecessary write (upsert)
-    let saldo = await prisma.saldo.findUnique({
-      where: { fotografoId: fotografo.id },
-    });
-
-    if (!saldo) {
-      saldo = await prisma.saldo.create({
-        data: {
-          fotografoId: fotografo.id,
-          disponivel: 0,
-          bloqueado: 0,
-        },
-      });
-    }
-
-    const transacoes = await prisma.transacao.findMany({
-      where: { fotografoId: fotografo.id },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    });
-
-    let minSaque = 50;
-    try {
-      minSaque = await getConfigNumber(CONFIG_KEYS.MIN_SAQUE);
-    } catch (configError) {
-      // Silent error for config, default fallback
-    }
-
-    // Use centralized serialization
-    const serializedSaldo = {
-      disponivel: serializeDecimal(saldo.disponivel),
-      bloqueado: serializeDecimal(saldo.bloqueado),
-    };
-
-    const serializedTransacoes = transacoes.map((t) => ({
-      ...serializeModel(t),
-      valor: serializeDecimal(t.valor),
-    }));
-
-    return {
-      success: true,
-      data: {
-        saldo: serializedSaldo,
-        transacoes: serializedTransacoes,
-        chavePix: fotografo.chavePix,
-        minSaque,
-      },
-    };
-  } catch (error: any) {
-    console.error("[getFinancialData] Error:", error.message);
-    return {
-      error: "Falha ao buscar dados financeiros",
-    };
-  }
-}
-
-/**
- * Atualiza a chave PIX do fotógrafo (requer código de verificação 2FA)
- */
-export async function updatePixKey(data: { chavePix: string; code: string }) {
-  const user = await getAuthenticatedUser();
-
-  if (!user) {
-    return { error: "Não autorizado" };
-  }
-
-  const { chavePix, code } = data;
-
-  // Simple validation
-  if (!chavePix || !code) {
-    return { error: "Chave PIX e código de verificação são obrigatórios" };
-  }
-
-  try {
-    // Verify 2FA code
-    const validCode = await prisma.verificationCode.findFirst({
-      where: {
-        email: user.email,
-        code: code,
-        type: "PIX_UPDATE",
-        expiresAt: { gt: new Date() },
-      },
-    });
-
-    if (!validCode) {
-      return { error: "Código inválido ou expirado" };
-    }
-
-    // Delete used code to prevent replay attacks
-    await prisma.verificationCode.delete({ where: { id: validCode.id } });
-
-    // Get photographer
-    const fotografo = await prisma.fotografo.findUnique({
-      where: { userId: user.id },
-    });
-
-    if (!fotografo) {
-      return { error: "Perfil de fotógrafo não encontrado" };
-    }
-
-    // Update with security: PIX key = CPF (enforced)
-    const updated = await prisma.fotografo.update({
-      where: { userId: user.id },
-      data: {
-        chavePix,
-        cpf: chavePix, // Force sync for security based on user requirements (assuming PIX is CPF)
-      },
-    });
-
-    revalidatePath("/dashboard/fotografo/financeiro");
-    return { success: true, data: serializeModel(updated) };
-  } catch (error: any) {
-    console.error("[updatePixKey] Error:", error.message);
-    return { error: "Erro ao atualizar chave PIX" };
   }
 }

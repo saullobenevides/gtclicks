@@ -38,7 +38,10 @@ export default function PhotographerLayout({ children }) {
 
     const checkProfile = async () => {
       try {
-        if (pathname === "/dashboard/fotografo/onboarding") {
+        if (
+          pathname === "/dashboard/fotografo/onboarding" ||
+          pathname === "/dashboard/fotografo/stripe-connect"
+        ) {
           setChecking(false);
           return;
         }
