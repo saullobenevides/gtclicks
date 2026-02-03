@@ -1,7 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { CATEGORIES } from "@/lib/constants";
-import { PageSection, SectionHeader } from "@/components/shared/layout";
+import {
+  PageSection,
+  SectionHeader,
+  PageBreadcrumbs,
+} from "@/components/shared/layout";
 
 // Imagens Unsplash verificadas - uma para cada categoria
 const REAL_IMAGES = {
@@ -195,6 +199,7 @@ const getCategoryImage = (category) => {
 export default function CategoriesPage() {
   return (
     <PageSection variant="default" containerWide>
+      <PageBreadcrumbs className="mb-6" />
       <SectionHeader
         isLanding
         badge="Categorias"

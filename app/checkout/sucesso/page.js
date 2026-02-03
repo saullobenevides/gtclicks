@@ -19,6 +19,9 @@ import { useWindowSize } from "react-use";
 import { getPaymentDetails } from "@/actions/checkout";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
+import { PageBreadcrumbs } from "@/components/shared/layout";
+import BackButton from "@/components/shared/BackButton";
+import CheckoutSteps from "@/components/checkout/CheckoutSteps";
 
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
@@ -67,6 +70,20 @@ export default function CheckoutSuccessPage() {
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center container-wide px-4 text-center py-12 sm:py-20 relative overflow-hidden">
+      <div className="absolute top-24 left-4 right-4 z-10 flex flex-col items-center gap-4">
+        <div className="w-full flex justify-start">
+          <BackButton href="/checkout" label="Voltar ao pagamento" />
+        </div>
+        <PageBreadcrumbs
+          items={[
+            { label: "Carrinho", href: "/carrinho", isLast: false },
+            { label: "Pagamento", href: "/checkout", isLast: false },
+            { label: "Confirmação", isLast: true },
+          ]}
+          className="w-full"
+        />
+        <CheckoutSteps className="w-full" />
+      </div>
       {showConfetti && (
         <Confetti
           width={width}

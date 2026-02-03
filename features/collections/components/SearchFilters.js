@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -8,32 +9,67 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
+
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debouncedValue;
+}
 
 export default function SearchFilters({ filters, cities = [] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [queryInput, setQueryInput] = useState(filters.q || "");
+  const debouncedQuery = useDebounce(queryInput, 400);
+
+  useEffect(() => {
+    setQueryInput(filters.q || "");
+  }, [filters.q]);
 
   const query = filters.q || "";
   const category = filters.categoria || "all";
   const city = filters.cidade || "all";
   const date = filters.date || "";
 
+  const updateUrl = useCallback(
+    (updates) => {
+      const params = new URLSearchParams(searchParams);
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value && value !== "all") params.set(key, value);
+        else params.delete(key);
+      });
+      params.delete("page");
+      router.push(`/busca?${params.toString()}`);
+    },
+    [router, searchParams]
+  );
+
+  const isSearching = queryInput !== debouncedQuery;
+
+  useEffect(() => {
+    if (debouncedQuery !== query) {
+      updateUrl({ q: debouncedQuery });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when debounced query changes
+  }, [debouncedQuery]);
+
   const handleChange = (key, value) => {
-    const params = new URLSearchParams(searchParams);
-    if (value && value !== "all") params.set(key, value);
-    else params.delete(key);
-    params.delete("page");
-    router.push(`/busca?${params.toString()}`);
+    if (key === "q") setQueryInput(value);
+    updateUrl({ [key]: value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
     const q = form.q?.value?.trim() || "";
-    handleChange("q", q);
+    setQueryInput(q);
+    updateUrl({ q });
   };
 
   return (
@@ -43,12 +79,25 @@ export default function SearchFilters({ filters, cities = [] }) {
       className="w-full flex flex-col sm:flex-row gap-3 sm:gap-4"
     >
       <div className="relative flex-1 min-w-0">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        {isSearching ? (
+          <Loader2
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin pointer-events-none"
+            aria-hidden
+          />
+        ) : (
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none"
+            aria-hidden
+          />
+        )}
         <Input
           name="q"
-          defaultValue={query}
+          value={queryInput}
+          onChange={(e) => setQueryInput(e.target.value)}
           placeholder="Buscar coleções, eventos ou fotógrafos..."
-          className="pl-9 h-11 bg-white dark:bg-zinc-900/50 border-border rounded-lg"
+          className="pl-9 h-11 bg-white dark:bg-zinc-900/50 border-border rounded-lg min-h-[44px]"
+          aria-label="Buscar"
+          aria-busy={isSearching}
         />
       </div>
 

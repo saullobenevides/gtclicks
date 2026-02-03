@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/features/cart/context/CartContext";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import {
@@ -41,19 +41,23 @@ export default function PhotoModalContent({ photo, onClose, onNext, onPrev }) {
   }, [onNext, onPrev, onClose]);
 
   const handleAddToCart = () => {
+    const titulo = formatCartItemTitle({
+      collectionName: photo.colecao?.nome,
+      numeroSequencial: photo.numeroSequencial,
+      photoId: photo.id,
+    });
     addToCart({
       fotoId: photo.id,
       colecaoId: photo.colecaoId || photo.colecao?.id,
-      titulo: formatCartItemTitle({
-        collectionName: photo.colecao?.nome,
-        numeroSequencial: photo.numeroSequencial,
-        photoId: photo.id,
-      }),
+      titulo,
       preco: price,
       precoBase: price,
       descontos: photo.colecao?.descontos || [],
       licenca: LICENSE_MVP_LABEL,
       previewUrl: photo.previewUrl,
+    });
+    toast.success("Adicionado ao carrinho", {
+      description: titulo,
     });
   };
 

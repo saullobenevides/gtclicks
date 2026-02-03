@@ -1,15 +1,20 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Search } from "lucide-react";
 import { searchCollections, getDistinctCities } from "@/lib/data/marketplace";
 import { CollectionCard } from "@/components/shared/cards";
-
+import EmptyState from "@/components/shared/states/EmptyState";
 import SearchFilters from "@/features/collections/components/SearchFilters";
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import SelfieSearch from "@/components/search/SelfieSearch"; // TODO: Rekognition desabilitado
 import AppPagination from "@/components/shared/AppPagination";
 
-import { PageSection, SectionHeader } from "@/components/shared/layout";
+import {
+  PageSection,
+  SectionHeader,
+  PageBreadcrumbs,
+} from "@/components/shared/layout";
 
 // Revalidate every 10 minutes
 export const revalidate = 600;
@@ -36,6 +41,7 @@ export default async function SearchPage(props) {
 
   return (
     <PageSection variant="default" containerWide>
+      <PageBreadcrumbs className="mb-6" />
       <SectionHeader
         isLanding
         badge="Explorar"
@@ -57,18 +63,36 @@ export default async function SearchPage(props) {
           <div className="space-y-8">
             <SearchFilters filters={rawFilters} cities={cities} />
 
+            {results.length > 0 && (
+              <p className="text-sm text-muted-foreground">
+                {metadata.total}{" "}
+                {metadata.total === 1
+                  ? "coleção encontrada"
+                  : "coleções encontradas"}
+              </p>
+            )}
+
             <div className="min-w-0">
               {results.length === 0 ? (
-                <div className="col-span-full py-16 sm:py-24 px-4 sm:px-8 text-center glass-panel border-dashed border-white/10 bg-transparent rounded-xl">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
-                    Nenhuma coleção encontrada
-                  </h2>
-                  <p className="text-muted-foreground text-base sm:text-lg mb-6 max-w-md mx-auto">
-                    Tente buscar por local ou categoria do evento.
-                  </p>
-                  <Button asChild variant="outline" className="min-h-[44px]">
-                    <Link href="/busca">Ver tudo</Link>
-                  </Button>
+                <div className="col-span-full py-16 sm:py-24 px-4 sm:px-8 glass-panel border-dashed border-white/10 bg-transparent rounded-xl">
+                  <EmptyState
+                    icon={Search}
+                    title="Nenhuma coleção encontrada"
+                    description="Tente buscar por local ou categoria do evento."
+                    variant="default"
+                  />
+                  <div className="flex flex-wrap gap-3 justify-center mt-6">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="min-h-[44px] touch-manipulation"
+                    >
+                      <Link href="/busca">Limpar filtros</Link>
+                    </Button>
+                    <Button asChild className="min-h-[44px] touch-manipulation">
+                      <Link href="/categorias">Explorar categorias</Link>
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex flex-col gap-8">

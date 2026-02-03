@@ -41,15 +41,56 @@ export default function Header() {
     return () => window.removeEventListener("keydown", handleEscape);
   }, []);
 
+  const [searchHistory, setSearchHistory] = useState([]);
+  const SEARCH_HISTORY_KEY = "gtclicks-search-history";
+  const MAX_HISTORY = 5;
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SEARCH_HISTORY_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setSearchHistory(
+          Array.isArray(parsed) ? parsed.slice(0, MAX_HISTORY) : []
+        );
+      }
+    } catch {
+      setSearchHistory([]);
+    }
+  }, []);
+
+  const addToSearchHistory = (q) => {
+    if (!q?.trim()) return;
+    setSearchHistory((prev) => {
+      const next = [q.trim(), ...prev.filter((x) => x !== q.trim())].slice(
+        0,
+        MAX_HISTORY
+      );
+      try {
+        localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const q = e.target.search?.value?.trim();
     setIsSearchOpen(false);
     if (q) {
+      addToSearchHistory(q);
       router.push(`/busca?q=${encodeURIComponent(q)}`);
     } else {
       router.push("/busca");
     }
+  };
+
+  const handleHistoryClick = (term) => {
+    setIsSearchOpen(false);
+    addToSearchHistory(term);
+    router.push(`/busca?q=${encodeURIComponent(term)}`);
   };
 
   useEffect(() => {
@@ -213,19 +254,42 @@ export default function Header() {
           </button>
           <form onSubmit={handleSearchSubmit} className="w-full max-w-2xl px-6">
             <div className="relative">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground pointer-events-none" />
+              <Search
+                className="absolute left-6 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground pointer-events-none"
+                aria-hidden
+              />
               <Input
                 ref={searchInputRef}
                 name="search"
                 type="search"
                 placeholder="Buscar coleções, eventos ou fotógrafos..."
-                className="pl-16 h-16 text-xl bg-black/40 border-2 border-white/20 text-white placeholder:text-muted-foreground rounded-2xl w-full focus-visible:ring-primary focus-visible:border-primary"
+                className="pl-16 h-16 text-xl bg-black/40 border-2 border-white/20 text-white placeholder:text-muted-foreground rounded-2xl w-full focus-visible:ring-primary focus-visible:border-primary transition-colors duration-200"
                 autoComplete="off"
+                aria-label="Campo de busca"
               />
             </div>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               Pressione Enter para buscar
             </p>
+            {searchHistory.length > 0 && (
+              <div className="mt-8 w-full max-w-2xl mx-auto">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
+                  Buscas recentes
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {searchHistory.map((term) => (
+                    <button
+                      key={term}
+                      type="button"
+                      onClick={() => handleHistoryClick(term)}
+                      className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/15 text-sm text-white border border-white/10 hover:border-white/20 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    >
+                      {term}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </form>
         </DialogContent>
       </Dialog>

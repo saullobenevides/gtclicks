@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useUser } from "@stackframe/stack";
-import Link from "next/link";
 import { PageSection, SectionHeader } from "@/components/shared/layout";
 import { ResponsiveGrid } from "@/components/shared/layout";
-import { EmptyState, LoadingState } from "@/components/shared/states";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/components/shared/states";
 import { ImageIcon } from "lucide-react";
 import { getLikedPhotos } from "@/actions/photos";
 import PhotoCard from "@/components/shared/cards/PhotoCard";
@@ -14,18 +17,24 @@ export default function MyFavoritesPage() {
   const user = useUser({ or: "redirect" });
   const [likedPhotos, setLikedPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchFavorites = useCallback(() => {
+    setError(null);
+    setLoading(true);
+    getLikedPhotos()
+      .then((res) => {
+        if (res.success && Array.isArray(res.data)) {
+          setLikedPhotos(res.data);
+        }
+      })
+      .catch(() => setError("Não foi possível carregar seus favoritos."))
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
-    if (user) {
-      getLikedPhotos()
-        .then((res) => {
-          if (res.success && Array.isArray(res.data)) {
-            setLikedPhotos(res.data);
-          }
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [user]);
+    if (user) fetchFavorites();
+  }, [user, fetchFavorites]);
 
   return (
     <PageSection variant="default">
@@ -38,6 +47,12 @@ export default function MyFavoritesPage() {
 
       {loading ? (
         <LoadingState variant="skeleton" count={8} size="lg" />
+      ) : error ? (
+        <ErrorState
+          title="Erro ao carregar"
+          message={error}
+          onRetry={fetchFavorites}
+        />
       ) : (
         <ResponsiveGrid
           cols={{ sm: 1, md: 2, lg: 3, xl: 4 }}

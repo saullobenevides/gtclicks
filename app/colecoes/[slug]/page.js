@@ -11,6 +11,7 @@ import ShareButton from "@/components/shared/actions/ShareButton";
 import ViewTracker from "@/components/analytics/ViewTracker";
 import CollectionSearchClient from "@/features/collections/components/CollectionSearchClient";
 import PageContainer from "@/components/shared/layout/PageContainer";
+import { PageBreadcrumbs } from "@/components/shared/layout";
 
 // New Components
 import CollectionHero from "./_components/CollectionHero";
@@ -78,6 +79,17 @@ export default async function CollectionDetail({ params, searchParams }) {
   return (
     <div className="min-h-screen bg-background">
       <ViewTracker entityId={collection.id} type="colecao" />
+
+      {/* Breadcrumbs - absolute over hero */}
+      <div className="absolute top-20 left-4 right-4 z-20 container-wide">
+        <PageBreadcrumbs
+          items={[
+            { label: "Coleções", href: "/busca", isLast: false },
+            { label: collection.title, isLast: true },
+          ]}
+          className="text-white/80 [&_a]:text-white/80 [&_a:hover]:text-white [&_span]:text-white"
+        />
+      </div>
 
       {/* 1. HERO SECTION (Figma Node 35:155 equivalent) */}
       <CollectionHero collection={collection} />

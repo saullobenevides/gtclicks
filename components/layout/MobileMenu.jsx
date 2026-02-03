@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X, Heart, Search as SearchIcon } from "lucide-react";
+import { X, Heart, Search as SearchIcon, ShoppingCart } from "lucide-react";
+import { useCart } from "@/features/cart/context/CartContext";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import {
@@ -18,6 +19,7 @@ import { siteConfig } from "@/config/site";
 
 export default function MobileMenu({ id = "mobile-menu", isOpen, onClose }) {
   const pathname = usePathname();
+  const { itemCount, setIsCartOpen } = useCart();
 
   const mainNavItems = siteConfig.navItems.filter(
     (item) => !["/meus-favoritos", "/carrinho"].includes(item.href)
@@ -111,6 +113,40 @@ export default function MobileMenu({ id = "mobile-menu", isOpen, onClose }) {
             <Heart className="h-5 w-5 shrink-0" />
             Meus Favoritos
           </Link>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsCartOpen(true);
+              onClose();
+            }}
+            className={cn(
+              "flex items-center gap-3 min-h-[48px] px-4 py-3 rounded-xl text-base font-medium transition-colors w-full text-left",
+              pathname === "/carrinho"
+                ? "bg-white/10 text-white"
+                : "text-muted-foreground hover:text-white hover:bg-white/5"
+            )}
+            aria-label={
+              itemCount > 0
+                ? `Carrinho com ${itemCount} ${
+                    itemCount === 1 ? "item" : "itens"
+                  }`
+                : "Abrir carrinho"
+            }
+          >
+            <div className="relative">
+              <ShoppingCart className="h-5 w-5 shrink-0" />
+              {itemCount > 0 && (
+                <span
+                  className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-[10px] font-bold flex items-center justify-center text-primary-foreground"
+                  aria-hidden
+                >
+                  {itemCount > 9 ? "9+" : itemCount}
+                </span>
+              )}
+            </div>
+            Carrinho {itemCount > 0 && `(${itemCount})`}
+          </button>
 
           <div className="mt-auto pt-8 pb-4">
             <Suspense>

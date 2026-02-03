@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { PageSection, SectionHeader } from "@/components/shared/layout";
+import { Button } from "@/components/ui/button";
+import {
+  PageSection,
+  SectionHeader,
+  PageBreadcrumbs,
+} from "@/components/shared/layout";
+import EmptyState from "@/components/shared/states/EmptyState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +46,7 @@ export default async function FotografosPage(props) {
 
   return (
     <PageSection variant="default" containerWide className="min-h-screen">
+      <PageBreadcrumbs className="mb-6" />
       <SectionHeader
         isLanding
         badge="Nossa Comunidade"
@@ -52,15 +59,14 @@ export default async function FotografosPage(props) {
       </div>
 
       {fotografos.length === 0 ? (
-        <div className="text-center py-20 bg-surface-subtle/50 rounded-radius-2xl border-2 border-dashed border-border-subtle">
-          <Camera className="h-12 w-12 text-text-muted mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-text-base">
-            Nenhum fotógrafo encontrado
-          </h3>
-          <p className="text-text-muted mt-2">
-            Nossa comunidade está crescendo. Volte em breve!
-          </p>
-        </div>
+        <EmptyState
+          icon={Camera}
+          title="Nenhum fotógrafo encontrado"
+          description="Tente outros filtros ou explore nossas categorias."
+          action={{ label: "Explorar categorias", href: "/categorias" }}
+          variant="default"
+          className="py-20 bg-surface-subtle/50 rounded-radius-2xl border-2 border-dashed border-border-subtle"
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
           {fotografos.map((fotografo) => (

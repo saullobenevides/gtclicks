@@ -18,6 +18,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Loader2, ShieldCheck, Lock, CreditCard } from "lucide-react";
 import { toast } from "sonner";
+import { PageBreadcrumbs } from "@/components/shared/layout";
+import BackButton from "@/components/shared/BackButton";
+import CheckoutSteps from "@/components/checkout/CheckoutSteps";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -133,8 +136,11 @@ export default function CheckoutPage() {
 
   if (isLoadingUser || !user || loadingOrder) {
     return (
-      <div className="flex h-[60vh] w-full items-center justify-center">
+      <div className="flex flex-col h-[60vh] w-full items-center justify-center gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-muted-foreground text-sm">
+          {loadingOrder ? "Carregando pedido..." : "Preparando checkout..."}
+        </p>
       </div>
     );
   }
@@ -163,13 +169,25 @@ export default function CheckoutPage() {
 
   return (
     <div className="container-wide px-4 py-12 md:py-20">
-      <div className="mb-10 text-center">
-        <h1 className="heading-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2">
-          {orderId ? "Finalizar Pagamento" : "Finalizar Compra"}
-        </h1>
-        <p className="text-muted-foreground flex items-center justify-center gap-2">
-          <Lock className="w-4 h-4" /> Ambiente Seguro
-        </p>
+      <div className="mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <BackButton href="/carrinho" label="Voltar ao carrinho" />
+          <PageBreadcrumbs
+            items={[
+              { label: "Carrinho", href: "/carrinho", isLast: false },
+              { label: "Pagamento", isLast: true },
+            ]}
+          />
+        </div>
+        <CheckoutSteps className="mb-6" />
+        <div className="text-center">
+          <h1 className="heading-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight mb-2">
+            {orderId ? "Finalizar Pagamento" : "Finalizar Compra"}
+          </h1>
+          <p className="text-muted-foreground flex items-center justify-center gap-2">
+            <Lock className="w-4 h-4" /> Ambiente Seguro
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-12">

@@ -47,6 +47,7 @@ describe("Collections Actions", () => {
 
       const formData = new FormData();
       formData.append("nome", "Test Collection");
+      formData.append("categoria", "Surf");
       formData.append("status", "RASCUNHO");
 
       const result = await createCollection(formData);
@@ -56,9 +57,10 @@ describe("Collections Actions", () => {
         expect.objectContaining({
           data: expect.objectContaining({
             nome: "Test Collection",
+            categoria: "Surf",
             fotografoId: "foto1",
           }),
-        }),
+        })
       );
     });
 
@@ -82,7 +84,7 @@ describe("Collections Actions", () => {
       expect(prisma.colecao.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { fotografoId: "foto1" },
-        }),
+        })
       );
     });
   });

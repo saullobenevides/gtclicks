@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@stackframe/stack";
@@ -19,7 +19,11 @@ import {
   SectionHeader,
   ResponsiveGrid,
 } from "@/components/shared/layout";
-import { EmptyState, LoadingState } from "@/components/shared/states";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/components/shared/states";
 import { ImageIcon } from "lucide-react";
 
 function DownloadCardSkeleton() {
@@ -44,18 +48,15 @@ export default function DownloadsPage() {
   const user = useUser();
   const isUserLoading = user === undefined;
   const [purchases, setPurchases] = useState([]);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(
     isUserLoading || (user !== null && user !== undefined)
   );
 
-  useEffect(() => {
-    if (isUserLoading) {
-      return;
-    }
-    if (!user) {
-      return;
-    }
-
+  const fetchDownloads = useCallback(() => {
+    if (!user?.id) return;
+    setError(null);
+    setLoading(true);
     fetch(`/api/meus-downloads?userId=${user.id}`)
       .then((res) => res.json())
       .then((data) => {
@@ -63,11 +64,15 @@ export default function DownloadsPage() {
       })
       .catch((err) => {
         console.error("Failed to fetch downloads:", err);
+        setError("Não foi possível carregar seus downloads.");
       })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [user, isUserLoading]);
+      .finally(() => setLoading(false));
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (isUserLoading || !user) return;
+    fetchDownloads();
+  }, [user, isUserLoading, fetchDownloads]);
 
   const renderContent = () => {
     if (isUserLoading || loading) {
@@ -77,6 +82,16 @@ export default function DownloadsPage() {
             <DownloadCardSkeleton key={i} />
           ))}
         </ResponsiveGrid>
+      );
+    }
+
+    if (error) {
+      return (
+        <ErrorState
+          title="Erro ao carregar"
+          message={error}
+          onRetry={fetchDownloads}
+        />
       );
     }
 

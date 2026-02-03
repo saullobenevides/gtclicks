@@ -1,8 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useCart } from "@/features/cart/context/CartContext";
+import { toast } from "sonner";
+import { PageBreadcrumbs } from "@/components/shared/layout";
+import BackButton from "@/components/shared/BackButton";
 import {
   Card,
   CardContent,
@@ -24,9 +36,15 @@ export default function CartPage() {
   } = useCart();
   const savings = getSavings();
 
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
   if (items.length === 0) {
     return (
-      <div className="container-wide px-4 flex min-h-[60vh] flex-col items-center justify-center py-16 sm:py-24 text-center">
+      <div className="container-wide px-4 relative flex min-h-[60vh] flex-col items-center justify-center py-16 sm:py-24 text-center">
+        <div className="absolute top-4 left-4 right-4 flex justify-start z-10">
+          <BackButton href="/busca" label="Voltar à busca" />
+        </div>
+        <PageBreadcrumbs className="mb-8" />
         <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10">
           <ShoppingCart className="h-10 w-10 text-muted-foreground" />
         </div>
@@ -44,8 +62,23 @@ export default function CartPage() {
     );
   }
 
+  const handleRemove = (item) => {
+    removeFromCart(item.fotoId);
+    toast.success("Removido do carrinho", { description: item.titulo });
+  };
+
+  const handleClearCart = () => {
+    clearCart();
+    setShowClearConfirm(false);
+    toast.success("Carrinho esvaziado");
+  };
+
   return (
     <div className="container-wide px-4 py-12 sm:py-16 md:py-24">
+      <div className="flex items-center justify-between mb-6">
+        <BackButton href="/busca" label="Voltar à busca" />
+        <PageBreadcrumbs className="ml-auto" />
+      </div>
       <div className="mb-12">
         <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">
           Seu Carrinho
@@ -109,7 +142,7 @@ export default function CartPage() {
                     variant="ghost"
                     size="icon"
                     className="min-h-11 min-w-11 text-muted-foreground hover:bg-red-500/10 hover:text-red-500 touch-manipulation"
-                    onClick={() => removeFromCart(item.fotoId, item.licencaId)}
+                    onClick={() => handleRemove(item)}
                     aria-label={`Remover ${item.titulo} do carrinho`}
                   >
                     <Trash2 className="h-5 w-5" />
@@ -121,13 +154,37 @@ export default function CartPage() {
 
           <div className="flex justify-end pt-4">
             <Button
-              onClick={clearCart}
+              onClick={() => setShowClearConfirm(true)}
               variant="ghost"
-              className="text-muted-foreground hover:text-white"
+              className="text-muted-foreground hover:text-red-400 hover:bg-red-500/10"
             >
               Limpar Carrinho
             </Button>
           </div>
+
+          <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+            <DialogContent className="bg-surface-page border-white/10">
+              <DialogHeader>
+                <DialogTitle>Limpar carrinho?</DialogTitle>
+                <DialogDescription>
+                  Todos os {items.length}{" "}
+                  {items.length === 1 ? "item será" : "itens serão"} removidos.
+                  Esta ação não pode ser desfeita.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowClearConfirm(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button variant="destructive" onClick={handleClearCart}>
+                  Limpar
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Order Summary */}
