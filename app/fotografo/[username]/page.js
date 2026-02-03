@@ -4,7 +4,7 @@ import {
 } from "@/lib/data/marketplace";
 
 import { notFound } from "next/navigation";
-import { MapPin, Camera, Image as ImageIcon } from "lucide-react";
+import { MapPin, Camera, Image as ImageIcon, Phone, Globe } from "lucide-react";
 import ShareButton from "@/components/shared/actions/ShareButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -195,6 +195,75 @@ export default async function PhotographerProfilePage(props) {
               )}
 
               {photographer.bio && <Separator className="my-8 md:my-10" />}
+
+              {/* Contato e Profissional */}
+              {(photographer.telefone ||
+                photographer.portfolioUrl ||
+                photographer.especialidades?.length > 0 ||
+                photographer.equipamentos) && (
+                <>
+                  <section
+                    className="space-y-4"
+                    aria-labelledby="contato-heading"
+                  >
+                    <h2
+                      id="contato-heading"
+                      className="text-xl font-bold sm:text-2xl text-foreground"
+                    >
+                      Contato e Profissional
+                    </h2>
+                    <div className="flex flex-col gap-4">
+                      {photographer.telefone && (
+                        <a
+                          href={`https://wa.me/55${photographer.telefone.replace(
+                            /\D/g,
+                            ""
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <Phone className="h-4 w-4 shrink-0" />
+                          <span>{photographer.telefone}</span>
+                        </a>
+                      )}
+                      {photographer.portfolioUrl && (
+                        <a
+                          href={photographer.portfolioUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <Globe className="h-4 w-4 shrink-0" />
+                          <span>Portfólio externo</span>
+                        </a>
+                      )}
+                      {photographer.especialidades?.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {photographer.especialidades.map((spec) => (
+                            <Badge
+                              key={spec}
+                              variant="secondary"
+                              className="font-normal"
+                            >
+                              {spec}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      {photographer.equipamentos && (
+                        <div className="flex items-start gap-2">
+                          <Camera className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {photographer.equipamentos}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                  <Separator className="my-8 md:my-10" />
+                </>
+              )}
 
               {/* Collections Grid */}
               <section

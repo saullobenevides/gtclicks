@@ -15,7 +15,7 @@ const createPhotographerSchema = z.object({
     .min(3, "Username muito curto")
     .regex(
       /^[a-zA-Z0-9_]+$/,
-      "Username deve conter apenas letras, números e underline",
+      "Username deve conter apenas letras, números e underline"
     )
     .optional(),
   bio: z.string().max(500, "Bio muito longa").optional(),
@@ -32,11 +32,10 @@ const updatePhotographerSchema = z.object({
   cidade: z.string().optional(),
   estado: z.string().optional(),
   instagram: z.string().optional(),
-  // chavePix: z.string().optional(), // Removed
   portfolioUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   equipamentos: z.string().optional(),
-  // cpf: z.string().optional(), // Removed
   especialidades: z.array(z.string()).optional(),
+  visibilitySettings: z.string().optional(), // JSON string
 });
 
 // --- Helper ---
@@ -167,16 +166,13 @@ export async function updatePhotographer(formData: FormData) {
     cidade: formData.get("cidade")?.toString(),
     estado: formData.get("estado")?.toString(),
     instagram: formData.get("instagram")?.toString()?.replace(/^@/, ""),
-    // chavePix: formData.get("chavePix")?.toString(),
     portfolioUrl: formData.get("portfolioUrl")?.toString(),
     equipamentos: formData.get("equipamentos")?.toString(),
-    // cpf: formData.get("cpf")?.toString(),
+    especialidades: formData.getAll("especialidades"),
+    visibilitySettings: formData.get("visibilitySettings")?.toString(),
   };
 
-  const validation = updatePhotographerSchema.safeParse({
-    ...rawData,
-    especialidades: formData.getAll("especialidades"),
-  });
+  const validation = updatePhotographerSchema.safeParse(rawData);
 
   if (!validation.success) {
     return {
@@ -187,6 +183,18 @@ export async function updatePhotographer(formData: FormData) {
 
   const data = validation.data;
 
+  let visibilitySettings: Record<string, boolean> | undefined;
+  if (data.visibilitySettings) {
+    try {
+      const parsed = JSON.parse(data.visibilitySettings);
+      if (typeof parsed === "object" && parsed !== null) {
+        visibilitySettings = parsed;
+      }
+    } catch {
+      // ignore invalid JSON
+    }
+  }
+
   try {
     const updated = await prisma.fotografo.update({
       where: { userId: user.id },
@@ -196,15 +204,15 @@ export async function updatePhotographer(formData: FormData) {
         cidade: data.cidade,
         estado: data.estado,
         instagram: data.instagram,
-        // chavePix: data.chavePix, // Removed for security (use updatePixKey)
         portfolioUrl: data.portfolioUrl,
         equipamentos: data.equipamentos,
-        // cpf: data.cpf, // Removed for security
         especialidades: data.especialidades,
+        ...(visibilitySettings && { visibilitySettings }),
       },
     });
 
-    revalidatePath(`/fotografos/${updated.username}`);
+    revalidatePath(`/fotografo/${updated.username}`);
+    revalidatePath("/dashboard/fotografo/perfil");
     return { success: true, data: serializeModel(updated) };
   } catch (error: any) {
     console.error("[updatePhotographer] Error:", error.message);

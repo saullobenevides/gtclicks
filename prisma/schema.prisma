@@ -56,6 +56,8 @@ model Fotografo {
   cpf            String?   @unique
   especialidades String[]
   equipamentos   String?
+  /// JSON: { bio, cidade, estado, instagram, telefone, especialidades, portfolioUrl, equipamentos } - true = visível no perfil público
+  visibilitySettings Json?
   
   fotos          Foto[]
   colecoes       Colecao[]

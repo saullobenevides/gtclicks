@@ -1,4 +1,3 @@
-import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { PageSection, SectionHeader } from "@/components/shared/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -6,6 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Camera, MapPin, ChevronRight, Instagram } from "lucide-react";
 import AppPagination from "@/components/shared/AppPagination";
+import {
+  searchPhotographers,
+  getDistinctPhotographerCities,
+} from "@/lib/data/marketplace";
+import PhotographerFilters from "@/features/photographer/components/PhotographerFilters";
 
 export const metadata = {
   title: "Nossos Fotógrafos | GTClicks",
@@ -15,39 +19,24 @@ export const metadata = {
 
 export default async function FotografosPage(props) {
   const searchParams = await props.searchParams;
-  const page = searchParams?.page ? parseInt(searchParams.page) : 1;
-  const limit = 12;
-  const skip = (page - 1) * limit;
+  const rawFilters = {
+    q: searchParams?.q ?? "",
+    categoria: searchParams?.categoria ?? "",
+    cidade: searchParams?.cidade ?? "",
+    page: searchParams?.page ? parseInt(searchParams.page) : 1,
+  };
 
-  // Fetch photographers with active status and their user details
-  const [fotografos, total] = await Promise.all([
-    prisma.fotografo.findMany({
-      where: {
-        user: { isActive: true },
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            image: true,
-          },
-        },
-        _count: {
-          select: { colecoes: true },
-        },
-      },
-      orderBy: { user: { name: "asc" } },
-      skip,
-      take: limit,
-    }),
-    prisma.fotografo.count({
-      where: {
-        user: { isActive: true },
-      },
-    }),
+  const filters = Object.entries(rawFilters).reduce((acc, [key, value]) => {
+    acc[key] = value === "all" ? "" : value;
+    return acc;
+  }, {});
+
+  const [cities, { data: fotografos, metadata }] = await Promise.all([
+    getDistinctPhotographerCities(),
+    searchPhotographers(filters),
   ]);
 
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = metadata.totalPages;
 
   return (
     <PageSection variant="default" containerWide className="min-h-screen">
@@ -57,6 +46,10 @@ export default async function FotografosPage(props) {
         title="Profissionais do Click"
         description="Encontre os melhores fotógrafos e acompanhe suas coleções exclusivas."
       />
+
+      <div className="mt-8 mb-12">
+        <PhotographerFilters filters={rawFilters} cities={cities} />
+      </div>
 
       {fotografos.length === 0 ? (
         <div className="text-center py-20 bg-surface-subtle/50 rounded-radius-2xl border-2 border-dashed border-border-subtle">
@@ -163,7 +156,7 @@ export default async function FotografosPage(props) {
       {totalPages > 1 && (
         <div className="mt-12">
           <AppPagination
-            currentPage={page}
+            currentPage={metadata.page}
             totalPages={totalPages}
             baseUrl="/fotografos"
             searchParams={searchParams}

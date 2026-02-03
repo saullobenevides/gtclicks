@@ -4,12 +4,13 @@
  */
 
 import prisma from "@/lib/prisma";
+import { serializePrismaData } from "@/lib/utils/serialization";
 
 /**
  * Busca fotos do fotógrafo pelo userId
  *
  * @param {string} userId - ID do usuário Stack
- * @returns {Promise<Array>} Fotos publicadas do fotógrafo
+ * @returns {Promise<Array>} Fotos publicadas do fotógrafo (serializadas para Client Components)
  */
 export async function getFotosByUserId(userId) {
   if (!userId) return [];
@@ -20,7 +21,7 @@ export async function getFotosByUserId(userId) {
 
   if (!fotografo) return [];
 
-  return prisma.foto.findMany({
+  const fotos = await prisma.foto.findMany({
     where: { fotografoId: fotografo.id },
     orderBy: { createdAt: "desc" },
     include: {
@@ -29,4 +30,6 @@ export async function getFotosByUserId(userId) {
       },
     },
   });
+
+  return serializePrismaData(fotos);
 }

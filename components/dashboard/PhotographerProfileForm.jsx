@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardHeader,
@@ -17,17 +18,33 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Save, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { useUser, useStackApp } from "@stackframe/stack";
+import { useUser } from "@stackframe/stack";
 import { toast } from "sonner";
 import { updatePhotographer } from "@/actions/photographers";
+
+const DEFAULT_VISIBILITY = {
+  bio: true,
+  cidade: true,
+  estado: true,
+  instagram: true,
+  telefone: true,
+  especialidades: true,
+  portfolioUrl: true,
+  equipamentos: true,
+};
 
 export default function PhotographerProfileForm({ photographer }) {
   const user = useUser();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const initialVisibility =
+    photographer?.visibilitySettings &&
+    typeof photographer.visibilitySettings === "object"
+      ? { ...DEFAULT_VISIBILITY, ...photographer.visibilitySettings }
+      : DEFAULT_VISIBILITY;
+
   const [formData, setFormData] = useState({
-    // userId: photographer.userId, // Not editable
     username: photographer.username || "",
     bio: photographer.bio || "",
     telefone: photographer.telefone || "",
@@ -39,10 +56,18 @@ export default function PhotographerProfileForm({ photographer }) {
     portfolioUrl: photographer.portfolioUrl || "",
     equipamentos: photographer.equipamentos || "",
     especialidades: photographer.especialidades || [],
+    visibility: initialVisibility,
   });
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleVisibilityChange = (key, checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      visibility: { ...prev.visibility, [key]: checked },
+    }));
   };
 
   /* Refactored to use Server Action */
@@ -53,19 +78,21 @@ export default function PhotographerProfileForm({ photographer }) {
 
     try {
       const payload = new FormData();
-      // Append simple fields
       Object.keys(formData).forEach((key) => {
-        if (key === "especialidades") return; // Handle array separately
+        if (key === "especialidades" || key === "visibility") return;
         if (formData[key] !== null && formData[key] !== undefined) {
           payload.append(key, formData[key]);
         }
       });
-      // Append especialidades
       if (Array.isArray(formData.especialidades)) {
         formData.especialidades.forEach((spec) =>
           payload.append("especialidades", spec)
         );
       }
+      payload.append(
+        "visibilitySettings",
+        JSON.stringify(formData.visibility || DEFAULT_VISIBILITY)
+      );
 
       const result = await updatePhotographer(payload);
 
@@ -132,8 +159,19 @@ export default function PhotographerProfileForm({ photographer }) {
               </Alert>
             )}
 
-            <div className="grid gap-2">
-              <Label htmlFor="bio">Bio / Sobre mim</Label>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="bio">Bio / Sobre mim</Label>
+                <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                  <Checkbox
+                    checked={formData.visibility?.bio ?? true}
+                    onCheckedChange={(c) =>
+                      handleVisibilityChange("bio", c === true)
+                    }
+                  />
+                  <span>Exibir no perfil</span>
+                </label>
+              </div>
               <Textarea
                 id="bio"
                 placeholder="Conte um pouco sobre sua experiência..."
@@ -144,8 +182,19 @@ export default function PhotographerProfileForm({ photographer }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="cidade">Cidade</Label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor="cidade">Cidade</Label>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                    <Checkbox
+                      checked={formData.visibility?.cidade ?? true}
+                      onCheckedChange={(c) =>
+                        handleVisibilityChange("cidade", c === true)
+                      }
+                    />
+                    <span>Exibir</span>
+                  </label>
+                </div>
                 <Input
                   id="cidade"
                   placeholder="Ex: São Paulo"
@@ -153,8 +202,19 @@ export default function PhotographerProfileForm({ photographer }) {
                   onChange={(e) => handleChange("cidade", e.target.value)}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="estado">Estado</Label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor="estado">Estado</Label>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                    <Checkbox
+                      checked={formData.visibility?.estado ?? true}
+                      onCheckedChange={(c) =>
+                        handleVisibilityChange("estado", c === true)
+                      }
+                    />
+                    <span>Exibir</span>
+                  </label>
+                </div>
                 <Input
                   id="estado"
                   placeholder="Ex: SP"
@@ -166,8 +226,19 @@ export default function PhotographerProfileForm({ photographer }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="instagram">Instagram</Label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor="instagram">Instagram</Label>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                    <Checkbox
+                      checked={formData.visibility?.instagram ?? true}
+                      onCheckedChange={(c) =>
+                        handleVisibilityChange("instagram", c === true)
+                      }
+                    />
+                    <span>Exibir</span>
+                  </label>
+                </div>
                 <div className="flex">
                   <span className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted text-muted-foreground text-sm">
                     @
@@ -181,8 +252,19 @@ export default function PhotographerProfileForm({ photographer }) {
                   />
                 </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="telefone">WhatsApp / Telefone</Label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor="telefone">WhatsApp / Telefone</Label>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                    <Checkbox
+                      checked={formData.visibility?.telefone ?? true}
+                      onCheckedChange={(c) =>
+                        handleVisibilityChange("telefone", c === true)
+                      }
+                    />
+                    <span>Exibir</span>
+                  </label>
+                </div>
                 <Input
                   id="telefone"
                   placeholder="(00) 00000-0000"
@@ -237,7 +319,18 @@ export default function PhotographerProfileForm({ photographer }) {
               <Label>Profissional</Label>
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
-                  <Label>Suas Especialidades</Label>
+                  <div className="flex items-center justify-between gap-2">
+                    <Label>Suas Especialidades</Label>
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                      <Checkbox
+                        checked={formData.visibility?.especialidades ?? true}
+                        onCheckedChange={(c) =>
+                          handleVisibilityChange("especialidades", c === true)
+                        }
+                      />
+                      <span>Exibir no perfil</span>
+                    </label>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {[
                       "Casamentos",
@@ -275,7 +368,18 @@ export default function PhotographerProfileForm({ photographer }) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="portfolio">Portfólio (Site Externo)</Label>
+                  <div className="flex items-center justify-between gap-2">
+                    <Label htmlFor="portfolio">Portfólio (Site Externo)</Label>
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                      <Checkbox
+                        checked={formData.visibility?.portfolioUrl ?? true}
+                        onCheckedChange={(c) =>
+                          handleVisibilityChange("portfolioUrl", c === true)
+                        }
+                      />
+                      <span>Exibir</span>
+                    </label>
+                  </div>
                   <Input
                     id="portfolio"
                     placeholder="https://..."
@@ -286,7 +390,18 @@ export default function PhotographerProfileForm({ photographer }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="equipamentos">Equipamentos</Label>
+                  <div className="flex items-center justify-between gap-2">
+                    <Label htmlFor="equipamentos">Equipamentos</Label>
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                      <Checkbox
+                        checked={formData.visibility?.equipamentos ?? true}
+                        onCheckedChange={(c) =>
+                          handleVisibilityChange("equipamentos", c === true)
+                        }
+                      />
+                      <span>Exibir</span>
+                    </label>
+                  </div>
                   <Textarea
                     id="equipamentos"
                     placeholder="Câmeras, Lentes..."
