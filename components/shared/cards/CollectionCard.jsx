@@ -51,8 +51,8 @@ export default function CollectionCard({
   const titleSize = isFeatured
     ? "text-text-2xl"
     : isCompact
-      ? "text-text-base"
-      : "text-text-xl";
+    ? "text-text-base"
+    : "text-text-xl";
   const padding = isCompact ? "p-space-4" : "p-space-6";
 
   const coverUrl = collection.cover || collection.capaUrl;
@@ -64,14 +64,14 @@ export default function CollectionCard({
         className={cn(
           "group relative block overflow-hidden rounded-radius-xl bg-surface-subtle transition-all duration-300 hover:-translate-y-1 hover:shadow-shadow-card-hover border-0",
           aspectClass,
-          className,
+          className
         )}
         data-testid="collection-card"
         data-collection-id={collection.id}
         aria-label={`Ver coleção ${collection.title || collection.name}`}
       >
-        {/* Cover Image */}
-        <div className="absolute inset-0 z-0">
+        {/* Cover Image - aspect reservado no Card evita CLS */}
+        <div className="absolute inset-0 z-0 contain[layout]">
           {coverUrl && !isGradient ? (
             <ImageWithFallback
               src={coverUrl}
@@ -104,16 +104,16 @@ export default function CollectionCard({
                   badge.variant === "success"
                     ? "default"
                     : badge.variant === "primary"
-                      ? "default"
-                      : "secondary"
+                    ? "default"
+                    : "secondary"
                 }
                 className={cn(
                   "backdrop-blur-sm",
                   badge.variant === "success"
                     ? "bg-status-success/90 hover:bg-status-success text-text-on-dark"
                     : badge.variant === "primary"
-                      ? "bg-action-primary/90 hover:bg-action-primary text-text-on-brand"
-                      : "bg-text-on-dark/90 hover:bg-text-on-dark text-black",
+                    ? "bg-action-primary/90 hover:bg-action-primary text-text-on-brand"
+                    : "bg-text-on-dark/90 hover:bg-text-on-dark text-black"
                 )}
               >
                 {badge.label}
@@ -126,14 +126,14 @@ export default function CollectionCard({
         <CardContent
           className={cn(
             "absolute bottom-0 left-0 w-full flex flex-col justify-end z-20 h-full",
-            padding,
+            padding
           )}
         >
           <div className="mt-auto">
             <h3
               className={cn(
                 "font-font-bold text-text-primary line-clamp-1 mb-space-1 drop-shadow-md group-hover:text-action-primary transition-colors",
-                titleSize,
+                titleSize
               )}
             >
               {collection.title ||

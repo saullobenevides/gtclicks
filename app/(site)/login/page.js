@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
 
-import { SignIn } from "@stackframe/stack";
 import { Badge } from "@/components/ui/badge";
 import { redirect } from "next/navigation";
+import LoginForm from "./LoginForm";
 
 export default async function LoginPage(props) {
   const searchParams = await props.searchParams;
@@ -30,8 +30,8 @@ export default async function LoginPage(props) {
         </p>
       </div>
 
-      <div className="glass-panel border-border/50 w-full max-w-md rounded-radius-xl p-4 shadow-shadow-card sm:p-6">
-        <SignIn fullPage={false} redirectUrl={redirectUrl} />
+      <div className="glass-panel border-border/50 w-full max-w-md rounded-radius-xl p-4 shadow-shadow-card sm:p-6 min-h-[280px]">
+        <LoginForm redirectUrl={redirectUrl} />
       </div>
     </section>
   );

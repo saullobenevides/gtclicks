@@ -5,7 +5,11 @@ import { Instagram, Youtube, Twitter, Music2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const socialLinks = [
-  { href: "https://instagram.com/gt.clicks", label: "Instagram", icon: Instagram },
+  {
+    href: "https://instagram.com/gt.clicks",
+    label: "Instagram",
+    icon: Instagram,
+  },
   { href: "https://youtube.com/@gtclicks", label: "YouTube", icon: Youtube },
   { href: "https://twitter.com/gtclicks", label: "Twitter", icon: Twitter },
   { href: "https://tiktok.com/@gtclicks", label: "TikTok", icon: Music2 },
@@ -55,11 +59,12 @@ export default function Footer() {
             >
               <div className="relative h-9 w-28">
                 <Image
-                  src="/logo.png"
+                  src="/logo.webp"
                   alt=""
                   fill
                   sizes="(max-width: 768px) 112px, 120px"
                   className="object-contain object-left"
+                  loading="lazy"
                 />
               </div>
             </Link>
@@ -67,7 +72,11 @@ export default function Footer() {
               {siteConfig.description}
             </p>
 
-            <div className="flex items-center gap-2" role="group" aria-label="Redes sociais">
+            <div
+              className="flex items-center gap-2"
+              role="group"
+              aria-label="Redes sociais"
+            >
               {socialLinks.map(({ href, label, icon: Icon }) => (
                 <a
                   key={href}
@@ -83,9 +92,21 @@ export default function Footer() {
             </div>
           </div>
 
-          <FooterSection id="footer-plataforma" title="Plataforma" links={siteConfig.footerParams.platform} />
-          <FooterSection id="footer-fotografos" title="Fotógrafos" links={siteConfig.footerParams.photographers} />
-          <FooterSection id="footer-suporte" title="Suporte" links={siteConfig.footerParams.support} />
+          <FooterSection
+            id="footer-plataforma"
+            title="Plataforma"
+            links={siteConfig.footerParams.platform}
+          />
+          <FooterSection
+            id="footer-fotografos"
+            title="Fotógrafos"
+            links={siteConfig.footerParams.photographers}
+          />
+          <FooterSection
+            id="footer-suporte"
+            title="Suporte"
+            links={siteConfig.footerParams.support}
+          />
         </div>
 
         <Separator className="mb-8 bg-white/10" />

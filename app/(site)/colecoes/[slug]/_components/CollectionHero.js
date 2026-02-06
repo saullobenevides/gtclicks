@@ -27,6 +27,7 @@ export default function CollectionHero({ collection }) {
           src={collection.capaUrl}
           alt={collection.title}
           className="h-full w-full object-cover"
+          sizes="100vw"
           priority
           fill
         />

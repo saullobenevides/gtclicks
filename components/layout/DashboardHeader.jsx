@@ -27,7 +27,7 @@ export default function DashboardHeader() {
         >
           <div className="relative h-8 w-28 md:h-9 md:w-32">
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt=""
               fill
               sizes="(max-width: 768px) 112px, 128px"

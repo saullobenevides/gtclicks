@@ -40,8 +40,10 @@ function PhotoEditorCard({
             src={photo.previewUrl}
             alt={label}
             fill
-            sizes="(max-width: 768px) 50vw, 33vw"
+            sizes="(max-width: 768px) 50vw, 200px"
             className="object-cover"
+            loading="lazy"
+            quality={80}
           />
         ) : (
           <div className="w-full h-full bg-white/5 flex items-center justify-center">

@@ -24,7 +24,7 @@ export default function CollectionsModeration() {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/admin/collections?status=${statusFilter}&page=${page}`,
+        `/api/admin/collections?status=${statusFilter}&page=${page}`
       );
 
       if (!response.ok) {
@@ -79,7 +79,7 @@ export default function CollectionsModeration() {
   const handleDelete = async (collectionId) => {
     if (
       !confirm(
-        "Tem certeza que deseja excluir esta coleção? Esta ação não pode ser desfeita.",
+        "Tem certeza que deseja excluir esta coleção? Esta ação não pode ser desfeita."
       )
     ) {
       return;
@@ -112,7 +112,7 @@ export default function CollectionsModeration() {
         `/api/admin/collections/${collectionId}/suspend`,
         {
           method: "POST",
-        },
+        }
       );
 
       if (response.ok) {
@@ -196,6 +196,8 @@ export default function CollectionsModeration() {
                         fill
                         sizes="192px"
                         className="object-cover"
+                        loading="lazy"
+                        quality={75}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-zinc-600">
@@ -239,7 +241,7 @@ export default function CollectionsModeration() {
                         <span>R$ {collection.precoBase?.toFixed(2)}</span>
                         <span>
                           {new Date(collection.createdAt).toLocaleDateString(
-                            "pt-BR",
+                            "pt-BR"
                           )}
                         </span>
                       </div>

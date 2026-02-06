@@ -192,8 +192,22 @@ const CATEGORY_IMAGES = {
   Default: REAL_IMAGES.abstract,
 };
 
+// Normaliza URLs Unsplash para tamanho otimizado (evita carregar full-res)
+const withUnsplashParams = (url, w = 600, q = 75) => {
+  if (!url?.includes("unsplash.com")) return url;
+  try {
+    const u = new URL(url);
+    u.searchParams.set("w", String(w));
+    u.searchParams.set("q", String(q));
+    return u.toString();
+  } catch {
+    return url;
+  }
+};
+
 const getCategoryImage = (category) => {
-  return CATEGORY_IMAGES[category] || CATEGORY_IMAGES.Default;
+  const url = CATEGORY_IMAGES[category] || CATEGORY_IMAGES.Default;
+  return withUnsplashParams(url);
 };
 
 export default function CategoriesPage() {
@@ -221,12 +235,13 @@ export default function CategoriesPage() {
               alt={category}
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-110"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority={index < 8}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              priority={index < 6}
+              quality={80}
             />
 
             {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
 
             {/* Content */}
             <div className="relative z-10 p-6 w-full transform transition-transform duration-300 translate-y-2 group-hover:translate-y-0">

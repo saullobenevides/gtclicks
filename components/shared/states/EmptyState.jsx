@@ -45,12 +45,15 @@ export default function EmptyState({
     >
       {/* Icon or Illustration */}
       {isIllustrated && illustration ? (
-        <div className="mb-6">
+        <div className="mb-6 relative h-48 w-48">
           <Image
             src={illustration}
             alt=""
-            className="h-48 w-48 opacity-50"
+            fill
+            sizes="192px"
+            className="opacity-50 object-contain"
             aria-hidden="true"
+            loading="lazy"
           />
         </div>
       ) : (
@@ -104,7 +107,7 @@ export default function EmptyState({
             size={isMinimal ? "default" : "lg"}
             className={
               isDashboard &&
-              "bg-[var(--button-primary-bg)] hover:bg-[var(--button-primary-hover)] text-white"
+              "bg-(--button-primary-bg)] hover:bg-(--button-primary-hover)] text-white"
             }
           >
             <Link href={action.href}>{action.label}</Link>
@@ -115,7 +118,7 @@ export default function EmptyState({
             size={isMinimal ? "default" : "lg"}
             className={
               isDashboard &&
-              "bg-[var(--button-primary-bg)] hover:bg-[var(--button-primary-hover)] text-white"
+              "bg-(--button-primary-bg)] hover:bg-(--button-primary-hover)] text-white"
             }
           >
             {action.label}

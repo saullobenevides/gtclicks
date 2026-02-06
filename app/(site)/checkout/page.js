@@ -170,14 +170,15 @@ export default function CheckoutPage() {
   return (
     <div className="container-wide px-4 py-12 md:py-20">
       <div className="mb-10">
-        <div className="flex items-center justify-between mb-4">
-          <BackButton href="/carrinho" label="Voltar ao carrinho" />
+        <div className="flex items-center justify-between gap-4 mb-4">
           <PageBreadcrumbs
             items={[
               { label: "Carrinho", href: "/carrinho", isLast: false },
               { label: "Pagamento", isLast: true },
             ]}
+            className="shrink-0 min-w-0 mb-0"
           />
+          <BackButton href="/carrinho" label="Voltar ao carrinho" />
         </div>
         <CheckoutSteps className="mb-6" />
         <div className="text-center">

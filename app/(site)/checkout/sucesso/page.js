@@ -70,18 +70,18 @@ export default function CheckoutSuccessPage() {
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center container-wide px-4 text-center py-12 sm:py-20 relative overflow-hidden">
-      <div className="absolute top-24 left-4 right-4 z-10 flex flex-col items-center gap-4">
-        <div className="w-full flex justify-start">
+      <div className="absolute top-20 left-4 right-4 z-10 container-wide flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-4">
+          <PageBreadcrumbs
+            items={[
+              { label: "Carrinho", href: "/carrinho", isLast: false },
+              { label: "Pagamento", href: "/checkout", isLast: false },
+              { label: "Confirmação", isLast: true },
+            ]}
+            className="shrink-0 min-w-0 mb-0"
+          />
           <BackButton href="/checkout" label="Voltar ao pagamento" />
         </div>
-        <PageBreadcrumbs
-          items={[
-            { label: "Carrinho", href: "/carrinho", isLast: false },
-            { label: "Pagamento", href: "/checkout", isLast: false },
-            { label: "Confirmação", isLast: true },
-          ]}
-          className="w-full"
-        />
         <CheckoutSteps className="w-full" />
       </div>
       {showConfetti && (

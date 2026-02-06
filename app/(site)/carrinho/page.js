@@ -41,10 +41,10 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="container-wide px-4 relative flex min-h-[60vh] flex-col items-center justify-center py-16 sm:py-24 text-center">
-        <div className="absolute top-4 left-4 right-4 flex justify-start z-10">
+        <div className="absolute top-4 left-0 right-0 z-10 flex items-center justify-between">
+          <PageBreadcrumbs className="mb-0" />
           <BackButton href="/busca" label="Voltar à busca" />
         </div>
-        <PageBreadcrumbs className="mb-8" />
         <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10">
           <ShoppingCart className="h-10 w-10 text-muted-foreground" />
         </div>
@@ -75,9 +75,9 @@ export default function CartPage() {
 
   return (
     <div className="container-wide px-4 py-12 sm:py-16 md:py-24">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <PageBreadcrumbs className="mb-0 shrink-0 min-w-0" />
         <BackButton href="/busca" label="Voltar à busca" />
-        <PageBreadcrumbs className="ml-auto" />
       </div>
       <div className="mb-12">
         <h1 className="heading-display font-display text-3xl md:text-4xl font-black text-white uppercase tracking-tight">

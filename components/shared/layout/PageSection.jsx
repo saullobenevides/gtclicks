@@ -18,8 +18,8 @@ export default function PageSection({
   className,
 }) {
   const paddingClasses = {
-    hero: "py-32 md:py-40",
-    default: "py-16 md:py-32",
+    hero: "pt-12 pb-32 md:pt-16 md:pb-40",
+    default: "pt-8 pb-16 md:pt-12 md:pb-32",
     compact: "py-8 md:py-12",
   };
 

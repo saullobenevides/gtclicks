@@ -41,23 +41,22 @@ export default function Header() {
     return () => window.removeEventListener("keydown", handleEscape);
   }, []);
 
-  const [searchHistory, setSearchHistory] = useState([]);
   const SEARCH_HISTORY_KEY = "gtclicks-search-history";
   const MAX_HISTORY = 5;
 
-  useEffect(() => {
+  const [searchHistory, setSearchHistory] = useState(() => {
+    if (typeof window === "undefined") return [];
     try {
       const stored = localStorage.getItem(SEARCH_HISTORY_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        setSearchHistory(
-          Array.isArray(parsed) ? parsed.slice(0, MAX_HISTORY) : []
-        );
+        return Array.isArray(parsed) ? parsed.slice(0, MAX_HISTORY) : [];
       }
     } catch {
-      setSearchHistory([]);
+      /* ignore */
     }
-  }, []);
+    return [];
+  });
 
   const addToSearchHistory = (q) => {
     if (!q?.trim()) return;
@@ -124,7 +123,7 @@ export default function Header() {
             >
               <div className="relative h-8 w-28 md:h-9 md:w-32 transition-transform duration-200 group-hover:scale-[1.02]">
                 <Image
-                  src="/logo.png"
+                  src="/logo.webp"
                   alt=""
                   fill
                   sizes="(max-width: 768px) 112px, 128px"

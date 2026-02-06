@@ -13,6 +13,7 @@ export default function ImageWithFallback({
   fill,
   width,
   height,
+  quality,
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -49,6 +50,8 @@ export default function ImageWithFallback({
         height={!useFill ? height : undefined}
         sizes={sizes}
         priority={priority}
+        loading={priority ? undefined : "lazy"}
+        quality={quality ?? (width && width <= 128 ? 75 : 80)}
         unoptimized={
           typeof src === "string" &&
           (src.startsWith("/api/") || src.includes("/api/images/"))

@@ -11,16 +11,17 @@ export default function HeroSection() {
     >
       <div className="absolute inset-0 -z-20">
         <Image
-          src="/hero-gtclicks.png"
+          src="/hero-gtclicks.webp"
           alt="Background"
           fill
           className="object-cover object-top"
           priority
-          quality={85}
-          sizes="100vw"
+          fetchPriority="high"
+          quality={75}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1920px"
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-surface-page/70 via-surface-page/60 to-surface-page" />
+      <div className="absolute inset-0 -z-10 bg-linear-to-b from-surface-page/70 via-surface-page/60 to-surface-page" />
 
       <div className="z-10 flex max-w-5xl flex-col items-center gap-space-8 animate-in fade-in zoom-in duration-700 pt-space-12 md:pt-32 px-space-4">
         <h1 className="heading-display font-display text-2xl sm:text-4xl md:text-6xl lg:text-7xl uppercase tracking-tighter leading-tight sm:leading-[0.85]">
