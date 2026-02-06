@@ -14,6 +14,8 @@
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db:seed-february": "node scripts/seed-february-sales.mjs",
+    "optimize:hero": "node scripts/optimize-hero.mjs",
+    "optimize:images": "node scripts/optimize-images.mjs",
     "postinstall": "prisma generate",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
