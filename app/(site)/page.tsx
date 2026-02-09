@@ -2,9 +2,9 @@ import { Suspense } from "react";
 import HeroSection from "@/components/home/HeroSection";
 import HomeContent from "./HomeContent";
 import HomeSkeleton from "./HomeSkeleton";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 
-const FAQSection = dynamic(() => import("@/components/home/FAQSection"));
+const FAQSection = nextDynamic(() => import("@/components/home/FAQSection"));
 
 // Home usa getCached (Upstash Redis), que é dinâmico — não pode ser estático no build
 export const dynamic = "force-dynamic";
