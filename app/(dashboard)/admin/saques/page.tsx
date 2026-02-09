@@ -289,7 +289,7 @@ export default function AdminSaquesPage() {
             </Card>
           )}
           {asaasBalanceError && (
-            <Alert variant="secondary">
+            <Alert variant="warning">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Saldo Asaas indisponível</AlertTitle>
               <AlertDescription>{asaasBalanceError}</AlertDescription>
