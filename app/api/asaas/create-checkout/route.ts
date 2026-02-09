@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isValidCpf } from "@/lib/cpf";
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { createAsaasCheckout } from "@/lib/asaas-checkout";
@@ -107,13 +108,32 @@ export async function POST(request: Request) {
 
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
+      include: { fotografo: { select: { cpf: true } } },
     });
 
     if (!dbUser) {
       return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
     }
 
-    const body = (await request.json().catch(() => ({}))) as { orderId?: string };
+    const body = (await request.json().catch(() => ({}))) as {
+      orderId?: string;
+      cpf?: string;
+    };
+    const cpfFromRequest = body.cpf?.replace(/\D/g, "");
+    if (
+      cpfFromRequest &&
+      cpfFromRequest.length >= 11 &&
+      !isValidCpf(cpfFromRequest)
+    ) {
+      return NextResponse.json(
+        { error: "CPF inválido. Verifique os números e tente novamente." },
+        { status: 400 }
+      );
+    }
+    const cpfCnpj =
+      (cpfFromRequest && cpfFromRequest.length >= 11 ? cpfFromRequest : null) ??
+      dbUser.fotografo?.cpf?.replace(/\D/g, "") ??
+      null;
     const existingOrderId = body.orderId;
 
     let pedido: { id: string; total: number };
@@ -235,10 +255,16 @@ export async function POST(request: Request) {
         value: item.finalPrice ?? 0,
       })),
       externalReference: pedidoId,
-      customerData: {
-        name: dbUser.name || "Cliente",
-        email: dbUser.email,
-      },
+      // Asaas exige cpfCnpj quando envia customerData; sem CPF omitimos e o cliente preenche no checkout
+      ...(cpfCnpj
+        ? {
+            customerData: {
+              name: dbUser.name || "Cliente",
+              email: dbUser.email,
+              cpfCnpj,
+            },
+          }
+        : {}),
       successUrl,
       cancelUrl,
       expiredUrl,

@@ -6,8 +6,8 @@ import dynamic from "next/dynamic";
 
 const FAQSection = dynamic(() => import("@/components/home/FAQSection"));
 
-// Revalidate a cada minuto para o ranking atualizar
-export const revalidate = 60;
+// Home usa getCached (Upstash Redis), que é dinâmico — não pode ser estático no build
+export const dynamic = "force-dynamic";
 
 /**
  * HeroSection renderiza imediatamente (FCP rápido).

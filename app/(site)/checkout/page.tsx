@@ -15,6 +15,8 @@ import { Separator } from "@/components/ui/separator";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Loader2, ShieldCheck, Lock, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { PageBreadcrumbs } from "@/components/shared/layout";
@@ -22,6 +24,7 @@ import BackButton from "@/components/shared/BackButton";
 import CheckoutSteps from "@/components/checkout/CheckoutSteps";
 import { ErrorState } from "@/components/shared/states";
 import { CheckoutPageSkeleton } from "@/components/shared/Skeletons";
+import { isValidCpf } from "@/lib/cpf";
 
 interface CartItem {
   fotoId: string;
@@ -80,6 +83,7 @@ export default function CheckoutPage() {
   const [errorOrder, setErrorOrder] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [asaasLoading, setAsaasLoading] = useState(false);
+  const [cpf, setCpf] = useState("");
 
   const fetchOrder = useCallback(async () => {
     if (!orderId || !user) return;
@@ -346,13 +350,52 @@ export default function CheckoutPage() {
             <CardContent className="pt-5">
               <div className="min-h-[400px] space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Você será redirecionado para a página segura do Asaas para
-                  finalizar o pagamento via PIX.
+                  Informe seu CPF e você será redirecionado para a página segura
+                  do Asaas para finalizar o pagamento via PIX.
                 </p>
+                <div className="space-y-2">
+                  <Label htmlFor="checkout-cpf" className="text-white/90">
+                    CPF
+                  </Label>
+                  <Input
+                    id="checkout-cpf"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="000.000.000-00"
+                    value={cpf}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "").slice(0, 11);
+                      setCpf(
+                        v
+                          .replace(/(\d{3})(\d)/, "$1.$2")
+                          .replace(/(\d{3})(\d)/, "$1.$2")
+                          .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+                      );
+                    }}
+                    className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+                    maxLength={14}
+                  />
+                  {cpf.replace(/\D/g, "").length > 0 &&
+                    cpf.replace(/\D/g, "").length !== 11 && (
+                      <p className="text-xs text-amber-400">
+                        CPF deve ter 11 dígitos
+                      </p>
+                    )}
+                  {cpf.replace(/\D/g, "").length === 11 &&
+                    !isValidCpf(cpf) && (
+                      <p className="text-xs text-red-400">
+                        CPF inválido. Verifique os números.
+                      </p>
+                    )}
+                </div>
                 <Button
                   size="lg"
                   className="w-full"
-                  disabled={asaasLoading}
+                  disabled={
+                    asaasLoading ||
+                    cpf.replace(/\D/g, "").length !== 11 ||
+                    !isValidCpf(cpf)
+                  }
                   onClick={async () => {
                     setAsaasLoading(true);
                     try {
@@ -363,6 +406,7 @@ export default function CheckoutPage() {
                         },
                         body: JSON.stringify({
                           orderId: orderId ?? undefined,
+                          cpf: cpf.replace(/\D/g, ""),
                         }),
                       });
                       const data = (await res.json()) as {
