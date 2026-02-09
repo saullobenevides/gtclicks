@@ -15,13 +15,13 @@ const DESCRIPTION_PREFIX = "Saque GT Clicks - ";
  */
 export async function POST(request: Request) {
   try {
-    const expectedToken =
-      process.env.ASAAS_WEBHOOK_TRANSFER_TOKEN ||
-      process.env.ASAAS_WEBHOOK_TOKEN;
-    if (expectedToken?.trim()) {
+    // Token opcional: o webhook "Transferências" (Integrações > Webhooks) pode não enviar
+    // asaas-access-token. Só validamos se ASAAS_WEBHOOK_TRANSFER_EVENTS_TOKEN estiver definido.
+    const expectedToken = process.env.ASAAS_WEBHOOK_TRANSFER_EVENTS_TOKEN?.trim();
+    if (expectedToken) {
       const received = request.headers.get("asaas-access-token");
       if (received !== expectedToken) {
-        console.warn("[Asaas transfer-events] Token inválido");
+        console.warn("[Asaas transfer-events] Token inválido ou ausente");
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
     }

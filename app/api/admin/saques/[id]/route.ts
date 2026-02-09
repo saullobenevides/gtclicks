@@ -128,16 +128,6 @@ export async function PATCH(
           { status: 400 }
         );
       }
-      if (payoutResult.manualRequired) {
-        return NextResponse.json(
-          {
-            error:
-              "O envio automático não está disponível. " +
-              "Faça o PIX via app do MP e clique em 'Confirmar manual'.",
-          },
-          { status: 400 }
-        );
-      }
       await logAdminActivity(auth.admin.id, "PAYOUT_PROCESSED", "SolicitacaoSaque", id, {
         valor: Number(saque.valor),
         fotografoUsername: saque.fotografo?.username,

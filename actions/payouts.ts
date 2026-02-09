@@ -125,11 +125,8 @@ export async function requestWithdrawal(data: { valor: number }) {
       return {
         success: true,
         data: serializeModel(result),
-        instant: !payoutResult.manualRequired,
-        manualRequired: payoutResult.manualRequired,
-        message: payoutResult.manualRequired
-          ? "Saque solicitado! O processamento será feito em até 24h."
-          : undefined,
+        message:
+          "Saque enviado! O valor será transferido para sua conta PIX em instantes.",
       };
     }
 

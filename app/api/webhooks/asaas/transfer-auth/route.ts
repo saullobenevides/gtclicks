@@ -7,6 +7,9 @@ import {
 
 const DESCRIPTION_PREFIX = "Saque GT Clicks - ";
 
+export const dynamic = "force-dynamic";
+export const maxDuration = 30;
+
 /**
  * Webhook de autorização de saque do Asaas.
  * Quando ativado em Asaas (Integrações > Mecanismos de segurança), todas as
@@ -174,4 +177,25 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   }
+}
+
+/** Permite preflight (CORS) se o Asaas ou algum proxy enviar OPTIONS. */
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      Allow: "POST, OPTIONS",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, asaas-access-token",
+    },
+  });
+}
+
+/** Diagnóstico: confirma que a URL está no ar. O webhook real é POST. */
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    webhook: "transfer-auth",
+    message: "Use POST para autorização de transferência (Asaas).",
+  });
 }
