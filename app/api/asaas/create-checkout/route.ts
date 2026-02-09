@@ -136,7 +136,7 @@ export async function POST(request: Request) {
         );
       }
 
-      pedido = order;
+      pedido = { id: order.id, total: Number(order.total) };
       itemsForPayment = order.itens.map((i) => ({
         ...i,
         finalPrice: Number(i.precoPago),
