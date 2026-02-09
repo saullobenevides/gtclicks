@@ -26,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, CheckCircle2, Loader2, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AppPagination from "@/components/shared/AppPagination";
+import { toast } from "sonner";
 import { getFinancialData, updatePixKey } from "@/actions/photographers";
 import { requestWithdrawal } from "@/actions/payouts";
 import { maskCpf } from "@/lib/cpf";
@@ -89,6 +90,7 @@ interface Transacao {
   tipo?: string;
   valor: number;
   status?: string | null;
+  observacao?: string | null;
   createdAt: string | Date;
 }
 
@@ -187,11 +189,24 @@ export default function FinanceiroPage() {
         throw new Error(result.error);
       }
       if (result.data) {
+        const list = result.data.transacoes || [];
         setSaldo(result.data.saldo);
-        setTransacoes(result.data.transacoes || []);
+        setTransacoes(list);
         setChavePix(result.data.chavePix || "");
         if (typeof result.data.minSaque === "number") {
           setMinSaque(result.data.minSaque);
+        }
+        // Toast com a resposta do webhook quando há saque que falhou recentemente
+        const falhaSaque = list.find(
+          (t) =>
+            (t.status || "").toUpperCase() === "FALHOU" &&
+            t.observacao &&
+            (Date.now() - new Date(t.createdAt).getTime() < 24 * 60 * 60 * 1000)
+        );
+        if (falhaSaque?.observacao) {
+          toast.error("Saque não concluído", {
+            description: falhaSaque.observacao,
+          });
         }
       }
     } catch (error) {
@@ -294,22 +309,21 @@ export default function FinanceiroPage() {
     try {
       const result = await requestWithdrawal({ valor });
       if (result.success) {
-        setMessage({
-          type: "success",
-          text:
-            result.message ||
-            "Saque enviado! O valor foi transferido para sua conta PIX.",
-        });
+        const msg =
+          result.message ||
+          "Saque enviado! O valor foi transferido para sua conta PIX.";
+        setMessage({ type: "success", text: msg });
+        toast.success(msg);
         setValorSaque("");
         fetchData();
       } else {
-        setMessage({
-          type: "error",
-          text: result.error || "Erro ao solicitar saque.",
-        });
+        const errMsg = result.error || "Erro ao solicitar saque.";
+        setMessage({ type: "error", text: errMsg });
+        toast.error("Saque não enviado", { description: errMsg });
       }
     } catch (error) {
       setMessage({ type: "error", text: "Erro ao solicitar saque." });
+      toast.error("Erro ao solicitar saque.");
     } finally {
       setSolicitandoSaque(false);
     }

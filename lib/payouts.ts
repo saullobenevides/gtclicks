@@ -47,7 +47,12 @@ export async function processPayoutForSaque(
     return { success: false, error: "Chave PIX não cadastrada" };
   }
 
-  let payoutResult: { success: boolean; error?: string; manualRequired?: boolean };
+  let payoutResult: {
+    success: boolean;
+    error?: string;
+    manualRequired?: boolean;
+    asaasTransferCreated?: boolean;
+  };
 
   if (isAsaasConfigured()) {
     const asaasResult = await sendPixTransfer({
@@ -56,10 +61,14 @@ export async function processPayoutForSaque(
       pixAddressKeyType: "CPF", // App atualmente cadastra apenas CPF
       description: `Saque GT Clicks - ${saque.id}`,
     });
+    // Asaas cria a transferência; o débito real (PROCESSADO + bloqueado--) só ocorre
+    // quando o webhook de autorização retornar APPROVED. Se retornar REFUSED ou a
+    // transferência falhar, o webhook (transfer-auth ou transfer-events) reverte.
     payoutResult = {
       success: asaasResult.success,
       error: asaasResult.error,
       manualRequired: false,
+      asaasTransferCreated: asaasResult.success, // saque fica PENDENTE até o auth webhook
     };
   } else {
     // Fallback: MP não suporta PIX payout via API → processamento manual
@@ -138,6 +147,12 @@ export async function processPayoutForSaque(
     };
   }
 
+  // Quando o Asaas só criou a transferência, o saque fica PENDENTE até o webhook
+  // de autorização retornar APPROVED (que chama markSaqueAsProcessedAfterTransferApproved).
+  if (payoutResult.asaasTransferCreated) {
+    return { success: true };
+  }
+
   const observacaoSucesso = isAsaasConfigured()
     ? "Saque processado via PIX (Asaas)"
     : "Saque processado via PIX Automático";
@@ -180,6 +195,64 @@ export async function processPayoutForSaque(
   }
 
   return { success: true };
+}
+
+/**
+ * Chamado pelo webhook de autorização do Asaas quando retornamos APPROVED.
+ * Marca o saque como PROCESSADO e debita o bloqueado (PIX foi autorizado).
+ */
+export async function markSaqueAsProcessedAfterTransferApproved(
+  saqueId: string
+): Promise<boolean> {
+  const saque = await prisma.solicitacaoSaque.findUnique({
+    where: { id: saqueId },
+    include: {
+      fotografo: { select: { userId: true } },
+    },
+  });
+
+  if (!saque || saque.status !== "PENDENTE") {
+    return false;
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.solicitacaoSaque.update({
+      where: { id: saqueId },
+      data: {
+        status: "PROCESSADO",
+        processadoEm: new Date(),
+        observacao: "Saque processado via PIX (Asaas)",
+      },
+    });
+
+    await tx.transacao.updateMany({
+      where: { saqueId, tipo: "SAQUE" },
+      data: { status: "PROCESSADO" },
+    });
+
+    const valorSaque = new Prisma.Decimal(saque.valor);
+    await tx.saldo.update({
+      where: { fotografoId: saque.fotografoId },
+      data: {
+        bloqueado: { decrement: valorSaque },
+      },
+    });
+  });
+
+  try {
+    const { notifyWithdrawalProcessed } = await import(
+      "@/actions/notifications"
+    );
+    await notifyWithdrawalProcessed({
+      userId: saque.fotografo!.userId,
+      value: Number(saque.valor),
+      status: "APROVADO",
+    });
+  } catch (nErr) {
+    console.error("Failed to send withdrawal approval notification:", nErr);
+  }
+
+  return true;
 }
 
 /**

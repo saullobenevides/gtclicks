@@ -257,6 +257,9 @@ export async function getFinancialData() {
       where: { fotografoId: fotografo.id },
       orderBy: { createdAt: "desc" },
       take: 50,
+      include: {
+        saque: { select: { observacao: true } },
+      },
     });
 
     let minSaque = 50;
@@ -275,6 +278,7 @@ export async function getFinancialData() {
     const serializedTransacoes = transacoes.map((t) => ({
       ...serializeModel(t),
       valor: serializeDecimal(t.valor),
+      observacao: t.saque?.observacao ?? undefined,
     }));
 
     return {

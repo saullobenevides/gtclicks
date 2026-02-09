@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { revertPendenteSaqueOnTransferRefused } from "@/lib/payouts";
+import {
+  revertPendenteSaqueOnTransferRefused,
+  markSaqueAsProcessedAfterTransferApproved,
+} from "@/lib/payouts";
 
 const DESCRIPTION_PREFIX = "Saque GT Clicks - ";
 
@@ -101,6 +104,10 @@ export async function POST(request: Request) {
 
     if (!saque) {
       logTransferAuth("refused", { transferId: transfer.id, saqueId, reason: "Saque não encontrado no banco" });
+      await revertPendenteSaqueOnTransferRefused(
+        saqueId,
+        "Autorização recusada: saque não encontrado. Valor devolvido ao saldo."
+      );
       return NextResponse.json(
         { status: "REFUSED", refuseReason: "Saque não encontrado" },
         { status: 200 }
@@ -113,6 +120,10 @@ export async function POST(request: Request) {
         saqueId,
         reason: `Saque já processado (status=${saque.status})`,
       });
+      await revertPendenteSaqueOnTransferRefused(
+        saqueId,
+        "Autorização recusada: saque já processado."
+      );
       return NextResponse.json(
         { status: "REFUSED", refuseReason: "Saque já processado" },
         { status: 200 }
@@ -154,6 +165,7 @@ export async function POST(request: Request) {
     }
 
     logTransferAuth("approved", { transferId: transfer.id, saqueId });
+    await markSaqueAsProcessedAfterTransferApproved(saqueId);
     return NextResponse.json({ status: "APPROVED" }, { status: 200 });
   } catch (error) {
     console.error("[Asaas transfer-auth] Error:", error);
