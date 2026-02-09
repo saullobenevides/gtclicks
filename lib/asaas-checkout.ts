@@ -6,15 +6,8 @@
  * Docs: https://docs.asaas.com/docs/checkout-asaas
  */
 
-const ASAAS_API_BASE =
-  process.env.ASAAS_SANDBOX === "true"
-    ? "https://api-sandbox.asaas.com"
-    : "https://api.asaas.com";
-
-const ASAAS_CHECKOUT_BASE =
-  process.env.ASAAS_SANDBOX === "true"
-    ? "https://sandbox.asaas.com"
-    : "https://asaas.com";
+const ASAAS_API_BASE = "https://api.asaas.com";
+const ASAAS_CHECKOUT_BASE = "https://asaas.com";
 
 export interface AsaasCheckoutItem {
   name: string;
@@ -141,7 +134,7 @@ export async function createAsaasCheckout(
           success: false,
           error:
             `${baseError} (URL enviada: ${options.successUrl}). ` +
-            "Cadastre o domínio em sandbox.asaas.com > Minha Conta > Configurações > Informações, ou use ngrok + NEXT_PUBLIC_APP_URL.",
+            "Cadastre o domínio em asaas.com > Minha Conta > Configurações > Informações.",
         };
       }
       return { success: false, error: baseError };

@@ -97,7 +97,10 @@ export async function POST(request: Request) {
 
     if (!isAsaasConfigured()) {
       return NextResponse.json(
-        { error: "Asaas não configurado. Use o checkout padrão." },
+        {
+          error:
+            "Checkout Asaas não configurado. Configure ASAAS_API_KEY nas variáveis de ambiente do Vercel.",
+        },
         { status: 503 }
       );
     }
@@ -205,22 +208,15 @@ export async function POST(request: Request) {
     const cancelUrl = `${baseUrl}/checkout?canceled=1`;
     const expiredUrl = `${baseUrl}/checkout?expired=1`;
 
-    const skipUrlValidation =
-      process.env.ASAAS_SANDBOX === "true" &&
-      process.env.ASAAS_SKIP_URL_VALIDATION === "true";
-
     if (
-      !skipUrlValidation &&
-      (!isSuccessUrlValidForAsaas(successUrl) ||
-        !isSuccessUrlValidForAsaas(cancelUrl) ||
-        !isSuccessUrlValidForAsaas(expiredUrl))
+      !isSuccessUrlValidForAsaas(successUrl) ||
+      !isSuccessUrlValidForAsaas(cancelUrl) ||
+      !isSuccessUrlValidForAsaas(expiredUrl)
     ) {
       return NextResponse.json(
         {
           error:
-            "A URL de retorno do checkout é inválida. O Asaas exige HTTPS e um domínio registrado na conta (não aceita localhost). " +
-            "Em desenvolvimento: use ngrok e defina NEXT_PUBLIC_APP_URL, ou em sandbox defina ASAAS_SKIP_URL_VALIDATION=true para tentar mesmo assim. " +
-            "Em produção: use o domínio cadastrado em Account Settings > Information.",
+            "A URL de retorno do checkout é inválida. O Asaas exige HTTPS e um domínio registrado em Account Settings > Information. Configure NEXT_PUBLIC_APP_URL.",
         },
         { status: 400 }
       );

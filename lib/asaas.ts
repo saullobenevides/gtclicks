@@ -25,10 +25,7 @@ export interface AsaasTransferResult {
   details?: Record<string, unknown>;
 }
 
-const ASAAS_API_BASE =
-  process.env.ASAAS_SANDBOX === "true"
-    ? "https://api-sandbox.asaas.com"
-    : "https://api.asaas.com";
+const ASAAS_API_BASE = "https://api.asaas.com";
 
 /**
  * Detecta o tipo da chave PIX pelo formato.
