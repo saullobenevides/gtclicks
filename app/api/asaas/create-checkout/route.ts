@@ -182,7 +182,7 @@ export async function POST(request: Request) {
         );
       }
 
-      pedido = await prisma.pedido.create({
+      const created = await prisma.pedido.create({
         data: {
           userId: user.id,
           total: safeTotal,
@@ -196,6 +196,7 @@ export async function POST(request: Request) {
           },
         },
       });
+      pedido = { id: created.id, total: Number(created.total) };
       itemsForPayment = itemsWithPrice;
     }
 
