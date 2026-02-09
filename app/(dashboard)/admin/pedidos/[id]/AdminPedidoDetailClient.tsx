@@ -69,9 +69,8 @@ export default function AdminPedidoDetailClient({
       toast.error("Pedido sem link de pagamento");
       return;
     }
-    const url = `https://www.mercadopago.com.br/developers/en/docs/checkout-pro/landing`;
-    navigator.clipboard.writeText(`Payment ID: ${pedido.paymentId}`);
-    toast.success("Payment ID copiado para a área de transferência");
+    navigator.clipboard.writeText(pedido.paymentId);
+    toast.success("ID copiado para a área de transferência");
   };
 
   const handleRefund = async () => {
@@ -128,7 +127,7 @@ export default function AdminPedidoDetailClient({
       {pedido.paymentId && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Mercado Pago</CardTitle>
+            <CardTitle className="text-lg">Pagamento</CardTitle>
             <Button
               variant="outline"
               size="sm"
@@ -136,7 +135,7 @@ export default function AdminPedidoDetailClient({
               className="gap-2"
             >
               <Copy className="h-4 w-4" />
-              Copiar Payment ID
+              Copiar ID
             </Button>
           </CardHeader>
           <CardContent>
@@ -212,9 +211,9 @@ export default function AdminPedidoDetailClient({
             <DialogTitle>Confirmar reembolso</DialogTitle>
             <DialogDescription>
               O valor de {formatCurrency(pedido.total)} será reembolsado ao
-              cliente via Mercado Pago. O pedido será marcado como cancelado e o
-              saldo dos fotógrafos será revertido. Esta ação não pode ser
-              desfeita.
+              cliente (gateway de pagamento). O pedido será marcado como
+              cancelado e o saldo dos fotógrafos será revertido. Esta ação não
+              pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">

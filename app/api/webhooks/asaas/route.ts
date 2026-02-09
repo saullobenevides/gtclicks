@@ -12,6 +12,12 @@ interface AsaasWebhookBody {
     status?: string;
     [key: string]: unknown;
   };
+  checkout?: {
+    id?: string;
+    externalReference?: string;
+    status?: string;
+    [key: string]: unknown;
+  };
 }
 
 export async function POST(request: Request) {
@@ -28,30 +34,38 @@ export async function POST(request: Request) {
     const body = (await request.json()) as AsaasWebhookBody;
 
     const event = body.event;
-    const payment = body.payment;
 
-    if (!event || !payment) {
-      return NextResponse.json({ received: true });
+    // Eventos de cobrança/pagamento (payment) ou de checkout (checkout)
+    const eventsWithPayment = ["PAYMENT_RECEIVED", "PAYMENT_CONFIRMED"];
+    const eventsWithCheckout = ["CHECKOUT_PAID"];
+    const isPaymentEvent = event && eventsWithPayment.includes(event);
+    const isCheckoutEvent = event && eventsWithCheckout.includes(event);
+
+    let pedidoId: string | undefined;
+    let paymentId: string | undefined;
+
+    if (isPaymentEvent && body.payment) {
+      pedidoId = body.payment.externalReference as string | undefined;
+      paymentId = body.payment.id as string | undefined;
+    } else if (isCheckoutEvent && body.checkout) {
+      pedidoId = body.checkout.externalReference as string | undefined;
+      paymentId = body.checkout.id as string | undefined;
     }
 
-    const eventsToProcess = ["PAYMENT_RECEIVED", "PAYMENT_CONFIRMED"];
-    if (!eventsToProcess.includes(event)) {
+    if (!event || (!isPaymentEvent && !isCheckoutEvent)) {
       return NextResponse.json({ received: true });
     }
-
-    const pedidoId = payment.externalReference as string | undefined;
-    const paymentId = payment.id as string | undefined;
 
     if (!pedidoId) {
       logWarn(
-        `Asaas webhook ${event}: payment without externalReference`,
+        `Asaas webhook ${event}: sem externalReference (payment ou checkout)`,
         "Webhook Asaas"
       );
       return NextResponse.json({ received: true });
     }
 
     logInfo(
-      `Payment ${paymentId} event: ${event} for order ${pedidoId}`,
+      `Event ${event} for order ${pedidoId} (payment/checkout id: ${paymentId ?? "n/a"})`,
       "Webhook Asaas"
     );
 
@@ -128,6 +142,7 @@ export async function POST(request: Request) {
             tipo: "VENDA",
             valor: valorFotografo,
             descricao: `Venda de foto: ${item.foto.titulo}`,
+            status: "PROCESSADO",
           },
         });
 

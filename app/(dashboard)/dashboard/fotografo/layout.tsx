@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useUser } from "@stackframe/stack";
 import { useRouter, usePathname } from "next/navigation";
 import { Home, Folder, Images, Wallet, User } from "lucide-react";
@@ -94,7 +94,11 @@ export default function PhotographerLayout({
   }, [user, pathname, router]);
 
   if (pathname === "/dashboard/fotografo/onboarding" || pathname === "/dashboard/fotografo/verificar-email") {
-    return <>{children}</>;
+    return (
+      <Suspense fallback={<LoadingSkeleton />}>
+        {children}
+      </Suspense>
+    );
   }
 
   if (checking) {
@@ -105,5 +109,11 @@ export default function PhotographerLayout({
     );
   }
 
-  return <DashboardLayout navItems={navItems}>{children}</DashboardLayout>;
+  return (
+    <DashboardLayout navItems={navItems}>
+      <Suspense fallback={<LoadingSkeleton />}>
+        {children}
+      </Suspense>
+    </DashboardLayout>
+  );
 }

@@ -183,6 +183,65 @@ export async function processPayoutForSaque(
 }
 
 /**
+ * Quando o Asaas recusa a transferência (webhook de autorização retorna REFUSED),
+ * marca o saque como FALHOU e devolve o valor ao fotógrafo (bloqueado → disponível).
+ * Só tem efeito se o saque ainda estiver PENDENTE.
+ */
+export async function revertPendenteSaqueOnTransferRefused(
+  saqueId: string,
+  observacao: string
+): Promise<void> {
+  const saque = await prisma.solicitacaoSaque.findUnique({
+    where: { id: saqueId },
+    include: {
+      fotografo: { select: { userId: true } },
+    },
+  });
+
+  if (!saque || saque.status !== "PENDENTE") {
+    return;
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.solicitacaoSaque.update({
+      where: { id: saqueId },
+      data: {
+        status: "FALHOU",
+        processadoEm: new Date(),
+        observacao,
+      },
+    });
+
+    await tx.transacao.updateMany({
+      where: { saqueId, tipo: "SAQUE" },
+      data: { status: "FALHOU" },
+    });
+
+    const valorSaque = new Prisma.Decimal(saque.valor);
+    await tx.saldo.update({
+      where: { fotografoId: saque.fotografoId },
+      data: {
+        bloqueado: { decrement: valorSaque },
+        disponivel: { increment: valorSaque },
+      },
+    });
+  });
+
+  try {
+    const { notifyWithdrawalProcessed } = await import(
+      "@/actions/notifications"
+    );
+    await notifyWithdrawalProcessed({
+      userId: saque.fotografo!.userId,
+      value: Number(saque.valor),
+      status: "REJEITADO",
+    });
+  } catch (nErr) {
+    console.error("Failed to send withdrawal failure notification:", nErr);
+  }
+}
+
+/**
  * Reprocessa um saque que falhou (status FALHOU).
  * Rebloqueia o saldo e tenta enviar o PIX novamente.
  */

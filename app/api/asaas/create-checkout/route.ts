@@ -118,6 +118,11 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => ({}))) as {
       orderId?: string;
       cpf?: string;
+      phone?: string;
+      address?: string;
+      addressNumber?: string;
+      postalCode?: string;
+      province?: string;
     };
     const cpfFromRequest = body.cpf?.replace(/\D/g, "");
     if (
@@ -134,6 +139,17 @@ export async function POST(request: Request) {
       (cpfFromRequest && cpfFromRequest.length >= 11 ? cpfFromRequest : null) ??
       dbUser.fotografo?.cpf?.replace(/\D/g, "") ??
       null;
+    const phoneDigits = body.phone?.replace(/\D/g, "") ?? null;
+    const phone =
+      phoneDigits && phoneDigits.length >= 10 ? phoneDigits : null;
+    const address = typeof body.address === "string" ? body.address.trim() : null;
+    const addressNumber =
+      typeof body.addressNumber === "string" ? body.addressNumber.trim() : null;
+    const postalCodeDigits = body.postalCode?.replace(/\D/g, "") ?? "";
+    const postalCode =
+      postalCodeDigits.length === 8 ? postalCodeDigits : null;
+    const province =
+      typeof body.province === "string" ? body.province.trim() : null;
     const existingOrderId = body.orderId;
 
     let pedido: { id: string; total: number };
@@ -255,13 +271,18 @@ export async function POST(request: Request) {
         value: item.finalPrice ?? 0,
       })),
       externalReference: pedidoId,
-      // Asaas exige cpfCnpj quando envia customerData; sem CPF omitimos e o cliente preenche no checkout
-      ...(cpfCnpj
+      // Asaas exige name, email, cpfCnpj, phone, address, addressNumber, postalCode e province quando envia customerData
+      ...(cpfCnpj && phone && address && addressNumber && postalCode && province
         ? {
             customerData: {
               name: dbUser.name || "Cliente",
               email: dbUser.email,
               cpfCnpj,
+              phone,
+              address,
+              addressNumber,
+              postalCode,
+              province,
             },
           }
         : {}),

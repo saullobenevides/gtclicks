@@ -16,11 +16,25 @@ export interface AsaasCheckoutItem {
   value: number;
 }
 
+/**
+ * Dados do pagador para o checkout Asaas.
+ * Docs: https://docs.asaas.com/docs/como-informar-os-dados-do-cliente
+ * Quando enviado, name, email, cpfCnpj e phone costumam ser exigidos pelo Asaas.
+ * Opcionais: complement, city (IBGE).
+ */
 export interface AsaasCheckoutCustomerData {
   name: string;
   email: string;
-  cpfCnpj?: string;
-  phone?: string;
+  cpfCnpj: string;
+  phone: string;
+  /** Logradouro (rua, avenida etc.) — obrigatório quando customerData é enviado. */
+  address: string;
+  /** Número do endereço — obrigatório quando customerData é enviado. */
+  addressNumber: string;
+  /** CEP (8 dígitos, apenas números) — obrigatório quando customerData é enviado. */
+  postalCode: string;
+  /** Bairro (province no Asaas) — obrigatório quando customerData é enviado. */
+  province: string;
 }
 
 export interface CreateAsaasCheckoutOptions {
@@ -96,12 +110,12 @@ export async function createAsaasCheckout(
     body.customerData = {
       name: options.customerData.name,
       email: options.customerData.email,
-      ...(options.customerData.cpfCnpj && {
-        cpfCnpj: options.customerData.cpfCnpj.replace(/\D/g, ""),
-      }),
-      ...(options.customerData.phone && {
-        phone: options.customerData.phone.replace(/\D/g, ""),
-      }),
+      cpfCnpj: options.customerData.cpfCnpj.replace(/\D/g, ""),
+      phone: options.customerData.phone.replace(/\D/g, ""),
+      address: options.customerData.address.trim(),
+      addressNumber: options.customerData.addressNumber.trim(),
+      postalCode: options.customerData.postalCode.replace(/\D/g, "").slice(0, 8),
+      province: options.customerData.province.trim(),
     };
   }
 

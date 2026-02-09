@@ -84,6 +84,11 @@ export default function CheckoutPage() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [asaasLoading, setAsaasLoading] = useState(false);
   const [cpf, setCpf] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [addressNumber, setAddressNumber] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [province, setProvince] = useState("");
 
   const fetchOrder = useCallback(async () => {
     if (!orderId || !user) return;
@@ -350,43 +355,160 @@ export default function CheckoutPage() {
             <CardContent className="pt-5">
               <div className="min-h-[400px] space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Informe seu CPF e você será redirecionado para a página segura
-                  do Asaas para finalizar o pagamento via PIX.
+                  Informe CPF, telefone, endereço (incl. bairro e CEP) para preencher no Asaas.
+                  Você será redirecionado para a página segura para pagar via PIX.
                 </p>
-                <div className="space-y-2">
-                  <Label htmlFor="checkout-cpf" className="text-white/90">
-                    CPF
-                  </Label>
-                  <Input
-                    id="checkout-cpf"
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="000.000.000-00"
-                    value={cpf}
-                    onChange={(e) => {
-                      const v = e.target.value.replace(/\D/g, "").slice(0, 11);
-                      setCpf(
-                        v
-                          .replace(/(\d{3})(\d)/, "$1.$2")
-                          .replace(/(\d{3})(\d)/, "$1.$2")
-                          .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
-                      );
-                    }}
-                    className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
-                    maxLength={14}
-                  />
-                  {cpf.replace(/\D/g, "").length > 0 &&
-                    cpf.replace(/\D/g, "").length !== 11 && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="checkout-cpf" className="text-white/90">
+                      CPF
+                    </Label>
+                    <Input
+                      id="checkout-cpf"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="000.000.000-00"
+                      value={cpf}
+                      onChange={(e) => {
+                        const v = e.target.value.replace(/\D/g, "").slice(0, 11);
+                        setCpf(
+                          v
+                            .replace(/(\d{3})(\d)/, "$1.$2")
+                            .replace(/(\d{3})(\d)/, "$1.$2")
+                            .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+                        );
+                      }}
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+                      maxLength={14}
+                    />
+                    {cpf.replace(/\D/g, "").length > 0 &&
+                      cpf.replace(/\D/g, "").length !== 11 && (
+                        <p className="text-xs text-amber-400">
+                          CPF deve ter 11 dígitos
+                        </p>
+                      )}
+                    {cpf.replace(/\D/g, "").length === 11 &&
+                      !isValidCpf(cpf) && (
+                        <p className="text-xs text-red-400">
+                          CPF inválido. Verifique os números.
+                        </p>
+                      )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="checkout-phone" className="text-white/90">
+                      Telefone (com DDD)
+                    </Label>
+                    <Input
+                      id="checkout-phone"
+                      type="text"
+                      inputMode="tel"
+                      placeholder="(00) 00000-0000"
+                      value={phone}
+                      onChange={(e) => {
+                        const v = e.target.value.replace(/\D/g, "").slice(0, 11);
+                        if (v.length <= 2) {
+                          setPhone(v ? `(${v}` : v);
+                        } else if (v.length <= 6) {
+                          setPhone(`(${v.slice(0, 2)}) ${v.slice(2)}`);
+                        } else {
+                          setPhone(
+                            `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`
+                          );
+                        }
+                      }}
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+                      maxLength={15}
+                    />
+                    {phone.replace(/\D/g, "").length > 0 &&
+                      phone.replace(/\D/g, "").length < 10 && (
+                        <p className="text-xs text-amber-400">
+                          Telefone deve ter 10 ou 11 dígitos (DDD + número)
+                        </p>
+                      )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="checkout-address" className="text-white/90">
+                      Endereço (rua, avenida)
+                    </Label>
+                    <Input
+                      id="checkout-address"
+                      type="text"
+                      placeholder="Ex: Rua das Flores"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+                      maxLength={200}
+                    />
+                    {address.length > 0 && address.trim().length < 5 && (
                       <p className="text-xs text-amber-400">
-                        CPF deve ter 11 dígitos
+                        Informe o logradouro (mín. 5 caracteres)
                       </p>
                     )}
-                  {cpf.replace(/\D/g, "").length === 11 &&
-                    !isValidCpf(cpf) && (
-                      <p className="text-xs text-red-400">
-                        CPF inválido. Verifique os números.
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="checkout-address-number" className="text-white/90">
+                      Número
+                    </Label>
+                    <Input
+                      id="checkout-address-number"
+                      type="text"
+                      placeholder="Ex: 123 ou S/N"
+                      value={addressNumber}
+                      onChange={(e) => setAddressNumber(e.target.value)}
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+                      maxLength={20}
+                    />
+                    {addressNumber.length > 0 && !addressNumber.trim() && (
+                      <p className="text-xs text-amber-400">
+                        Informe o número ou S/N
                       </p>
                     )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="checkout-province" className="text-white/90">
+                      Bairro
+                    </Label>
+                    <Input
+                      id="checkout-province"
+                      type="text"
+                      placeholder="Ex: Centro, Jardins"
+                      value={province}
+                      onChange={(e) => setProvince(e.target.value)}
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+                      maxLength={100}
+                    />
+                    {province.length > 0 && province.trim().length < 2 && (
+                      <p className="text-xs text-amber-400">
+                        Informe o bairro (mín. 2 caracteres)
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="checkout-postal-code" className="text-white/90">
+                      CEP
+                    </Label>
+                    <Input
+                      id="checkout-postal-code"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="00000-000"
+                      value={postalCode}
+                      onChange={(e) => {
+                        const v = e.target.value.replace(/\D/g, "").slice(0, 8);
+                        setPostalCode(
+                          v.length <= 5 ? v : `${v.slice(0, 5)}-${v.slice(5)}`
+                        );
+                      }}
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+                      maxLength={9}
+                    />
+                    {postalCode.replace(/\D/g, "").length > 0 &&
+                      postalCode.replace(/\D/g, "").length !== 8 && (
+                        <p className="text-xs text-amber-400">
+                          CEP deve ter 8 dígitos
+                        </p>
+                      )}
+                  </div>
                 </div>
                 <Button
                   size="lg"
@@ -394,7 +516,12 @@ export default function CheckoutPage() {
                   disabled={
                     asaasLoading ||
                     cpf.replace(/\D/g, "").length !== 11 ||
-                    !isValidCpf(cpf)
+                    !isValidCpf(cpf) ||
+                    phone.replace(/\D/g, "").length < 10 ||
+                    address.trim().length < 5 ||
+                    !addressNumber.trim() ||
+                    province.trim().length < 2 ||
+                    postalCode.replace(/\D/g, "").length !== 8
                   }
                   onClick={async () => {
                     setAsaasLoading(true);
@@ -407,6 +534,11 @@ export default function CheckoutPage() {
                         body: JSON.stringify({
                           orderId: orderId ?? undefined,
                           cpf: cpf.replace(/\D/g, ""),
+                          phone: phone.replace(/\D/g, ""),
+                          address: address.trim(),
+                          addressNumber: addressNumber.trim(),
+                          postalCode: postalCode.replace(/\D/g, ""),
+                          province: province.trim(),
                         }),
                       });
                       const data = (await res.json()) as {

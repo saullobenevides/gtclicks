@@ -17,6 +17,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
@@ -87,7 +88,38 @@ interface Transacao {
   descricao?: string | null;
   tipo?: string;
   valor: number;
+  status?: string | null;
   createdAt: string | Date;
+}
+
+function getStatusLabel(t: Transacao): string {
+  const status = (t.status || "").toUpperCase();
+  const tipo = (t.tipo || "").toUpperCase();
+  if (status === "FALHOU") return "Falhou";
+  if (status === "PENDENTE") {
+    return tipo === "SAQUE" ? "Pendente (saque)" : "Pendente";
+  }
+  if (status === "PROCESSADO") {
+    return Number(t.valor) > 0 ? "Creditado" : "Descontado";
+  }
+  // Transações antigas sem status: VENDA com valor positivo = creditado; SAQUE negativo = descontado se não pendente
+  if (tipo === "VENDA" && Number(t.valor) > 0) return "Creditado";
+  if (tipo === "SAQUE" && Number(t.valor) < 0) return "Descontado";
+  return status || "—";
+}
+
+function getStatusLabelClass(t: Transacao): string {
+  const label = getStatusLabel(t);
+  if (label === "Creditado") return "text-emerald-500";
+  if (label === "Descontado") return "text-amber-500";
+  if (label === "Falhou") return "text-red-400";
+  if (label.startsWith("Pendente")) return "text-muted-foreground";
+  return "text-muted-foreground";
+}
+
+/** Mesma cor do status, para o valor (Creditado=verde, Descontado=âmbar, Falhou=vermelho). */
+function getValorClass(t: Transacao): string {
+  return getStatusLabelClass(t);
 }
 
 interface Saldo {
@@ -482,13 +514,20 @@ export default function FinanceiroPage() {
                     <span className="text-xs text-muted-foreground/60">
                       {new Date(t.createdAt).toLocaleDateString("pt-BR")}
                     </span>
+                    <span
+                      className={cn(
+                        "text-xs font-medium",
+                        getStatusLabelClass(t)
+                      )}
+                    >
+                      {getStatusLabel(t)}
+                    </span>
                   </div>
                   <span
-                    className={`font-black text-sm tracking-tight ${
-                      Number(t.valor) > 0
-                        ? "text-green-500"
-                        : "text-muted-foreground"
-                    }`}
+                    className={cn(
+                      "font-black text-sm tracking-tight",
+                      getValorClass(t)
+                    )}
                   >
                     {Number(t.valor) > 0 ? "+" : ""}R${" "}
                     {Number(t.valor).toFixed(2)}
@@ -519,6 +558,9 @@ export default function FinanceiroPage() {
                 >
                   Data
                 </SortableTableHead>
+                <TableHead className="text-muted-foreground">
+                  Status
+                </TableHead>
                 <SortableTableHead
                   field="valor"
                   sort={sort}
@@ -534,7 +576,7 @@ export default function FinanceiroPage() {
               {sortedTransacoes.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={3}
+                    colSpan={4}
                     className="h-24 text-center text-muted-foreground"
                   >
                     <div className="flex flex-col items-center gap-2">
@@ -560,10 +602,16 @@ export default function FinanceiroPage() {
                     </TableCell>
                     <TableCell
                       className={cn(
+                        "font-medium",
+                        getStatusLabelClass(t)
+                      )}
+                    >
+                      {getStatusLabel(t)}
+                    </TableCell>
+                    <TableCell
+                      className={cn(
                         "text-right font-bold",
-                        Number(t.valor) > 0
-                          ? "text-emerald-500"
-                          : "text-muted-foreground"
+                        getValorClass(t)
                       )}
                     >
                       {Number(t.valor) > 0 ? "+" : ""}R${" "}

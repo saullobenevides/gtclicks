@@ -43,6 +43,19 @@ export async function GET(
       });
     }
 
+    const paymentId = String(pedido.paymentId);
+    // ID em formato UUID = Asaas (checkout). Não consultamos MP.
+    const isAsaasId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      paymentId
+    );
+    if (isAsaasId) {
+      return NextResponse.json({
+        hasPayment: true,
+        status: "CONFIRMED",
+        message: "Pago via Asaas. Use o botão abaixo para acessar o pedido.",
+      });
+    }
+
     const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
     if (!accessToken) {
       return NextResponse.json(
@@ -53,7 +66,7 @@ export async function GET(
 
     const client = new MercadoPagoConfig({ accessToken });
     const payment = new Payment(client);
-    const paymentData = await payment.get({ id: pedido.paymentId });
+    const paymentData = await payment.get({ id: paymentId });
 
     let pixData: {
       qrCode?: string;

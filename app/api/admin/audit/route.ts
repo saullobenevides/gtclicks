@@ -15,11 +15,6 @@ export async function POST(request: Request) {
       orderId?: string;
     };
 
-    const client = new MercadoPagoConfig({
-      accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN ?? "",
-    });
-    const paymentClient = new Payment(client);
-
     const discrepancies: Array<{
       type: string;
       severity: string;
@@ -30,48 +25,54 @@ export async function POST(request: Request) {
       payload?: { id: string; realCount: number };
     }> = [];
 
+    const mpAccessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
     const recentOrders = await prisma.pedido.findMany({
       take: 50,
       orderBy: { createdAt: "desc" },
       where: { paymentId: { not: null } },
     });
 
-    for (const order of recentOrders) {
-      if (!order.paymentId) continue;
+    if (mpAccessToken) {
+      const client = new MercadoPagoConfig({ accessToken: mpAccessToken });
+      const paymentClient = new Payment(client);
 
-      const paymentId = String(order.paymentId);
-      if (
-        paymentId.startsWith("pi_") ||
-        paymentId.startsWith("mock_") ||
-        !/^\d+$/.test(paymentId)
-      ) {
-        continue;
-      }
+      for (const order of recentOrders) {
+        if (!order.paymentId) continue;
 
-      try {
-        const mpPayment = await paymentClient.get({ id: order.paymentId });
-
-        let mpStatus = "PENDENTE";
-        if (mpPayment.status === "approved") mpStatus = "PAGO";
-        else if (
-          mpPayment.status === "rejected" ||
-          mpPayment.status === "cancelled"
-        )
-          mpStatus = "CANCELADO";
-
-        if (order.status !== mpStatus && order.status !== "CANCELADO") {
-          if (mpStatus === "PAGO" && order.status !== "PAGO") {
-            discrepancies.push({
-              type: "STATUS_MISMATCH",
-              severity: "CRITICAL",
-              orderId: order.id,
-              message: `Pedido ${order.id} está ${order.status} no banco, mas PAGO no Mercado Pago (${order.paymentId}).`,
-              action: "SYNC_STATUS",
-            });
-          }
+        const paymentId = String(order.paymentId);
+        if (
+          paymentId.startsWith("pi_") ||
+          paymentId.startsWith("mock_") ||
+          !/^\d+$/.test(paymentId)
+        ) {
+          continue;
         }
-      } catch (e) {
-        console.error(`Error checking payment ${order.paymentId}`, e);
+
+        try {
+          const mpPayment = await paymentClient.get({ id: order.paymentId });
+
+          let mpStatus = "PENDENTE";
+          if (mpPayment.status === "approved") mpStatus = "PAGO";
+          else if (
+            mpPayment.status === "rejected" ||
+            mpPayment.status === "cancelled"
+          )
+            mpStatus = "CANCELADO";
+
+          if (order.status !== mpStatus && order.status !== "CANCELADO") {
+            if (mpStatus === "PAGO" && order.status !== "PAGO") {
+              discrepancies.push({
+                type: "STATUS_MISMATCH",
+                severity: "CRITICAL",
+                orderId: order.id,
+                message: `Pedido ${order.id} está ${order.status} no banco, mas PAGO no Mercado Pago (${order.paymentId}).`,
+                action: "SYNC_STATUS",
+              });
+            }
+          }
+        } catch (e) {
+          console.error(`Error checking payment ${order.paymentId}`, e);
+        }
       }
     }
 

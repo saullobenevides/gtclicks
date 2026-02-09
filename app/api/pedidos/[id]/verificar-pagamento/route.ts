@@ -38,6 +38,15 @@ export async function POST(
       });
     }
 
+    // Pedidos sem paymentId são do fluxo Asaas: status é atualizado pelo webhook.
+    // Apenas devolvemos o status atual do banco (sem consultar MP).
+    if (!pedido.paymentId) {
+      return NextResponse.json({
+        status: pedido.status,
+        message: "Pagamento será confirmado ao finalizar no checkout.",
+      });
+    }
+
     const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
     if (!accessToken) {
       return NextResponse.json(
