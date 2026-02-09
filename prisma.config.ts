@@ -10,5 +10,6 @@ export default defineConfig({
   datasource: {
     url: env("DATABASE_URL"),
   },
+  // @ts-expect-error - seed is supported by Prisma CLI but not in config types
   seed: "node prisma/seed.mjs",
 });

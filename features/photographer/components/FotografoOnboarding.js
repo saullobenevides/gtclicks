@@ -48,7 +48,6 @@ export default function FotografoOnboarding({ onSuccess }) {
     cidade: "",
     estado: "",
     instagram: "",
-    chavePix: "",
   });
 
   const handleChange = (field, value) => {
@@ -88,7 +87,6 @@ export default function FotografoOnboarding({ onSuccess }) {
           cidade: formData.cidade,
           estado: formData.estado,
           instagram: formData.instagram,
-          chavePix: formData.chavePix,
         }),
       });
 
@@ -116,7 +114,7 @@ export default function FotografoOnboarding({ onSuccess }) {
         formData.name && formData.username && formData.username.length >= 3
       );
     if (currentStep === 2) return formData.cidade && formData.estado;
-    if (currentStep === 3) return formData.chavePix;
+    if (currentStep === 3) return true; // chavePix: cadastrar na página Financeiro
     return false;
   };
 
@@ -280,16 +278,12 @@ export default function FotografoOnboarding({ onSuccess }) {
 
           {currentStep === 3 && (
             <>
-              <div className="grid gap-2">
-                <Label htmlFor="chavePix">Chave Pix</Label>
-                <Input
-                  id="chavePix"
-                  value={formData.chavePix}
-                  onChange={(e) => handleChange("chavePix", e.target.value)}
-                  placeholder="CPF, Email, Telefone ou Aleatória"
-                />
-                <p className="text-xs text-muted-foreground">
-                  É para onde enviaremos seus ganhos. Verifique com atenção.
+              <div className="rounded-md bg-muted/50 border border-white/10 p-4 text-sm">
+                <p className="font-medium mb-1">Chave PIX (Para Recebimento)</p>
+                <p className="text-muted-foreground">
+                  Por segurança, cadastre sua chave PIX na página{" "}
+                  <strong>Financeiro</strong> após concluir o cadastro. Será
+                  necessário verificar seu email para confirmar.
                 </p>
               </div>
             </>

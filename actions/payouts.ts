@@ -11,23 +11,21 @@ import { revalidatePath } from "next/cache";
 import { getConfigNumber, CONFIG_KEYS } from "@/lib/config";
 import { z } from "zod";
 import { serializeDecimal, serializeModel } from "@/lib/serialization";
+import { processPayoutForSaque } from "@/lib/payouts";
 
 // --- Schemas ---
 
 const withdrawalSchema = z.object({
   valor: z.number().positive("Valor deve ser positivo"),
-  chavePix: z.string().min(5, "Chave PIX inválida"),
 });
 
 // --- Actions ---
 
 /**
- * Solicita um saque para o fotógrafo autenticado
+ * Solicita um saque para o fotógrafo autenticado.
+ * A chave PIX é obtida do perfil no servidor (nunca do client) por segurança.
  */
-export async function requestWithdrawal(data: {
-  valor: number;
-  chavePix: string;
-}) {
+export async function requestWithdrawal(data: { valor: number }) {
   const user = await getAuthenticatedUser();
 
   if (!user) {
@@ -43,7 +41,7 @@ export async function requestWithdrawal(data: {
     };
   }
 
-  const { valor, chavePix } = validation.data;
+  const { valor } = validation.data;
 
   const valorDecimal = new Prisma.Decimal(valor);
   const minSaque = await getConfigNumber(CONFIG_KEYS.MIN_SAQUE);
@@ -60,6 +58,12 @@ export async function requestWithdrawal(data: {
     if (!fotografo) {
       return { error: "Perfil de fotógrafo não encontrado" };
     }
+
+    if (!fotografo.chavePix) {
+      return { error: "Cadastre uma chave PIX antes de solicitar saque" };
+    }
+
+    const chavePix = fotografo.chavePix;
 
     const result = await prisma.$transaction(async (tx) => {
       const saldo = await tx.saldo.findUnique({
@@ -113,8 +117,28 @@ export async function requestWithdrawal(data: {
       return saque;
     });
 
+    const payoutResult = await processPayoutForSaque(result.id);
+
     revalidatePath("/dashboard/fotografo/financeiro");
-    return { success: true, data: serializeModel(result) };
+
+    if (payoutResult.success) {
+      return {
+        success: true,
+        data: serializeModel(result),
+        instant: !payoutResult.manualRequired,
+        manualRequired: payoutResult.manualRequired,
+        message: payoutResult.manualRequired
+          ? "Saque solicitado! O processamento será feito em até 24h."
+          : undefined,
+      };
+    }
+
+    return {
+      success: false,
+      error:
+        payoutResult.error ||
+        "Não foi possível enviar o PIX. O valor foi devolvido ao seu saldo. Verifique sua chave PIX e tente novamente.",
+    };
   } catch (error: any) {
     console.error("[requestWithdrawal] Error:", error.message);
 

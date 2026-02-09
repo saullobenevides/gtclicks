@@ -20,11 +20,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SortableTableHead } from "@/components/shared/SortableTableHead";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { getFinancialData } from "@/actions/photographers";
 
 export default function FinancialSummary() {
+  const router = useRouter();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState("createdAt");
@@ -116,7 +118,7 @@ export default function FinancialSummary() {
             <Button
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold h-10"
               disabled={saldo.disponivel <= 0}
-              onClick={() => toast.info("Funcionalidade em desenvolvimento")}
+              onClick={() => router.push("/dashboard/fotografo/financeiro")}
             >
               Solicitar Saque
             </Button>

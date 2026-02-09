@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url       = env("DATABASE_URL")
-  // directUrl = env("DIRECT_DATABASE_URL") // Only for Neon pooling in production
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_DATABASE_URL") // Neon: descomente para migrations (use URL sem -pooler)
 }
 
 // --- USUÁRIOS ---
@@ -64,6 +64,8 @@ model Fotografo {
   saldo          Saldo?
   transacoes     Transacao[]
   saques         SolicitacaoSaque[]
+
+  @@index([cidade])
 }
 
 // --- PRODUTOS (FOTOS) ---
@@ -195,8 +197,10 @@ model Colecao {
   
   @@index([fotografoId])
   @@index([status, createdAt])
+  @@index([status, views])
   @@index([slug])
   @@index([categoria, status])
+  @@index([status, cidade])
 }
 
 model Folder {
@@ -304,6 +308,9 @@ model ItemPedido {
   // Segurança
   downloadToken   String    @default(cuid())
   downloadsCount  Int       @default(0)
+
+  @@index([fotoId])
+  @@index([pedidoId])
 }
 
 // --- FINANCEIRO ---
@@ -331,6 +338,9 @@ model Transacao {
   saque          SolicitacaoSaque? @relation(fields: [saqueId], references: [id])
   
   createdAt      DateTime  @default(now())
+
+  @@index([fotografoId])
+  @@index([fotografoId, createdAt])
 }
 
 model SolicitacaoSaque {
@@ -347,6 +357,9 @@ model SolicitacaoSaque {
   transacoes     Transacao[]
   
   createdAt      DateTime  @default(now())
+
+  @@index([fotografoId])
+  @@index([status])
 }
 
 model Notification {
@@ -392,4 +405,18 @@ model UsageLog {
   createdAt DateTime @default(now())
 
   @@index([userId, action, createdAt])
+}
+
+model AdminActivityLog {
+  id           String   @id @default(cuid())
+  adminId      String
+  action       String   // COLLECTION_APPROVED, REFUND_ISSUED, PAYOUT_PROCESSED, etc.
+  resourceType String   // Collection, Pedido, SolicitacaoSaque
+  resourceId   String
+  metadata     Json?    // { reason, collectionName, valor, ... }
+  createdAt    DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@index([action, createdAt])
+  @@index([resourceType, resourceId])
 }

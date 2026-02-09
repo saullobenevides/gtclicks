@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { invalidate } from "@/lib/cache";
 import { z } from "zod";
 import { slugify } from "@/lib/slug";
 import { serializeModel, serializeDecimal } from "@/lib/serialization";
@@ -142,11 +143,17 @@ export async function createCollection(formData: FormData) {
         local: local || null,
         dataInicio: dataInicio ? new Date(dataInicio) : null,
         dataFim: dataFim ? new Date(dataFim) : null,
-        descontos: descontos && Array.isArray(descontos) ? descontos : null,
+        descontos: descontos && Array.isArray(descontos) ? descontos : [],
         fotografoId: fotografo.id,
       },
     });
 
+    if (status === "PUBLICADA") {
+      await invalidate("homepage:*");
+      await invalidate("marketplace:distinct-cities");
+      await invalidate("marketplace:distinct-photographer-cities");
+      await invalidate("search:*");
+    }
     revalidatePath("/dashboard/colecoes");
     return { success: true, data: serializeCollection(newCollection) };
   } catch (error: any) {
@@ -181,7 +188,10 @@ export async function updateCollection(collectionId: string, data: any) {
   try {
     const collection = await prisma.colecao.findUnique({
       where: { id: collectionId },
-      include: { fotografo: true },
+      select: {
+        id: true,
+        fotografo: { select: { userId: true } },
+      },
     });
 
     if (!collection || collection.fotografo.userId !== user.id) {
@@ -224,6 +234,12 @@ export async function updateCollection(collectionId: string, data: any) {
       data: cleanData,
     });
 
+    if (cleanData.status === "PUBLICADA") {
+      await invalidate("homepage:*");
+      await invalidate("marketplace:distinct-cities");
+      await invalidate("marketplace:distinct-photographer-cities");
+      await invalidate("search:*");
+    }
     revalidatePath(`/dashboard/fotografo/colecoes/${collectionId}/editar`);
     revalidatePath(`/dashboard/fotografo/colecoes`);
     return { success: true, data: serializeCollection(updated) };
@@ -264,6 +280,12 @@ export async function bulkUpdateCollectionsStatus(
       data: { status },
     });
 
+    if (status === "PUBLICADA" && count > 0) {
+      await invalidate("homepage:*");
+      await invalidate("marketplace:distinct-cities");
+      await invalidate("marketplace:distinct-photographer-cities");
+      await invalidate("search:*");
+    }
     revalidatePath("/dashboard/fotografo/colecoes");
     return { success: true, updated: count };
   } catch (error: any) {
@@ -288,7 +310,10 @@ export async function setCollectionCover(
 
     const collection = await prisma.colecao.findUnique({
       where: { id: collectionId },
-      include: { fotografo: true },
+      select: {
+        id: true,
+        fotografo: { select: { userId: true } },
+      },
     });
 
     if (!collection || collection.fotografo.userId !== user.id) {

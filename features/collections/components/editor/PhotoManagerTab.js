@@ -119,9 +119,9 @@ export default function PhotoManagerTab({
                   isCover={
                     collectionData.capaUrl === photo.previewUrl ||
                     (collectionData.capaUrl &&
-                      photo.s3Key &&
+                      photo.previewUrl &&
                       collectionData.capaUrl.includes(
-                        photo.s3Key.split("/").pop()
+                        photo.previewUrl.split("/").pop()?.split("?")[0] ?? ""
                       ))
                   }
                   uploadState={uploadState}

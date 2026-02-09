@@ -15,7 +15,7 @@ const createOrderSchema = z.object({
       z.object({
         fotoId: z.string().cuid(),
         licencaId: z.string().cuid().optional(),
-      }),
+      })
     )
     .min(1, "O carrinho não pode estar vazio"),
   checkoutSessionId: z.string().optional(),
@@ -48,7 +48,11 @@ export async function createOrder(data: {
 
   try {
     let calculatedTotal = new Prisma.Decimal(0);
-    const orderItems = [];
+    const orderItems: Array<{
+      fotoId: string;
+      licencaId: string | null;
+      precoPago: Prisma.Decimal;
+    }> = [];
 
     for (const item of itens) {
       const foto = await prisma.foto.findUnique({

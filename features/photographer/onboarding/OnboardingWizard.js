@@ -61,7 +61,6 @@ export default function OnboardingWizard({ initialData = {} }) {
     especialidades: initialData.especialidades || [],
     equipamentos: initialData.equipamentos || "",
     cpf: initialData.cpf || "",
-    chavePix: initialData.chavePix || "",
   });
 
   const updateForm = (field, value) => {
@@ -319,13 +318,15 @@ export default function OnboardingWizard({ initialData = {} }) {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label>Chave Pix (Para Recebimento)</Label>
-                <Input
-                  value={formData.chavePix}
-                  onChange={(e) => updateForm("chavePix", e.target.value)}
-                  placeholder="CPF, E-mail ou Celular"
-                />
+              <div className="rounded-md bg-muted/50 border border-white/10 p-4 text-sm text-muted-foreground">
+                <p className="font-medium text-foreground mb-1">
+                  Chave PIX (Para Recebimento)
+                </p>
+                <p>
+                  Por segurança, cadastre sua chave PIX na página{" "}
+                  <strong>Financeiro</strong> após concluir o cadastro. Será
+                  necessário verificar seu email para confirmar.
+                </p>
               </div>
             </>
           )}

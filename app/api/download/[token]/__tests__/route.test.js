@@ -22,6 +22,14 @@ jest.mock("@aws-sdk/s3-request-presigner", () => ({
     .mockResolvedValue("https://s3-signed-url.example/file"),
 }));
 
+jest.mock("@/lib/auth", () => ({
+  getAuthenticatedUser: jest.fn().mockResolvedValue(null),
+}));
+
+jest.mock("@/lib/rate-limit", () => ({
+  checkDownloadRateLimit: jest.fn().mockResolvedValue({ allowed: true }),
+}));
+
 jest.mock("next/server", () => ({
   NextResponse: {
     json: (data, init = {}) => ({
@@ -92,7 +100,8 @@ describe("/api/download/[token]", () => {
       id: "item-1",
       downloadToken: "valid-token",
       fotoId: "foto-1",
-      pedido: { status: "PAGO" },
+      downloadsCount: 0,
+      pedido: { status: "PAGO", userId: "user-1" },
       foto: {
         s3Key: "uploads/photo.jpg",
         titulo: "Minha Foto",

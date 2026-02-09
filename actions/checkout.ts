@@ -30,8 +30,17 @@ export async function getPaymentDetails(orderId: string) {
     const paymentData = await payment.get({ id: order.paymentId });
 
     // Extract Pix data
-    let pixData = null;
-    let boletoData = null;
+    let pixData: {
+      qrCode?: string;
+      qrCodeBase64?: string;
+      ticketUrl?: string;
+      expiration?: string;
+    } | null = null;
+    let boletoData: {
+      ticketUrl?: string;
+      barcode?: string;
+      expiration?: string;
+    } | null = null;
 
     if (paymentData.payment_method_id === "pix") {
       const poi = paymentData.point_of_interaction;

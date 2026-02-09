@@ -15,18 +15,24 @@ import { serializePrismaData } from "@/lib/utils/serialization";
 export async function getFotosByUserId(userId) {
   if (!userId) return [];
 
-  const fotografo = await prisma.fotografo.findUnique({
-    where: { userId },
-  });
-
-  if (!fotografo) return [];
-
   const fotos = await prisma.foto.findMany({
-    where: { fotografoId: fotografo.id },
+    where: { fotografo: { userId } },
     orderBy: { createdAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      titulo: true,
+      previewUrl: true,
+      numeroSequencial: true,
+      colecaoId: true,
+      colecao: {
+        select: { id: true, nome: true, precoFoto: true, descontos: true },
+      },
       licencas: {
-        include: { licenca: true },
+        select: {
+          licencaId: true,
+          preco: true,
+          licenca: { select: { id: true, nome: true } },
+        },
       },
     },
   });

@@ -9,6 +9,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { useUser } from "@stackframe/stack";
+import { toast } from "sonner";
 
 const CartContext = createContext();
 
@@ -59,6 +60,9 @@ export function CartProvider({ children }) {
         });
       } catch (error) {
         console.error("Failed to sync addition to server:", error);
+        toast.warning(
+          "Não foi possível sincronizar com sua conta. Os itens ficaram salvos localmente."
+        );
       }
     }
   };
@@ -74,8 +78,9 @@ export function CartProvider({ children }) {
         // The server action 'removeFromCart' takes itemId.
         // Sync logic is a bit disconnected here.
         // For simplicity, we'll keep using the API for complex sync or improve the action.
-        const { removeFromCart: removeFromCartAction } =
-          await import("@/actions/cart");
+        const { removeFromCart: removeFromCartAction } = await import(
+          "@/actions/cart"
+        );
         // In this project, database items are linked to users.
         // We might need a 'removeFromCartByFotoId' action.
 
@@ -85,7 +90,19 @@ export function CartProvider({ children }) {
           method: "DELETE",
           body: JSON.stringify({ fotoId }),
           headers: { "Content-Type": "application/json" },
-        }).catch(console.error);
+        })
+          .then((res) => {
+            if (!res.ok) {
+              toast.warning(
+                "Não foi possível sincronizar a remoção com sua conta."
+              );
+            }
+          })
+          .catch(() => {
+            toast.warning(
+              "Não foi possível sincronizar a remoção com sua conta."
+            );
+          });
       } catch (error) {
         console.error("Failed to sync removal to server:", error);
       }
@@ -100,6 +117,7 @@ export function CartProvider({ children }) {
         await clearCartAction();
       } catch (error) {
         console.error("Failed to clear cart on server:", error);
+        toast.warning("Não foi possível sincronizar o carrinho com sua conta.");
       }
     }
   };
@@ -152,7 +170,7 @@ export function CartProvider({ children }) {
   const getSavings = () => {
     const originalTotal = items.reduce(
       (sum, item) => sum + Number(item.precoBase || item.preco || 0),
-      0,
+      0
     );
     return originalTotal - getTotalPrice();
   };
@@ -170,6 +188,7 @@ export function CartProvider({ children }) {
         itemCount: items.length,
         isCartOpen,
         setIsCartOpen,
+        isLoaded,
       }}
     >
       {children}
@@ -183,7 +202,7 @@ function CartSync({ items, setItems }) {
   const isClient = useSyncExternalStore(
     () => () => {}, // subscribe (no-op)
     () => true, // getSnapshot (client)
-    () => false, // getServerSnapshot (server)
+    () => false // getServerSnapshot (server)
   );
 
   if (!isClient) return null;
@@ -215,9 +234,16 @@ function CartSyncInner({ items, setItems }) {
             if (data.items) {
               setItems(data.items);
             }
+          } else {
+            toast.warning(
+              "Não foi possível sincronizar seu carrinho com a conta. Os itens locais foram mantidos."
+            );
           }
         } catch (error) {
           console.error("Failed to sync cart:", error);
+          toast.warning(
+            "Não foi possível sincronizar seu carrinho com a conta. Os itens locais foram mantidos."
+          );
         }
       };
 

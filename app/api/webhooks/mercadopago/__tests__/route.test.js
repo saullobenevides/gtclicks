@@ -37,6 +37,10 @@ jest.mock("next/server", () => ({
   },
 }));
 
+jest.mock("@/lib/mercadopago-webhook", () => ({
+  validateWebhookSignature: jest.fn().mockReturnValue({ valid: true }),
+}));
+
 import { POST } from "@/app/api/webhooks/mercadopago/route";
 import prisma from "@/lib/prisma";
 
@@ -54,7 +58,7 @@ function createRequest(body, extraHeaders = {}) {
 describe("/api/webhooks/mercadopago", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    delete process.env.MERCADOPAGO_WEBHOOK_SECRET;
+    process.env.MERCADOPAGO_WEBHOOK_SECRET = "test-webhook-secret";
     process.env.MERCADOPAGO_ACCESS_TOKEN = "test-token";
   });
 
@@ -71,7 +75,13 @@ describe("/api/webhooks/mercadopago", () => {
   });
 
   it("should reject invalid signature when MERCADOPAGO_WEBHOOK_SECRET is set", async () => {
-    process.env.MERCADOPAGO_WEBHOOK_SECRET = "my-secret";
+    const { validateWebhookSignature } = await import(
+      "@/lib/mercadopago-webhook"
+    );
+    validateWebhookSignature.mockReturnValueOnce({
+      valid: false,
+      reason: "Invalid signature",
+    });
 
     const request = createRequest(
       { type: "payment", data: { id: "pay-123" } },
@@ -84,6 +94,20 @@ describe("/api/webhooks/mercadopago", () => {
     expect(response.status).toBe(401);
     expect(data.error).toBe("Invalid signature");
     expect(prisma.pedido.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("should return 503 when MERCADOPAGO_WEBHOOK_SECRET is not set", async () => {
+    const origSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+    delete process.env.MERCADOPAGO_WEBHOOK_SECRET;
+
+    const request = createRequest({ type: "payment", data: { id: "pay-123" } });
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(data.error).toBe("Webhook not configured");
+
+    process.env.MERCADOPAGO_WEBHOOK_SECRET = origSecret;
   });
 
   it("should process PAGO (approved) and return 200 when payment is approved", async () => {

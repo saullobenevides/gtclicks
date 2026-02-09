@@ -295,7 +295,8 @@ export async function getFinancialData() {
 }
 
 /**
- * Atualiza a chave PIX do fotógrafo (requer código de verificação 2FA)
+ * Atualiza a chave PIX do fotógrafo (requer código de verificação 2FA).
+ * Aceita apenas CPF como chave PIX (validação de formato e checksum).
  */
 export async function updatePixKey(data: { chavePix: string; code: string }) {
   const user = await getAuthenticatedUser();
@@ -306,10 +307,19 @@ export async function updatePixKey(data: { chavePix: string; code: string }) {
 
   const { chavePix, code } = data;
 
-  // Simple validation
   if (!chavePix || !code) {
     return { error: "Chave PIX e código de verificação são obrigatórios" };
   }
+
+  const { isValidCpf, sanitizeCpf } = await import("@/lib/cpf");
+  if (!isValidCpf(chavePix)) {
+    return {
+      error:
+        "CPF inválido. Digite apenas os 11 dígitos ou use o formato 000.000.000-00",
+    };
+  }
+
+  const chavePixSanitizada = sanitizeCpf(chavePix);
 
   try {
     // Verify 2FA code
@@ -338,12 +348,12 @@ export async function updatePixKey(data: { chavePix: string; code: string }) {
       return { error: "Perfil de fotógrafo não encontrado" };
     }
 
-    // Update with security: PIX key = CPF (enforced)
+    // Armazena apenas dígitos (CPF sanitizado) para consistência
     const updated = await prisma.fotografo.update({
       where: { userId: user.id },
       data: {
-        chavePix,
-        cpf: chavePix, // Force sync for security based on user requirements (assuming PIX is CPF)
+        chavePix: chavePixSanitizada,
+        cpf: chavePixSanitizada,
       },
     });
 
